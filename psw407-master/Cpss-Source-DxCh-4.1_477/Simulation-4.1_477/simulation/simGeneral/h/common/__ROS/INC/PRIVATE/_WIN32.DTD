@@ -1,0 +1,68 @@
+/*!**************************************************RND Template version 4.1
+ *!                 D A T A   T Y P E   D E F I N I T I O N
+ *!==========================================================================
+ *$ TITLE: Router Server - General definitions for _WIN32
+ *!--------------------------------------------------------------------------
+ *$ FILENAME: X:\simulation\chip_simulation\simulation\h\common\ROS\INC\PRIVATE\_WIN32.DTD
+ *!--------------------------------------------------------------------------
+ *$ SYSTEM, SUBSYSTEM: Router Server, General definitions
+ *!--------------------------------------------------------------------------
+ *$ AUTHORS: Michael,AmitK
+ *!--------------------------------------------------------------------------
+ *$ LATEST UPDATE: 19-Jun-2007, 12:42 PM CREATION DATE: 29-Dec-94
+ *!**************************************************************************
+ *!
+ *!**************************************************************************
+ *!
+ *$ GENERAL DESCRIPTION:
+ *!
+ *$ REMARKS:
+ *!
+ *!**************************************************************************
+ *!*/
+
+
+/*! Processor type definitions. */
+typedef  CHAR      INT_8;
+typedef  SHORT     INT_16;
+typedef  LONG      INT_32;
+
+typedef  BYTE      UINT_8;
+typedef  WORD      UINT_16;
+typedef  DWORD     UINT_32;
+
+#ifndef NULL
+#define NULL    ((void *)0L)
+#endif
+
+#define PKD
+
+#define ALIGNMENT_BOUNDARY  1L
+
+#define PRAGMA_NOALIGN
+#define PRAGMA_ALIGN
+
+/*
+for VC :
+instead of PRAGMA_NOALIGN
+use
+#pragma pack(1)
+instead of PRAGMA_ALIGN
+use
+#pragma pack()
+*/
+
+
+
+#define PRAGMA_NOALIGN_COND
+#define PRAGMA_ALIGN_COND
+
+PRAGMA_NOALIGN
+
+typedef PKD struct {
+    UINT_32 word1;
+    UINT_32 word2;
+} UINT_64;
+
+PRAGMA_ALIGN
+

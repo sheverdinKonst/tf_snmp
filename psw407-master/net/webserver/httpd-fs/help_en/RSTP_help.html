@@ -1,0 +1,27 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body bgcolor = "#eeeeee"> 
+<b><p align="center"> RSTP</p></b>
+<br> 
+<b>Bridge settings:</b>
+
+<li><b>RSTP State</b> - STP/RSTP operating mode. 
+<li><b>Bridge Priority</b> - bridge (switch) priority set in increments of 4096 (0-61440). 
+It is required to determine Root Bridge (of the root switch). 
+<li><b>Forward BPDU</b> - forwarding of BPDU packets when the STP/RSTP protocol is disabled 
+<li><b>TX Hold Count</b> - limit the maximum number of BPDU packets sent per second (1-10). 
+<li><b>Bridge Max Age</b> - time of waiting for the bridge in seconds, after which it sends a message about rebuilding of the network (6-40 seconds). 
+<li><b>Bridge Hello Time</b> - the period of sending BPDU packets in seconds (1-2 seconds). 
+<li><b>Forward Delay Time</b> -  the delay of transition of port states from the Listening and Learning state to the Forwarding state (in seconds) (4-30). 
+<br><br>
+<b>Port settings:</b>
+<li><b>RSTP State</b> - including the port in the STP / RSTP protocol. 
+<li><b>Port Priority</b> - port priority (0-240) changes in steps of 16. 
+<li><b>Cost </b> - the cost of the port's path (1-200000000). 
+<li><b>Auto cost</b> -automatically select the cost of the port path. If the tick is not set, the cost of the path is taken from the <b>Cost</b> field.
+<li><b>Edge </b> - manual or automatic detection of the edge port. 
+<li><b>PTP</b> - manual or automatic detection of a point-to-point connection.
+</body>
+</html>

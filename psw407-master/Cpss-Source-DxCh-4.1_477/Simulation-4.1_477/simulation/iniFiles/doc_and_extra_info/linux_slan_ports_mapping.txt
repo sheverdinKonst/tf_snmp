@@ -1,0 +1,46 @@
+;;
+;; the INI files for linux should be diff from those of 'win' only be the name of 'slans'
+;; so in Linux use next conventions:
+;;
+             
+
+;;
+;;So if anyone need INI file for Linux , he will take the “common” INI file and will edit it.
+;;
+
+
+;; Linux with physical ports(NICs)
+
+dev0_port0  = eth1
+
+dev0_port8  = eth2
+
+dev0_port18 = eth3
+
+dev0_port23 = eth4
+
+
+
+;; Linux with SMB simulation
+
+dev0_port0  = fifo:A:01
+
+dev0_port8  = fifo:A:02
+
+dev0_port18 = fifo:A:03
+
+dev0_port23 = fifo:A:04
+
+
+
+;; Linux CPU port (for dev 0 -- PP)
+
+dev0_port63  = lo
+
+
+
+;; Linux NIC port (NIC)
+
+dev1_port0  = lo
+
+

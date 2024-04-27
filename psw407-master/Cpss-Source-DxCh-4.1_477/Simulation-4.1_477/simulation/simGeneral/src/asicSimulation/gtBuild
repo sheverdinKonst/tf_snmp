@@ -1,0 +1,23 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+ifeq (APPLICATION_SIDE_ONLY, $(DISTRIBUTED_SIMULATION_ROLE))
+    SUBDIRS      = SDistributed SCIB SInit
+endif
+
+ifeq (BROKER_ONLY, $(DISTRIBUTED_SIMULATION_ROLE))
+    SUBDIRS      = SDistributed SCIB SInit
+endif
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

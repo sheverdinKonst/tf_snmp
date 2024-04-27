@@ -1,0 +1,554 @@
+/**
+  ******************************************************************************
+  * @file    stm32f4x7_eth_bsp.c
+  * @author  MCD Application Team
+  * @version V1.0.0
+  * @date    31-October-2011 
+  * @brief   STM32F4x7 Ethernet hardware configuration.
+  ******************************************************************************
+  * @attention
+  *
+  * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
+  * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
+  * TIME. AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY
+  * DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING
+  * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
+  * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+  *
+  * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
+  ******************************************************************************
+  */
+
+/* Includes ------------------------------------------------------------------*/
+#include <stdio.h>
+#include "stm32f4x7_eth.h"
+#include "stm32f4x7_eth_bsp.h"
+#include <FreeRTOSConfig.h>
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
+//#include "netconf.h"
+//#include <stdio.h>
+#include "stm32f4xx_rcc.h"
+#include "stm32f4xx_gpio.h"
+#include "misc.h"
+#include "stm32f4xx_exti.h"
+#include "stm32f4xx_syscfg.h"
+#include "SMIApi.h"
+#include "board.h"
+#include "settings.h"
+#include "../deffines.h"
+#include "selftest.h"
+#include "debug.h"
+
+
+extern ETH_DMADESCTypeDef  DMARxDscrTab[ETH_RXBUFNB] __attribute__ ((aligned (4))); /* Ethernet Rx DMA Descriptor */
+extern ETH_DMADESCTypeDef  DMATxDscrTab[ETH_TXBUFNB] __attribute__ ((aligned (4))); /* Ethernet Tx DMA Descriptor */
+extern uint8_t Rx_Buff[ETH_RXBUFNB][ETH_RX_BUF_SIZE] __attribute__ ((aligned (4))); /* Ethernet Receive Buffer */
+extern uint8_t Tx_Buff[ETH_TXBUFNB][ETH_TX_BUF_SIZE] __attribute__ ((aligned (4))); /* Ethernet Transmit Buffer */
+
+extern xSemaphoreHandle s_xSemaphore;
+extern __IO ETH_DMA_Rx_Frame_infos *DMA_RX_FRAME_infos;
+
+/* Private typedef -----------------------------------------------------------*/
+/* Private define ------------------------------------------------------------*/
+/* Private macro -------------------------------------------------------------*/
+/* Private variables ---------------------------------------------------------*/
+__IO uint32_t  EthInitStatus = 0;
+__IO uint8_t EthLinkStatus = 0;
+
+/* Private function prototypes -----------------------------------------------*/
+static void ETH_GPIO_Config(void);
+//static void ETH_NVIC_Config(void);
+static void ETH_MACDMA_Config(void);
+
+/* Private functions ---------------------------------------------------------*/
+
+/**
+  * @brief  ETH_BSP_Config
+  * @param  None
+  * @retval None
+  */
+void ETH_BSP_Config(void)
+{
+  /* Configure the GPIO ports for ethernet pins */
+  DEBUG_MSG(ETH_DBG,"ETH_GPIO_Config...ok\r\n");
+  ETH_GPIO_Config();
+
+  /* Configure the Ethernet MAC/DMA */
+  ETH_MACDMA_Config();
+  DEBUG_MSG(ETH_DBG,"ETH_MACDMA_Config...ok\r\n");
+  DEBUG_MSG(ETH_DBG,"EthInitStatus: %lu\r\n",EthInitStatus);
+}
+
+/**
+  * @brief  Configures the Ethernet Interface
+  * @param  None
+  * @retval None
+  */
+
+//extern uint8_t dev_addr[6];
+
+static void ETH_MACDMA_Config(void)
+{
+u32 cnt = 0;
+  ETH_InitTypeDef ETH_InitStructure;
+
+
+  /* Reset ETHERNET on AHB Bus */
+  ETH_DeInit();
+
+  /* Software reset */
+  ETH_SoftwareReset();
+
+  DEBUG_MSG(ETH_DBG,"pre ETH_GetSoftwareResetStatus\r\n");
+  /* Wait for software reset */
+  cnt = 1000000;
+  while ((ETH_GetSoftwareResetStatus() == SET)&&(cnt)){cnt--;};
+
+  if(ETH_GetSoftwareResetStatus() == SET)
+	  ADD_ALARM(ERROR_MARVEL_START);
+  DEBUG_MSG(ETH_DBG,"after ETH_GetSoftwareResetStatus\r\n");
+  
+
+  /* ETHERNET Configuration --------------------------------------------------*/
+  /* Call ETH_StructInit if you don't like to configure all ETH_InitStructure parameter */
+  ETH_StructInit(&ETH_InitStructure);
+
+  /* Fill ETH_InitStructure parametrs */
+  /*------------------------   MAC   -----------------------------------*/
+  ETH_InitStructure.ETH_AutoNegotiation = ETH_AutoNegotiation_Disable;
+  ETH_InitStructure.ETH_Speed =ETH_Speed_100M;
+  ETH_InitStructure.ETH_Mode = ETH_Mode_FullDuplex;
+
+  ETH_InitStructure.ETH_LoopbackMode = ETH_LoopbackMode_Disable;
+  ETH_InitStructure.ETH_RetryTransmission = ETH_RetryTransmission_Disable;
+  ETH_InitStructure.ETH_AutomaticPadCRCStrip = ETH_AutomaticPadCRCStrip_Disable;
+  ETH_InitStructure.ETH_ReceiveAll = ETH_ReceiveAll_Disable;
+  ETH_InitStructure.ETH_BroadcastFramesReception = ETH_BroadcastFramesReception_Enable;
+  ETH_InitStructure.ETH_PromiscuousMode = ETH_PromiscuousMode_Disable;
+#if LWIP_IGMP
+  ETH_InitStructure.ETH_MulticastFramesFilter = ETH_MulticastFramesFilter_None;
+#else
+  ETH_InitStructure.ETH_MulticastFramesFilter = ETH_MulticastFramesFilter_Perfect;
+#endif
+  ETH_InitStructure.ETH_UnicastFramesFilter = ETH_UnicastFramesFilter_Perfect;
+#ifdef CHECKSUM_BY_HARDWARE
+  ETH_InitStructure.ETH_ChecksumOffload = ETH_ChecksumOffload_Enable;
+#endif
+
+  //включение проверки VID
+//  ETH_InitStructure.ETH_VLANTagComparison = ETH_VLANTagComparison_12Bit;
+//  ETH_InitStructure.ETH_VLANTagIdentifier = 0x1;
+
+  /*------------------------   DMA   -----------------------------------*/  
+  
+  /* When we use the Checksum offload feature, we need to enable the Store and Forward mode: 
+  the store and forward guarantee that a whole frame is stored in the FIFO, so the MAC can insert/verify the checksum, 
+  if the checksum is OK the DMA can handle the frame otherwise the frame is dropped */
+  ETH_InitStructure.ETH_DropTCPIPChecksumErrorFrame = ETH_DropTCPIPChecksumErrorFrame_Enable; 
+  ETH_InitStructure.ETH_ReceiveStoreForward = ETH_ReceiveStoreForward_Enable;         
+  ETH_InitStructure.ETH_TransmitStoreForward = ETH_TransmitStoreForward_Enable;     
+ 
+  ETH_InitStructure.ETH_ForwardErrorFrames = ETH_ForwardErrorFrames_Disable;       
+  ETH_InitStructure.ETH_ForwardUndersizedGoodFrames = ETH_ForwardUndersizedGoodFrames_Disable;   
+  ETH_InitStructure.ETH_SecondFrameOperate = ETH_SecondFrameOperate_Enable;
+  ETH_InitStructure.ETH_AddressAlignedBeats = ETH_AddressAlignedBeats_Enable;      
+  ETH_InitStructure.ETH_FixedBurst = ETH_FixedBurst_Enable;                
+  ETH_InitStructure.ETH_RxDMABurstLength = ETH_RxDMABurstLength_32Beat;          
+  ETH_InitStructure.ETH_TxDMABurstLength = ETH_TxDMABurstLength_32Beat;
+  ETH_InitStructure.ETH_DMAArbitration = ETH_DMAArbitration_RoundRobin_RxTx_2_1;
+
+  /* Configure Ethernet */
+  EthInitStatus = ETH_Init(&ETH_InitStructure, PHY_ADDRESS);
+
+  /* Enable the Ethernet Rx Interrupt */
+  ETH_DMAITConfig(ETH_DMA_IT_NIS | ETH_DMA_IT_R, ENABLE);
+  
+
+#if (IP_STACK == UIP)//1-uip 0 - lwip
+//low level init
+
+	/* create binary semaphore used for informing ethernetif of frame reception */
+	if (s_xSemaphore == NULL)
+	{
+		//s_xSemaphore= xSemaphoreCreateCounting(20,0);
+		vSemaphoreCreateBinary(s_xSemaphore);
+		DEBUG_MSG(ETH_DBG,"s_xSemaphore created\r\n");
+	}
+
+  /* Initialize Tx Descriptors list: Chain Mode */
+  ETH_DMATxDescChainInit(DMATxDscrTab, &Tx_Buff[0][0], ETH_TXBUFNB);
+  /* Initialize Rx Descriptors list: Chain Mode  */
+  ETH_DMARxDescChainInit(DMARxDscrTab, &Rx_Buff[0][0], ETH_RXBUFNB);
+
+
+  //ETH_MACAddressConfig(ETH_MAC_Address0, &dev_addr[0]);
+  //config later
+
+
+
+    /* Enable Ethernet Rx interrrupt */
+  if(1){
+	  for(u8 i=0; i<ETH_RXBUFNB; i++)
+	  {
+		ETH_DMARxDescReceiveITConfig(&DMARxDscrTab[i], ENABLE);
+	  }
+  }
+
+  /* create the task that handles the ETH_MAC */
+  //xTaskCreate(ethernetif_input, (signed char*) "Eth_if", netifINTERFACE_TASK_STACK_SIZE,
+  //		  NULL,2, ( xTaskHandle * ) NULL);
+
+  ETH_Start();
+
+  // Enable MAC and DMA transmission and reception
+#endif
+
+
+}
+
+/**
+  * @brief  Configures the different GPIO ports.
+  * @param  None
+  * @retval None
+  *
+
+
+*/
+
+
+void ETH_GPIO_Config(void)
+{
+  GPIO_InitTypeDef GPIO_InitStructure;
+
+  //use in RCC_Init();
+  /* Enable GPIOs clocks */
+  // called in RCC_Init();
+  /*RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOB |
+                         RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOI |
+                         RCC_AHB1Periph_GPIOG | RCC_AHB1Periph_GPIOH |
+                         RCC_AHB1Periph_GPIOF, ENABLE);*/
+
+  /* Enable SYSCFG clock */
+  //called in RCC_Init();
+  /*RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);*/
+ 
+  /* Configure MCO (PA8) */
+  /*GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;*/
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
+  
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+  /* MII/RMII Media interface selection --------------------------------------*/
+#ifdef MII_MODE /* Mode MII with STM324xG-EVAL  */
+
+ #ifdef PHY_CLOCK_MCO
+#error using PHY_CLOCK_MCO !!!
+  /* Output HSE clock (25MHz) on MCO pin (PA8) to clock the PHY */
+  RCC_MCO1Config(RCC_MCO1Source_HSE, RCC_MCO1Div_1);
+ #endif /* PHY_CLOCK_MCO */
+
+
+  // this is my code !
+  /* Get HSE clock = 25MHz on PA8 pin(MCO) */
+  //RCC_MCO1Config(RCC_MCO1Source_HSE, RCC_MCO1Div_1);//
+
+  SYSCFG_ETH_MediaInterfaceConfig(SYSCFG_ETH_MediaInterface_MII);
+
+  //RCC_MCO1Config(RCC_MCO1Source_HSE, RCC_MCO1Div_1);
+
+#elif defined RMII_MODE  /* Mode RMII with STM324xG-EVAL */
+#error using RMII_MODE !!!!!
+  SYSCFG_ETH_MediaInterfaceConfig(SYSCFG_ETH_MediaInterface_RMII);
+#endif
+  
+/* Ethernet pins configuration ************************************************/
+   /*
+        ETH_MDIO -------------------------> PA2 +
+        ETH_MDC --------------------------> PC1 +
+
+        ETH_PPS_OUT ----------------------> PB5 +
+        ETH_MII_CRS ----------------------> PH2 ? PA0+
+        ETH_MII_COL ----------------------> PH3 ? PA3+
+        ETH_MII_RX_ER --------------------> PI10 ? PB10+
+        ETH_MII_RXD2 ---------------------> PH6 ? PB0
+        ETH_MII_RXD3 ---------------------> PH7 ? PB1 +
+        ETH_MII_TX_CLK -------------------> PC3 +
+        ETH_MII_TXD2 ---------------------> PC2 +
+        ETH_MII_TXD3 ---------------------> PB8 +
+        ETH_MII_RX_CLK/ETH_RMII_REF_CLK---> PA1+
+        ETH_MII_RX_DV/ETH_RMII_CRS_DV ----> PA7 +
+        ETH_MII_RXD0/ETH_RMII_RXD0 -------> PC4 +
+        ETH_MII_RXD1/ETH_RMII_RXD1 -------> PC5 +
+        ETH_MII_TX_EN/ETH_RMII_TX_EN -----> PG11 ? PB11 +
+        ETH_MII_TXD0/ETH_RMII_TXD0 -------> PG13 ? PB12 +
+        ETH_MII_TXD1/ETH_RMII_TXD1 -------> PG14 ? PB13 +
+                                                  */
+
+  /* Configure PA0, PA1, PA2, PA3, and PA7 */
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_7;
+  GPIO_PinAFConfig(GPIOA, GPIO_PinSource0, GPIO_AF_ETH);
+  GPIO_PinAFConfig(GPIOA, GPIO_PinSource1, GPIO_AF_ETH);
+  GPIO_PinAFConfig(GPIOA, GPIO_PinSource2, GPIO_AF_ETH);
+  GPIO_PinAFConfig(GPIOA, GPIO_PinSource3, GPIO_AF_ETH);
+  GPIO_PinAFConfig(GPIOA, GPIO_PinSource7, GPIO_AF_ETH);
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+  /* Configure PB0,PB1,PB8,PB10,PB11,PB12 and PB13 */
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 |GPIO_Pin_1 | GPIO_Pin_8 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13;
+  GPIO_PinAFConfig(GPIOB, GPIO_PinSource0, GPIO_AF_ETH);
+  GPIO_PinAFConfig(GPIOB, GPIO_PinSource1, GPIO_AF_ETH);
+  GPIO_PinAFConfig(GPIOB, GPIO_PinSource8, GPIO_AF_ETH);
+  GPIO_PinAFConfig(GPIOB, GPIO_PinSource10, GPIO_AF_ETH);
+  GPIO_PinAFConfig(GPIOB, GPIO_PinSource11, GPIO_AF_ETH);
+  GPIO_PinAFConfig(GPIOB, GPIO_PinSource12, GPIO_AF_ETH);
+  GPIO_PinAFConfig(GPIOB, GPIO_PinSource13, GPIO_AF_ETH);
+  GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+  /* Configure PC1, PC2, PC3, PC4 and PC5 */
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5;
+  GPIO_PinAFConfig(GPIOC, GPIO_PinSource1, GPIO_AF_ETH);
+  GPIO_PinAFConfig(GPIOC, GPIO_PinSource2, GPIO_AF_ETH);
+  GPIO_PinAFConfig(GPIOC, GPIO_PinSource3, GPIO_AF_ETH);
+  GPIO_PinAFConfig(GPIOC, GPIO_PinSource4, GPIO_AF_ETH);
+  GPIO_PinAFConfig(GPIOC, GPIO_PinSource5, GPIO_AF_ETH);
+  GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+}
+/**
+
+  * @brief  Configures and enable the Ethernet global interrupt.
+  * @param  None
+  * @retval None
+  */
+/*
+void ETH_NVIC_Config(void)
+{
+  NVIC_InitTypeDef   NVIC_InitStructure;
+
+  
+  //NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+  //NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+  
+  // Enable the Ethernet global Interrupt
+  NVIC_InitStructure.NVIC_IRQChannel = ETH_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY+1;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);    
+}*/
+
+/**
+  * @brief  Configure the PHY to generate an interrupt on change of link status.
+  * @param PHYAddress: external PHY address  
+  * @retval None
+  */
+uint32_t Eth_Link_PHYITConfig(uint16_t PHYAddress)
+{
+  uint32_t tmpreg = 0;
+
+  /* Read PHY_IRQ_STAT_CTRL register */
+  tmpreg = ETH_ReadPHYRegister(PHYAddress, PHY_IRQ_STAT_CTRL);
+  if (tmpreg & PHY_LINK_UP)
+  {
+    EthLinkStatus = 1;
+    GPIOD->ODR |= GPIO_Pin_12;
+  }
+
+  /* Enable output interrupt events to signal via the INT pin */
+  tmpreg |= (uint32_t) PHY_IRQ_LINK_DOWN | PHY_IRQ_LINK_UP;
+  if(!(ETH_WritePHYRegister(PHYAddress, PHY_IRQ_STAT_CTRL, tmpreg)))
+  {
+    /* Return ERROR in case of write timeout */
+    return ETH_ERROR;
+  }
+  
+  /*debug*/
+  /*tmpreg = 0;
+  tmpreg = ETH_ReadPHYRegister(PHYAddress, PHY_IRQ_STAT_CTRL);
+  printf("PHY_IRQ_STAT_CTRL 0x%04x\r\n",tmpreg);
+
+  printf("ret good\r\n");*/
+  /* Return SUCCESS */
+  return ETH_SUCCESS;   
+}
+
+/**
+  * @brief  EXTI configuration for Ethernet link status.
+  * @param PHYAddress: external PHY address  
+  * @retval None
+  */
+void Eth_Link_EXTIConfig(void)
+{
+  GPIO_InitTypeDef GPIO_InitStructure;
+  EXTI_InitTypeDef EXTI_InitStructure;
+  NVIC_InitTypeDef NVIC_InitStructure;
+
+  /* Enable the INT (PC0) Clock */
+  RCC_AHB1PeriphClockCmd(ETH_LINK_GPIO_CLK, ENABLE);
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+
+  /* Configure INT pin as input */
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_InitStructure.GPIO_Pin = ETH_LINK_PIN;
+  GPIO_Init(ETH_LINK_GPIO_PORT, &GPIO_InitStructure);
+
+  /* Connect EXTI Line to INT Pin */
+  SYSCFG_EXTILineConfig(ETH_LINK_EXTI_PORT_SOURCE, ETH_LINK_EXTI_PIN_SOURCE);
+
+  /* Configure EXTI line */
+  EXTI_InitStructure.EXTI_Line = ETH_LINK_EXTI_LINE;
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;  
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
+  
+  /*NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);*/
+  /*NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);*/
+
+  NVIC_InitStructure.NVIC_IRQChannel = ETH_LINK_EXTI_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY+5;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+}
+
+
+
+
+/**
+ * Should allocate a pbuf and transfer the bytes of the incoming
+ * packet from the interface into the pbuf.
+ *
+ * @param netif the lwip network interface structure for this ethernetif
+ * @return a pbuf filled with the received packet (including MAC header)
+ *         NULL on memory error
+ */
+//static struct pbuf *
+u16 low_level_input(/*struct netif *netif*/u8 *buffer)
+{
+  //struct pbuf *p, *q;
+  u16_t len=0;
+  uint32_t i =0;
+  FrameTypeDef frame;
+  //u8 *buffer;
+  __IO ETH_DMADESCTypeDef *DMARxNextDesc;
+
+  //p = NULL;
+
+  /* Get received frame */
+  //frame = ETH_Get_Received_Frame_interrupt();
+  frame = ETH_Get_Received_Frame();
+
+  /* check that frame has no error */
+  if ((frame.descriptor->Status & ETH_DMARxDesc_ES) == (uint32_t)RESET)
+  {
+
+    /* Obtain the size of the packet and put it into the "len" variable. */
+    len = frame.length;
+    buffer = (u8 *)frame.buffer;
+
+    /* We allocate a pbuf chain of pbufs from the pool. */
+    //p = pbuf_alloc(PBUF_RAW, len, PBUF_POOL);
+
+    /* Copy received frame from ethernet driver buffer to stack buffer */
+    /*if (p != NULL)
+    {
+      for (q = p; q != NULL; q = q->next)
+      {
+        memcpy((u8_t*)q->payload, (u8_t*)&buffer[l], q->len);
+        l = l + q->len;
+      }
+    }*/
+
+  }
+
+  /* Release descriptors to DMA */
+  /* Check if received frame with multiple DMA buffer segments */
+  if (DMA_RX_FRAME_infos->Seg_Count > 1)
+  {
+    DMARxNextDesc = DMA_RX_FRAME_infos->FS_Rx_Desc;
+  }
+  else
+  {
+    DMARxNextDesc = frame.descriptor;
+  }
+
+  /* Set Own bit in Rx descriptors: gives the buffers back to DMA */
+  for (i=0; i<DMA_RX_FRAME_infos->Seg_Count; i++)
+  {
+    DMARxNextDesc->Status = ETH_DMARxDesc_OWN;
+    DMARxNextDesc = (ETH_DMADESCTypeDef *)(DMARxNextDesc->Buffer2NextDescAddr);
+  }
+
+  /* Clear Segment_Count */
+  DMA_RX_FRAME_infos->Seg_Count =0;
+
+
+  /* When Rx Buffer unavailable flag is set: clear it and resume reception */
+  if ((ETH->DMASR & ETH_DMASR_RBUS) != (u32)RESET)
+  {
+    /* Clear RBUS ETHERNET DMA flag */
+    ETH->DMASR = ETH_DMASR_RBUS;
+
+    /* Resume DMA reception */
+    ETH->DMARPDR = 0;
+  }
+  //return p;
+  return len;
+}
+
+
+/**
+ * This function is the ethernetif_input task, it is processed when a packet
+ * is ready to be read from the interface. It uses the function low_level_input()
+ * that should handle the actual reception of bytes from the network
+ * interface. Then the type of the received packet is determined and
+ * the appropriate input function is called.
+ *
+ * @param netif the lwip network interface structure for this ethernetif
+ */
+#if 0
+void ethernetif_input( void * pvParameters )
+{
+ //struct pbuf *p;
+
+  for( ;; )
+  {
+
+	if(s_xSemaphore != NULL) {
+		if (xSemaphoreTake( s_xSemaphore, emacBLOCK_TIME_WAITING_FOR_INPUT)==pdTRUE)
+		{
+		  GET_NEXT_FRAGMENT:
+		  len = low_level_input(uip_buff);
+		  /*p = low_level_input( s_pxNetIf );
+		  if (ERR_OK != s_pxNetIf->input( p, s_pxNetIf))
+		  {
+			pbuf_free(p);
+			p=NULL;
+		  }
+		  else
+		  {
+			xSemaphoreTake(s_xSemaphore, 0);
+			goto GET_NEXT_FRAGMENT;
+		  }
+		  */
+		}
+	}
+  }
+}
+#endif
+
+
+
+
+
+
+
+/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/

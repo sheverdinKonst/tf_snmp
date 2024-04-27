@@ -1,0 +1,3664 @@
+;; NOTE: the values came from Cider , but 'formula's where manually managed
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; MgRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;TWSI Global Configuration
+00000010 2C000015
+;;;TWSI Last Address
+00000014 FFFFFFFF
+;;;TWSI Timeout Limit
+00000018 80100000
+;;;POE Control Register
+0000001C 380A0864
+;;;TWSI State History0
+00000020 00000004
+;;;Global Interrupt Counter Initialization Value
+00000044 00000006
+;;;Device ID
+0000004C 000E0000
+;;;Vendor ID
+00000050 000011AB
+;;;MG Metal Fix
+00000054 FFFF0000
+;;;Global Control
+00000058 00088002
+;;;Extended Global Control
+0000005C 20002007
+;;;General Access Engine (Genxs) Rate Configuration
+00000060 03030302
+;;;NA Address Update Queue Control; FU Address Update Queue Control
+000000C4 00000001 2 8
+;;;General Control
+000000D4 00170F0F
+;;;GenXs Existing Units Configuration 0; GenXs Existing Units Configuration 1; GenXs Existing Units Configuration 2; GenXs Existing Units Configuration 3; GenXs Existing Units Configuration 4; GenXs Existing Units Configuration 5; GenXs Existing Units Configuration 6; GenXs Existing Units Configuration 7
+000000E4 FFFFFFFF 8 4
+;;;General Configurations_1
+00000110 000006FF
+;;;Unit Default ID (UDID)
+00000204 000000E0
+;;;Window Control Register0; Window Control Register1; Window Control Register2; Window Control Register3; Window Control Register4; Window Control Register5
+00000254 00000007 6 4
+;;;Regret Counter Initialization Values
+00000270 0000001F
+;;;Regret Control
+00000274 00000001
+;;;Pex Sync FIFO Tuning0
+0000027C 00007249
+;;;CT Global Configuration
+00000390 000FFFFF
+;;;Confi Processor Global Configuration
+00000500 000E1A80
+;;;Host CPU Doorbell Register
+00000518 00000001
+;;;Global Interrupt1 Counter Initialization Value; Global Interrupt2 Counter Initialization Value
+00000654 00000006 2 60
+;;;Tx SDMA Token-Bucket Queue&lt;0&gt; Counter; Tx SDMA Token-Bucket Queue&lt;1&gt; Counter; Tx SDMA Token-Bucket Queue&lt;2&gt; Counter; Tx SDMA Token-Bucket Queue&lt;3&gt; Counter; Tx SDMA Token-Bucket Queue&lt;4&gt; Counter; Tx SDMA Token-Bucket Queue&lt;5&gt; Counter; Tx SDMA Token-Bucket Queue&lt;6&gt; Counter; Tx SDMA Token-Bucket Queue&lt;7&gt; Counter; Tx SDMA Token-Bucket Counter
+00002700 3FFFFFFF 9 10
+;;;SDMA Configuration
+00002800 81800008
+;;;Receive SDMA Status
+0000281C 000000FF
+;;;Receive SDMA Resource Error Count_And_Mode_ &lt;0&gt;; Receive SDMA Resource Error Count_And_Mode_ &lt;1&gt;
+00002860 00000400 2 4
+;;;Transmit SDMA WRR Token Parameters
+00002874 00000024
+;;;Receive SDMA Resource Error Count_And_Mode &lt;2&gt;; Receive SDMA Resource Error Count_And_Mode &lt;3&gt;; Receive SDMA Resource Error Count_And_Mode &lt;4&gt;; Receive SDMA Resource Error Count_And_Mode &lt;5&gt;; Receive SDMA Resource Error Count_And_Mode &lt;6&gt;; Receive SDMA Resource Error Count_And_Mode &lt;7&gt;
+00002878 00000400 6 4
+;;;Tx SDMA Small Packet Reject
+000028F0 00000080
+;;;XSMI Management (For DOC ONLY); XSMI Management (For DOC ONLY)
+00040000 14A00000 2 2000
+;;;XSMI Configuration; XSMI Configuration
+0004000C 0000002C 2 2000
+;;;TWSI Internal Slave Address
+00080000 000000C0
+;;;TWSI Internal Control
+00080008 00000041
+;;;TWSI Internal Baud Rate
+0008000C 0000007C
+;;;I2C Baud Rate
+0009100C 00000025
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; L2iRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;Ingress Port &lt;0&gt; Bridge Configuration1
+01000010 001FFFE0
+;;;VLAN MRU Profile Configuration&lt;0&gt;; VLAN MRU Profile Configuration&lt;1&gt;; VLAN MRU Profile Configuration&lt;2&gt;; VLAN MRU Profile Configuration&lt;3&gt;
+01000300 05F205F2 4 4
+;;;Ingress Port &lt;1&gt; Bridge Configuration1; Ingress Port &lt;2&gt; Bridge Configuration1; Ingress Port &lt;3&gt; Bridge Configuration1; Ingress Port &lt;4&gt; Bridge Configuration1; Ingress Port &lt;5&gt; Bridge Configuration1; Ingress Port &lt;6&gt; Bridge Configuration1; Ingress Port &lt;7&gt; Bridge Configuration1; Ingress Port &lt;8&gt; Bridge Configuration1; Ingress Port &lt;9&gt; Bridge Configuration1; Ingress Port &lt;10&gt; Bridge Configuration1; Ingress Port &lt;11&gt; Bridge Configuration1
+;;;Ingress Port &lt;12&gt; Bridge Configuration1; Ingress Port &lt;13&gt; Bridge Configuration1; Ingress Port &lt;14&gt; Bridge Configuration1; Ingress Port &lt;15&gt; Bridge Configuration1; Ingress Port &lt;16&gt; Bridge Configuration1; Ingress Port &lt;17&gt; Bridge Configuration1; Ingress Port &lt;18&gt; Bridge Configuration1; Ingress Port &lt;19&gt; Bridge Configuration1; Ingress Port &lt;20&gt; Bridge Configuration1; Ingress Port &lt;21&gt; Bridge Configuration1
+;;; Ingress Port &lt;22&gt; Bridge Configuration1; Ingress Port &lt;23&gt; Bridge Configuration1; Ingress Port &lt;24&gt; Bridge Configuration1; Ingress Port &lt;25&gt; Bridge Configuration1; Ingress Port &lt;26&gt; Bridge Configuration1; Ingress Port &lt;27&gt; Bridge Configuration1
+01001010 001FFFE0 27 1000
+;;;Ingress Port &lt;63&gt; Bridge Configuration1
+0103F010 001FFFE0
+;;;Bridge Global Configuration0
+01040000 69030011
+;;;L2ingress Idle State
+01040008 00003FFF
+;;;Bridge Global Configuration2
+0104000C 0000803F
+;;;IPv6 MC Bridging Bytes Selection Configuration
+01040010 52103210
+;;;Update Fifo Configuration
+01040014 0000000F
+;;;Ingress VLAN Range Configuration
+010400A8 00FFEFFE
+;;;Ingress Rate Limit Configuration1
+01040144 00000027
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; EgressAndTxqRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;Transmit Queue Control
+02800000 170E8203
+;;;Transmit Queue Extended Control
+02800004 23BC00C3
+;;;Token Bucket Update Rate and MC FIFO Configuration
+0280000C 44508510
+;;;Egress Filtering Register0
+02800010 F0000000
+;;;Statistical and CPU-Triggered Egress Mirroring to Analyzer Port Configuration
+02800020 00000020
+;;;Mirrored Packets to Analyzer Port Descriptors Limit Configuration
+02800024 0002800A
+;;;Shared Priority Register%n, Multiplicity: n*0x4: where n (0-1) represents Profile
+02800028 FFFFFFFF 2 4
+;;;Profile%n Port Tail Drop Limits Configuration, Multiplicity: n*0x4: where n (0-3) represents Profile
+02800030 000A0019 4 4
+;;;Profile%p SDWRR Weights Configuration Register0, Multiplicity: p*0x10: where p (0-3) represents Profile
+02800040 04030201 4 10
+;;;Profile%p SDWRR Weights Configuration Register1, Multiplicity: p*0x10: where p (0-3) represents Profile
+02800044 08070605 4 10
+;;;Profile%p SDWRR and Strict Priority Configuration, Multiplicity: p*0x10: where p (0-3) represents Profile
+02800048 000000FF 4 10
+;;;Port<%n> Txq Configuration, Multiplicity: n * 0x200: where n (0-27) represents Port
+02800080 0000FFFF 28 200
+;;;Total Buffer Limit Configuration
+02800084 00003000
+;;;Extended SDWRR Transmit Scheduler Configuration Register
+028000AC 00000201
+;;;Dequeue SWRR Weight Register 0; Dequeue SWRR Weight Register 1
+028000B0 09249249 2 4
+;;;Dequeue SWRR Weight Register 2
+028000B8 01249249
+;;;Dequeue SWRR Weight Register 3
+028000BC 00000089
+;;;Descriptors RAM Unfixed ECC Errors; Descriptors RAM Fixed ECC Errors; FLL RAM Unfixed ECC Errors; FLL RAM Fixed ECC Errors
+028000D4 00001FFF 4 4
+;;;VLAN Table Parity Errors
+028000E4 00000FFF
+;;;Free Linked List Queue Tail and Queue Head Pointer
+02800128 03FFC0E0
+;;;Free Linked List Queue Head FIFO
+0280012C 000000E3
+;;;XG Control Register
+02800180 03000000
+;;;Debug Control
+028001A8 40000000
+;;;Txq Exact Rate Shaping and WRR Constant Configuration
+028001B4 0000228E
+;;;Unicast SrcID Egress Filtering Configuration
+028001D4 8FFFFFFF
+;;;Transmit Queue Resource Sharing
+028001F0 012BC300
+;;;Transmit Queue Misc Control
+028001F8 00000007
+;;;Global Configuration
+02800F50 00000004
+;;;Profile%p TC<%n> DP0 Tail Drop Limits, Multiplicity: n*0x08+p*0x400: where p (0-7) represents Profile, where n (0-7) represents TC
+02940000 000A0019 8 8
+02940400 000A0019 8 8
+02940800 000A0019 8 8
+02940C00 000A0019 8 8
+02941000 000A0019 8 8
+02941400 000A0019 8 8
+02941800 000A0019 8 8
+;;;Profile%p TC<%n> DP1 Tail Drop Limits, Multiplicity: n*0x08+p*0x400: where p (0-7) represents Profile, where n (0-7) represents TC
+02940004 000A0019 8 8
+02940404 000A0019 8 8
+02940804 000A0019 8 8
+02940C04 000A0019 8 8
+02941004 000A0019 8 8
+02941404 000A0019 8 8
+02941804 000A0019 8 8
+;;;Trunk<%n> Non-Trunk Members Table, Multiplicity: n*0x10: (where <n> represents Trunk 0-127)
+02A40000 8FFFFFFF 128 10
+;;;Device<n> Map Table Entry, Multiplicity: n*0x10: (where <n> represents Dev 0-31)
+02A40004 00000001 32 10
+;;;Old Designated Trunk Port Entry<%n> Table, Multiplicity: n*0x10: (where <n> represents Entry 0-7)
+02A40008 8FFFFFFF 8 10
+;;;SrcID<%m> Egress Filtering Table Entry, Multiplicity: m*0x10: where m (0-31) represents SrcID
+02A4000C FFFFFFFF 32 10
+;;;Port<%n> L1Overhead Configuration, Multiplicity: n * 0x200: where n (0-27) represents Port
+02A80000 00005DC0 28 200
+;;;XSMI Management
+02CC0000 14A00000
+;;;L2 Port Isolation Table Entry%n, Multiplicity: 0x10*n: where n (0-2175) represents SrcDev_SrcPort
+02E40004 0FFFFFFF 2176 10
+;;;L3 Port Isolation Table Entry%n, Multiplicity: 0x10*n: where n (0-2175) represents SrcDev_SrcPort
+02E40008 0FFFFFFF 2176 10
+;;;Designated Trunk Port Entry<%n> Table, Multiplicity: n*0x10: where n (0-15) represents Entry
+02E4000C 8FFFFFFF 16 10
+;;;Stack TC Remap Table Entry <1>
+02E80004 00249249
+;;;Stack TC Remap Table Entry <2>
+02E80008 00492492
+;;;Stack TC Remap Table Entry <3>
+02E8000C 006DB6DB
+;;;Stack TC Remap Table Entry <4>
+02E80010 00924924
+;;;Stack TC Remap Table Entry <5>
+02E80014 00B6DB6D
+;;;Stack TC Remap Table Entry <6>
+02E80018 00DB6DB6
+;;;Stack TC Remap Table Entry <7>
+02E8001C 00FFFFFF
+;; VIDX entry 0xFFF
+0390FFF0 1FFFFFFE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; CcfcRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;BCN Control
+03400000 00000006
+;;;Global BCN Trigger Threshold
+03400010 00000F00
+;;;BCN Global Pause Thresholds
+03400014 01C00F00
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; IpvxRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;Router Global Control0
+04000000 20000041
+;;;Router MTU Configuration Register&lt;0&gt;; Router MTU Configuration Register&lt;1&gt;; Router MTU Configuration Register&lt;2&gt;; Router MTU Configuration Register&lt;3&gt;
+04000004 017705DC 4 4
+;;;IPv4 Control Register0; IPv6 Control Register0
+04000100 1B79B01B 2 100
+;;;IPv4 Control Register1
+04000104 001B661B
+;;;IPv6 Control Register1
+04000204 0000661B
+;;;IPv6 Unicast Scope Prefix&lt;0&gt;; IPv6 Unicast Scope Prefix&lt;1&gt;; IPv6 Unicast Scope Prefix&lt;2&gt;; IPv6 Unicast Scope Prefix&lt;3&gt;
+04000250 FFC0FE80 4 4
+;;;IPv6 Unicast Scope&lt;1&gt; Level
+04000264 00000001
+;;;IPv6 Unicast Scope&lt;2&gt; Level
+04000268 00000002
+;;;IPv6 Unicast Scope&lt;3&gt; Level
+0400026C 00000003
+;;;Router Additional Control
+04000964 0000001F
+;;;Router Metal Fix
+04000968 0000FFFF
+;;;Router DFT Register
+04000D70 18300000
+;;;Unicast Routing Engine Configuration Register 
+04000E3C 007F0000
+;;;TCAM Bist Config Status Register
+04002050 0000028B
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; BmRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;Buffer Management Global Buffers Limits Configuration
+05000000 AFD7FAFF
+;;;Buffer Management Network Port Group Limits Configuration; Buffer Management HyperG.Stack Ports Group Limits
+05000004 5FD7FAFF 2 4
+;;;Buffer Management Aging Configuration
+0500000C 00000006
+;;;Allocation Arbiter WRR Weights Configuration
+05000010 00000009
+;;;Buffer Management Shared Buffers Configuration
+05000014 000017FF
+;;;Ports Buffers Limit Profile0 Configuration
+05000020 02807007
+;;;Ports Buffers Limit Profile1 Configuration
+05000024 0A024825
+;;;Buffers Limits Profile Association1
+05000034 00550000
+;;;Buffer Management Metal Fix
+05000060 FFFF0010
+;;;IDLE State
+05000068 0001FFFF
+;;;Linked List Tail Pointer
+05000200 000017FF
+;;;Buffer Management Linked List Head1 Pointer
+05000208 00000001
+;;;Buffer Management Linked List Head2 Pointer
+0500020C 00000002
+;;;Buffer management Linked List Head3 Pointer
+05000210 00000003
+;;;DFX
+05000304 18600001
+;;;DFX1
+05000308 000000C3
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; EplrRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;Policer Control0
+06000000 BE830003
+;;;Policer MRU
+06000010 00002800
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; LmsRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;MIB Counters Control Register0 (for Ports 0 through 5)
+07004020 00003F60
+;;;PHY Address Register0 (for Ports 0 through 5)
+07004030 128398A4
+;;;PHY Auto-Negotiation Configuration Register0
+07004034 00000140
+;;;SMI0 Management
+07004054 04000000
+;;;LED Interface0 Control Register0 (for Ports 0 through 11 and XG Port)
+07004100 4109FF00
+;;;LED Interface0 Group0-1 Configuration Register (for ports 0 through 11)
+07004104 FFFFFFFF
+;;;Gig ports Periodic FC Counter Max Value Register
+07004140 000CCC00
+;;;One ms Counter Max Value Register
+07004144 000061A8
+;;;LMS0 Misc Configurations
+07004200 00368000
+;;;FlexLink Port LED Interface0 Class0-4 Manipulation Register
+07005100 00000001
+;;;MIB Counters Control Register0 (for Ports 6 through 11)
+08004020 00003F60
+;;;PHY Address Register1 (for Ports 6 through 11)
+08004030 1EE6B16A
+;;;PHY Auto-Negotiation Configuration Register1
+08004034 000001C0
+;;;LED Interface0 Group2-3 Configuration Register (for ports 0 through 11)
+08004104 FFFFFFFF
+;;;Two and Half Gig ports Periodic FC Counter Max Value Register
+08004140 00051E00
+;;;Stack Ports Mode Register
+08004144 0000000F
+;;;FlexLink Ports LED Interface0 Group0-1 Configuration Register
+08005104 FFFFFFFF
+;;;Ports MIB Counters Interrupt Summary Mask
+08005110 0000003E
+;;;Ports Interrupt Summary Mask
+08005114 01FFFFFE
+;;; MIB Counters Control Register0 (for Ports 12 through 17)
+09004020 00003F60
+;;;PHY Address Register2 (for Ports 12 through 17)
+09004030 128398A4
+;;;PHY Auto-Negotiation Configuration Register2
+09004034 00000140
+;;;SMI1 Management
+09004054 04000000
+;;;LED Interface1 Control Register0 (for Ports 12 through 23 and XG port)
+09004100 4109FF00
+;;;LED Interface1 Group0-1 Configuration Register (for ports 12 through 23)
+09004104 FFFFFFFF
+;;;XG ports Periodic FC Counter Max Value Register
+09004140 00014700
+;;;LMS1 Misc Configurations
+09004200 00368000
+;;;FlexLink Ports LED Interface1 Class0-4 Manipulation Register
+09005100 00000001
+;;;MIB Counters Control Register0 (for Ports 18 through 23)
+0A004020 00003F60
+;;;PHY Address Register3 (for Ports 18 through 23)
+0A004030 1EE6B16A
+;;;PHY Auto-Negotiation Configuration Register3
+0A004034 000001C0
+;;;LED Interface1 Group2-3 Configuration Register (for ports 12 through 23)
+0A004104 FFFFFFFF 2 1000
+;;;Stack Ports Periodic FC Counter Max Value Register
+0A004140 0000CC00
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; FdbRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;FDB Global Configuration
+0B000000 017BFC80
+;;;FDB Action0
+0B000004 000003C1
+;;;MAC Lookup0
+0B00000C FFFFFFFF
+;;;MAC Lookup1
+0B000010 0000FFFF
+;;;VLAN Lookup
+0B000014 00000FFF
+;;;Dip Lookup; Sip Lookup
+0B000024 FFFFFFFF 2 4
+;;;AU Message to CPU
+0B000034 FFFFFFFF
+;;;AU FIFO to CPU Configuration
+0B000038 0000001C
+;;;MetalFix
+0B00006C FFFF0000
+;;;FDB Idle State
+0B000070 00001FFF
+;;;FDB Ram Envelope Configurations
+0B000084 00000183
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; MemRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;Buffer Memory MPPM Configuration
+0E00000C 00001442
+;;;Buffer Memory First XG Write Bandwidth Configuration
+0E00005C 0018AAAA
+;;;Buffer Memory Wr DMA 2nd Stage Arbiter Configuration
+0E000064 00729863
+;;;Mem Dft2 Register
+0E000088 18300300
+;;;Arbiters Configuration Register 0
+0E0000A0 00024983
+;;;MBIST Configuration Register
+0E0000C0 0010E4FE
+;;;MPPM Latency Register
+0E0000CC 0002C773
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; CncRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;CNC Global Configuration Register
+10000000 000003DF
+;;;CNC Metal Fix Register
+10000180 0000FFFF
+;;;Ram Envelope Configurations
+1000018C 00000183
+;;;CNC Block 0 Configuration Register6; CNC Block 1 Configuration Register6; CNC Block 2 Configuration Register6; CNC Block 3 Configuration Register6; CNC Block 4 Configuration Register6; CNC Block 5 Configuration Register6; CNC Block 6 Configuration Register6; CNC Block 7 Configuration Register6; CNC Block 8 Configuration Register6; CNC Block 9 Configuration Register6; CNC Block 10 Configuration Register6
+10001098 00000008 12 100
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; GopRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;Port MAC Control Register0
+12000000 00008BE5
+;;;Port MAC Control Register1
+12000004 00000003
+;;;Port MAC Control Register2
+12000008 0000C048
+;;;Port Auto-Negotiation Configuration
+1200000C 0000BAE8
+;;;Port Serial Parameters Configuration
+12000014 000008C4
+;;;Port FIFO Configuration Register 0
+12000018 00004B4D
+;;;Port FIFO Configuration Register 1
+1200001C 00000052
+;;;Port SERDES Configuration Register0
+12000028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1200002C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+12000030 0000C815
+;;;Port MAC Control Register3
+12000048 00000300
+;;;Port MAC Control Register4
+12000090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+12000094 00000001
+;;;LPI Control 0
+120000C0 00001004
+;;;LPI Control 1
+120000C4 00000100
+;;;LPI Control 2
+120000C8 000001FD
+;;;Pulse 1 ms Low Register
+120000D4 000000FF
+;;;Port MAC Control Register0
+12001000 00008BE5
+;;;Port MAC Control Register1
+12001004 00000003
+;;;Port MAC Control Register2
+12001008 0000C048
+;;;Port Auto-Negotiation Configuration
+1200100C 0000BAE8
+;;;Port Serial Parameters Configuration
+12001014 000008C4
+;;;Port FIFO Configuration Register 0
+12001018 00004B4D
+;;;Port FIFO Configuration Register 1
+1200101C 00000052
+;;;Port SERDES Configuration Register0
+12001028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1200102C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+12001030 0000C815
+;;;Port MAC Control Register3
+12001048 00000300
+;;;Port MAC Control Register4
+12001090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+12001094 00000001
+;;;LPI Control 0
+120010C0 00001004
+;;;LPI Control 1
+120010C4 00000100
+;;;LPI Control 2
+120010C8 000001FD
+;;;Pulse 1 ms Low Register
+120010D4 000000FF
+;;;Port MAC Control Register0
+12002000 00008BE5
+;;;Port MAC Control Register1
+12002004 00000003
+;;;Port MAC Control Register2
+12002008 0000C048
+;;;Port Auto-Negotiation Configuration
+1200200C 0000BAE8
+;;;Port Serial Parameters Configuration
+12002014 000008C4
+;;;Port FIFO Configuration Register 0
+12002018 00004B4D
+;;;Port FIFO Configuration Register 1
+1200201C 00000052
+;;;Port SERDES Configuration Register0
+12002028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1200202C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+12002030 0000C815
+;;;Port MAC Control Register3
+12002048 00000300
+;;;Port MAC Control Register4
+12002090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+12002094 00000001
+;;;LPI Control 0
+120020C0 00001004
+;;;LPI Control 1
+120020C4 00000100
+;;;LPI Control 2
+120020C8 000001FD
+;;;Pulse 1 ms Low Register
+120020D4 000000FF
+;;;Port MAC Control Register0
+12003000 00008BE5
+;;;Port MAC Control Register1
+12003004 00000003
+;;;Port MAC Control Register2
+12003008 0000C048
+;;;Port Auto-Negotiation Configuration
+1200300C 0000BAE8
+;;;Port Serial Parameters Configuration
+12003014 000008C4
+;;;Port FIFO Configuration Register 0
+12003018 00004B4D
+;;;Port FIFO Configuration Register 1
+1200301C 00000052
+;;;Port SERDES Configuration Register0
+12003028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1200302C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+12003030 0000C815
+;;;Port MAC Control Register3
+12003048 00000300
+;;;Port MAC Control Register4
+12003090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+12003094 00000001
+;;;LPI Control 0
+120030C0 00001004
+;;;LPI Control 1
+120030C4 00000100
+;;;LPI Control 2
+120030C8 000001FD
+;;;Pulse 1 ms Low Register
+120030D4 000000FF
+;;;Port MAC Control Register0
+12004000 00008BE5
+;;;Port MAC Control Register1
+12004004 00000003
+;;;Port MAC Control Register2
+12004008 0000C048
+;;;Port Auto-Negotiation Configuration
+1200400C 0000BAE8
+;;;Port Serial Parameters Configuration
+12004014 000008C4
+;;;Port FIFO Configuration Register 0
+12004018 00004B4D
+;;;Port FIFO Configuration Register 1
+1200401C 00000052
+;;;Port SERDES Configuration Register0
+12004028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1200402C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+12004030 0000C815
+;;;Port MAC Control Register3
+12004048 00000300
+;;;Port MAC Control Register4
+12004090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+12004094 00000001
+;;;LPI Control 0
+120040C0 00001004
+;;;LPI Control 1
+120040C4 00000100
+;;;LPI Control 2
+120040C8 000001FD
+;;;Pulse 1 ms Low Register
+120040D4 000000FF
+;;;Port MAC Control Register0
+12005000 00008BE5
+;;;Port MAC Control Register1
+12005004 00000003
+;;;Port MAC Control Register2
+12005008 0000C048
+;;;Port Auto-Negotiation Configuration
+1200500C 0000BAE8
+;;;Port Serial Parameters Configuration
+12005014 000008C4
+;;;Port FIFO Configuration Register 0
+12005018 00004B4D
+;;;Port FIFO Configuration Register 1
+1200501C 00000052
+;;;Port SERDES Configuration Register0
+12005028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1200502C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+12005030 0000C815
+;;;Port MAC Control Register3
+12005048 00000300
+;;;Port MAC Control Register4
+12005090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+12005094 00000001
+;;;LPI Control 0
+120050C0 00001004
+;;;LPI Control 1
+120050C4 00000100
+;;;LPI Control 2
+120050C8 000001FD
+;;;Pulse 1 ms Low Register
+120050D4 000000FF
+;;;Port MAC Control Register0
+12006000 00008BE5
+;;;Port MAC Control Register1
+12006004 00000003
+;;;Port MAC Control Register2
+12006008 0000C048
+;;;Port Auto-Negotiation Configuration
+1200600C 0000BAE8
+;;;Port Serial Parameters Configuration
+12006014 000008C4
+;;;Port FIFO Configuration Register 0
+12006018 00004B4D
+;;;Port FIFO Configuration Register 1
+1200601C 00000052
+;;;Port SERDES Configuration Register0
+12006028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1200602C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+12006030 0000C815
+;;;Port MAC Control Register3
+12006048 00000300
+;;;Port MAC Control Register4
+12006090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+12006094 00000001
+;;;LPI Control 0
+120060C0 00001004
+;;;LPI Control 1
+120060C4 00000100
+;;;LPI Control 2
+120060C8 000001FD
+;;;Pulse 1 ms Low Register
+120060D4 000000FF
+;;;Port MAC Control Register0
+12007000 00008BE5
+;;;Port MAC Control Register1
+12007004 00000003
+;;;Port MAC Control Register2
+12007008 0000C048
+;;;Port Auto-Negotiation Configuration
+1200700C 0000BAE8
+;;;Port Serial Parameters Configuration
+12007014 000008C4
+;;;Port FIFO Configuration Register 0
+12007018 00004B4D
+;;;Port FIFO Configuration Register 1
+1200701C 00000052
+;;;Port SERDES Configuration Register0
+12007028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1200702C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+12007030 0000C815
+;;;Port MAC Control Register3
+12007048 00000300
+;;;Port MAC Control Register4
+12007090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+12007094 00000001
+;;;LPI Control 0
+120070C0 00001004
+;;;LPI Control 1
+120070C4 00000100
+;;;LPI Control 2
+120070C8 000001FD
+;;;Pulse 1 ms Low Register
+120070D4 000000FF
+;;;Port MAC Control Register0
+12008000 00008BE5
+;;;Port MAC Control Register1
+12008004 00000003
+;;;Port MAC Control Register2
+12008008 0000C048
+;;;Port Auto-Negotiation Configuration
+1200800C 0000BAE8
+;;;Port Serial Parameters Configuration
+12008014 000008C4
+;;;Port FIFO Configuration Register 0
+12008018 00004B4D
+;;;Port FIFO Configuration Register 1
+1200801C 00000052
+;;;Port SERDES Configuration Register0
+12008028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1200802C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+12008030 0000C815
+;;;Port MAC Control Register3
+12008048 00000300
+;;;Port MAC Control Register4
+12008090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+12008094 00000001
+;;;LPI Control 0
+120080C0 00001004
+;;;LPI Control 1
+120080C4 00000100
+;;;LPI Control 2
+120080C8 000001FD
+;;;Pulse 1 ms Low Register
+120080D4 000000FF
+;;;Port MAC Control Register0
+12009000 00008BE5
+;;;Port MAC Control Register1
+12009004 00000003
+;;;Port MAC Control Register2
+12009008 0000C048
+;;;Port Auto-Negotiation Configuration
+1200900C 0000BAE8
+;;;Port Serial Parameters Configuration
+12009014 000008C4
+;;;Port FIFO Configuration Register 0
+12009018 00004B4D
+;;;Port FIFO Configuration Register 1
+1200901C 00000052
+;;;Port SERDES Configuration Register0
+12009028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1200902C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+12009030 0000C815
+;;;Port MAC Control Register3
+12009048 00000300
+;;;Port MAC Control Register4
+12009090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+12009094 00000001
+;;;LPI Control 0
+120090C0 00001004
+;;;LPI Control 1
+120090C4 00000100
+;;;LPI Control 2
+120090C8 000001FD
+;;;Pulse 1 ms Low Register
+120090D4 000000FF
+;;;Port MAC Control Register0
+1200A000 00008BE5
+;;;Port MAC Control Register1
+1200A004 00000003
+;;;Port MAC Control Register2
+1200A008 0000C048
+;;;Port Auto-Negotiation Configuration
+1200A00C 0000BAE8
+;;;Port Serial Parameters Configuration
+1200A014 000008C4
+;;;Port FIFO Configuration Register 0
+1200A018 00004B4D
+;;;Port FIFO Configuration Register 1
+1200A01C 00000052
+;;;Port SERDES Configuration Register0
+1200A028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1200A02C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+1200A030 0000C815
+;;;Port MAC Control Register3
+1200A048 00000300
+;;;Port MAC Control Register4
+1200A090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+1200A094 00000001
+;;;LPI Control 0
+1200A0C0 00001004
+;;;LPI Control 1
+1200A0C4 00000100
+;;;LPI Control 2
+1200A0C8 000001FD
+;;;Pulse 1 ms Low Register
+1200A0D4 000000FF
+;;;Port MAC Control Register0
+1200B000 00008BE5
+;;;Port MAC Control Register1
+1200B004 00000003
+;;;Port MAC Control Register2
+1200B008 0000C048
+;;;Port Auto-Negotiation Configuration
+1200B00C 0000BAE8
+;;;Port Serial Parameters Configuration
+1200B014 000008C4
+;;;Port FIFO Configuration Register 0
+1200B018 00004B4D
+;;;Port FIFO Configuration Register 1
+1200B01C 00000052
+;;;Port SERDES Configuration Register0
+1200B028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1200B02C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+1200B030 0000C815
+;;;Port MAC Control Register3
+1200B048 00000300
+;;;Port MAC Control Register4
+1200B090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+1200B094 00000001
+;;;LPI Control 0
+1200B0C0 00001004
+;;;LPI Control 1
+1200B0C4 00000100
+;;;LPI Control 2
+1200B0C8 000001FD
+;;;Pulse 1 ms Low Register
+1200B0D4 000000FF
+;;;Port MAC Control Register0
+1200C000 00008BE5
+;;;Port MAC Control Register1
+1200C004 00000003
+;;;Port MAC Control Register2
+1200C008 0000C048
+;;;Port Auto-Negotiation Configuration
+1200C00C 0000BAE8
+;;;Port Serial Parameters Configuration
+1200C014 000008C4
+;;;Port FIFO Configuration Register 0
+1200C018 00004B4D
+;;;Port FIFO Configuration Register 1
+1200C01C 00000052
+;;;Port SERDES Configuration Register0
+1200C028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1200C02C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+1200C030 0000C815
+;;;Port MAC Control Register3
+1200C048 00000300
+;;;Port MAC Control Register4
+1200C090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+1200C094 00000001
+;;;LPI Control 0
+1200C0C0 00001004
+;;;LPI Control 1
+1200C0C4 00000100
+;;;LPI Control 2
+1200C0C8 000001FD
+;;;Pulse 1 ms Low Register
+1200C0D4 000000FF
+;;;Port MAC Control Register0
+1200D000 00008BE5
+;;;Port MAC Control Register1
+1200D004 00000003
+;;;Port MAC Control Register2
+1200D008 0000C048
+;;;Port Auto-Negotiation Configuration
+1200D00C 0000BAE8
+;;;Port Serial Parameters Configuration
+1200D014 000008C4
+;;;Port FIFO Configuration Register 0
+1200D018 00004B4D
+;;;Port FIFO Configuration Register 1
+1200D01C 00000052
+;;;Port SERDES Configuration Register0
+1200D028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1200D02C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+1200D030 0000C815
+;;;Port MAC Control Register3
+1200D048 00000300
+;;;Port MAC Control Register4
+1200D090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+1200D094 00000001
+;;;LPI Control 0
+1200D0C0 00001004
+;;;LPI Control 1
+1200D0C4 00000100
+;;;LPI Control 2
+1200D0C8 000001FD
+;;;Pulse 1 ms Low Register
+1200D0D4 000000FF
+;;;Port MAC Control Register0
+1200E000 00008BE5
+;;;Port MAC Control Register1
+1200E004 00000003
+;;;Port MAC Control Register2
+1200E008 0000C048
+;;;Port Auto-Negotiation Configuration
+1200E00C 0000BAE8
+;;;Port Serial Parameters Configuration
+1200E014 000008C4
+;;;Port FIFO Configuration Register 0
+1200E018 00004B4D
+;;;Port FIFO Configuration Register 1
+1200E01C 00000052
+;;;Port SERDES Configuration Register0
+1200E028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1200E02C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+1200E030 0000C815
+;;;Port MAC Control Register3
+1200E048 00000300
+;;;Port MAC Control Register4
+1200E090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+1200E094 00000001
+;;;LPI Control 0
+1200E0C0 00001004
+;;;LPI Control 1
+1200E0C4 00000100
+;;;LPI Control 2
+1200E0C8 000001FD
+;;;Pulse 1 ms Low Register
+1200E0D4 000000FF
+;;;Port MAC Control Register0
+1200F000 00008BE5
+;;;Port MAC Control Register1
+1200F004 00000003
+;;;Port MAC Control Register2
+1200F008 0000C048
+;;;Port Auto-Negotiation Configuration
+1200F00C 0000BAE8
+;;;Port Serial Parameters Configuration
+1200F014 000008C4
+;;;Port FIFO Configuration Register 0
+1200F018 00004B4D
+;;;Port FIFO Configuration Register 1
+1200F01C 00000052
+;;;Port SERDES Configuration Register0
+1200F028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1200F02C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+1200F030 0000C815
+;;;Port MAC Control Register3
+1200F048 00000300
+;;;Port MAC Control Register4
+1200F090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+1200F094 00000001
+;;;LPI Control 0
+1200F0C0 00001004
+;;;LPI Control 1
+1200F0C4 00000100
+;;;LPI Control 2
+1200F0C8 000001FD
+;;;Pulse 1 ms Low Register
+1200F0D4 000000FF
+;;;Port MAC Control Register0
+12010000 00008BE5
+;;;Port MAC Control Register1
+12010004 00000003
+;;;Port MAC Control Register2
+12010008 0000C048
+;;;Port Auto-Negotiation Configuration
+1201000C 0000BAE8
+;;;Port Serial Parameters Configuration
+12010014 000008C4
+;;;Port FIFO Configuration Register 0
+12010018 00004B4D
+;;;Port FIFO Configuration Register 1
+1201001C 00000052
+;;;Port SERDES Configuration Register0
+12010028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1201002C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+12010030 0000C815
+;;;Port MAC Control Register3
+12010048 00000300
+;;;Port MAC Control Register4
+12010090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+12010094 00000001
+;;;LPI Control 0
+120100C0 00001004
+;;;LPI Control 1
+120100C4 00000100
+;;;LPI Control 2
+120100C8 000001FD
+;;;Pulse 1 ms Low Register
+120100D4 000000FF
+;;;Port MAC Control Register0
+12011000 00008BE5
+;;;Port MAC Control Register1
+12011004 00000003
+;;;Port MAC Control Register2
+12011008 0000C048
+;;;Port Auto-Negotiation Configuration
+1201100C 0000BAE8
+;;;Port Serial Parameters Configuration
+12011014 000008C4
+;;;Port FIFO Configuration Register 0
+12011018 00004B4D
+;;;Port FIFO Configuration Register 1
+1201101C 00000052
+;;;Port SERDES Configuration Register0
+12011028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1201102C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+12011030 0000C815
+;;;Port MAC Control Register3
+12011048 00000300
+;;;Port MAC Control Register4
+12011090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+12011094 00000001
+;;;LPI Control 0
+120110C0 00001004
+;;;LPI Control 1
+120110C4 00000100
+;;;LPI Control 2
+120110C8 000001FD
+;;;Pulse 1 ms Low Register
+120110D4 000000FF
+;;;Port MAC Control Register0
+12012000 00008BE5
+;;;Port MAC Control Register1
+12012004 00000003
+;;;Port MAC Control Register2
+12012008 0000C048
+;;;Port Auto-Negotiation Configuration
+1201200C 0000BAE8
+;;;Port Serial Parameters Configuration
+12012014 000008C4
+;;;Port FIFO Configuration Register 0
+12012018 00004B4D
+;;;Port FIFO Configuration Register 1
+1201201C 00000052
+;;;Port SERDES Configuration Register0
+12012028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1201202C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+12012030 0000C815
+;;;Port MAC Control Register3
+12012048 00000300
+;;;Port MAC Control Register4
+12012090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+12012094 00000001
+;;;LPI Control 0
+120120C0 00001004
+;;;LPI Control 1
+120120C4 00000100
+;;;LPI Control 2
+120120C8 000001FD
+;;;Pulse 1 ms Low Register
+120120D4 000000FF
+;;;Port MAC Control Register0
+12013000 00008BE5
+;;;Port MAC Control Register1
+12013004 00000003
+;;;Port MAC Control Register2
+12013008 0000C048
+;;;Port Auto-Negotiation Configuration
+1201300C 0000BAE8
+;;;Port Serial Parameters Configuration
+12013014 000008C4
+;;;Port FIFO Configuration Register 0
+12013018 00004B4D
+;;;Port FIFO Configuration Register 1
+1201301C 00000052
+;;;Port SERDES Configuration Register0
+12013028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1201302C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+12013030 0000C815
+;;;Port MAC Control Register3
+12013048 00000300
+;;;Port MAC Control Register4
+12013090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+12013094 00000001
+;;;LPI Control 0
+120130C0 00001004
+;;;LPI Control 1
+120130C4 00000100
+;;;LPI Control 2
+120130C8 000001FD
+;;;Pulse 1 ms Low Register
+120130D4 000000FF
+;;;Port MAC Control Register0
+12014000 00008BE5
+;;;Port MAC Control Register1
+12014004 00000003
+;;;Port MAC Control Register2
+12014008 0000C048
+;;;Port Auto-Negotiation Configuration
+1201400C 0000BAE8
+;;;Port Serial Parameters Configuration
+12014014 000008C4
+;;;Port FIFO Configuration Register 0
+12014018 00004B4D
+;;;Port FIFO Configuration Register 1
+1201401C 00000052
+;;;Port SERDES Configuration Register0
+12014028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1201402C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+12014030 0000C815
+;;;Port MAC Control Register3
+12014048 00000300
+;;;Port MAC Control Register4
+12014090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+12014094 00000001
+;;;LPI Control 0
+120140C0 00001004
+;;;LPI Control 1
+120140C4 00000100
+;;;LPI Control 2
+120140C8 000001FD
+;;;Pulse 1 ms Low Register
+120140D4 000000FF
+;;;Port MAC Control Register0
+12015000 00008BE5
+;;;Port MAC Control Register1
+12015004 00000003
+;;;Port MAC Control Register2
+12015008 0000C048
+;;;Port Auto-Negotiation Configuration
+1201500C 0000BAE8
+;;;Port Serial Parameters Configuration
+12015014 000008C4
+;;;Port FIFO Configuration Register 0
+12015018 00004B4D
+;;;Port FIFO Configuration Register 1
+1201501C 00000052
+;;;Port SERDES Configuration Register0
+12015028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1201502C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+12015030 0000C815
+;;;Port MAC Control Register3
+12015048 00000300
+;;;Port MAC Control Register4
+12015090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+12015094 00000001
+;;;LPI Control 0
+120150C0 00001004
+;;;LPI Control 1
+120150C4 00000100
+;;;LPI Control 2
+120150C8 000001FD
+;;;Pulse 1 ms Low Register
+120150D4 000000FF
+;;;Port MAC Control Register0
+12016000 00008BE5
+;;;Port MAC Control Register1
+12016004 00000003
+;;;Port MAC Control Register2
+12016008 0000C048
+;;;Port Auto-Negotiation Configuration
+1201600C 0000BAE8
+;;;Port Serial Parameters Configuration
+12016014 000008C4
+;;;Port FIFO Configuration Register 0
+12016018 00004B4D
+;;;Port FIFO Configuration Register 1
+1201601C 00000052
+;;;Port SERDES Configuration Register0
+12016028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1201602C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+12016030 0000C815
+;;;Port MAC Control Register3
+12016048 00000300
+;;;Port MAC Control Register4
+12016090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+12016094 00000001
+;;;LPI Control 0
+120160C0 00001004
+;;;LPI Control 1
+120160C4 00000100
+;;;LPI Control 2
+120160C8 000001FD
+;;;Pulse 1 ms Low Register
+120160D4 000000FF
+;;;Port MAC Control Register0
+12017000 00008BE5
+;;;Port MAC Control Register1
+12017004 00000003
+;;;Port MAC Control Register2
+12017008 0000C048
+;;;Port Auto-Negotiation Configuration
+1201700C 0000BAE8
+;;;Port Serial Parameters Configuration
+12017014 000008C4
+;;;Port FIFO Configuration Register 0
+12017018 00004B4D
+;;;Port FIFO Configuration Register 1
+1201701C 00000052
+;;;Port SERDES Configuration Register0
+12017028 0000001E
+;;;Port SERDES Configuration Register1 (Used for 100FX in xCat_a1); Port MIB Counters Control
+1201702C 0000000C 2 18
+;;;Port SERDES Configuration Register2
+12017030 0000C815
+;;;Port MAC Control Register3
+12017048 00000300
+;;;Port MAC Control Register4
+12017090 0000FD9A
+;;;Port Serial Parameters 1 Configuration
+12017094 00000001
+;;;LPI Control 0
+120170C0 00001004
+;;;LPI Control 1
+120170C4 00000100
+;;;LPI Control 2
+120170C8 000001FD
+;;;Pulse 1 ms Low Register
+120170D4 000000FF
+;;;Port MAC Control Register0
+120D8000 00000201
+;;;Port MAC Control Register1
+120D8004 000002F9
+;;;Port MAC Control Register2
+120D8008 00000400
+;;;Port FIFOs Thresholds Configuration
+120D8010 00007BE3
+;;;Port MAC Control Register3
+120D801C 00006000
+;;;Port Metal Fix
+120D802C 00000080
+;;;XG MIB Counters Control
+120D8030 000007EC
+;;;PPFC control
+120D8060 000002FF
+;;;Port MAC Control Register4
+120D8084 00000210
+;;;Port MAC Control Register5
+120D8088 0000900C
+;;;Port MAC Control Register0
+120D9000 00000201
+;;;Port MAC Control Register1
+120D9004 000002F9
+;;;Port MAC Control Register2
+120D9008 00000400
+;;;Port FIFOs Thresholds Configuration
+120D9010 00007BE3
+;;;Port MAC Control Register3
+120D901C 00006000
+;;;Port Metal Fix
+120D902C 00000080
+;;;XG MIB Counters Control
+120D9030 000007EC
+;;;PPFC control
+120D9060 000002FF
+;;;Port MAC Control Register4
+120D9084 00000210
+;;;Port MAC Control Register5
+120D9088 0000900C
+;;;Port MAC Control Register0
+120DA000 00000201
+;;;Port MAC Control Register1
+120DA004 000002F9
+;;;Port MAC Control Register2
+120DA008 00000400
+;;;Port FIFOs Thresholds Configuration
+120DA010 00007BE3
+;;;Port MAC Control Register3
+120DA01C 00006000
+;;;Port Metal Fix
+120DA02C 00000080
+;;;XG MIB Counters Control
+120DA030 000007EC
+;;;PPFC control
+120DA060 000002FF
+;;;Port MAC Control Register4
+120DA084 00000210
+;;;Port MAC Control Register5
+120DA088 0000900C
+;;;Port MAC Control Register0
+120DB000 00000201
+;;;Port MAC Control Register1
+120DB004 000002F9
+;;;Port MAC Control Register2
+120DB008 00000400
+;;;Port FIFOs Thresholds Configuration
+120DB010 00007BE3
+;;;Port MAC Control Register3
+120DB01C 00006000
+;;;Port Metal Fix
+120DB02C 00000080
+;;;XG MIB Counters Control
+120DB030 000007EC
+;;;PPFC control
+120DB060 000002FF
+;;;Port MAC Control Register4
+120DB084 00000210
+;;;Port MAC Control Register5
+120DB088 0000900C
+;;;Port MAC Control Register0
+120DC000 00000201
+;;;Port MAC Control Register1
+120DC004 000002F9
+;;;Port MAC Control Register2
+120DC008 00000400
+;;;Port FIFOs Thresholds Configuration
+120DC010 00007BE3
+;;;Port MAC Control Register3
+120DC01C 00006000
+;;;Port Metal Fix
+120DC02C 00000080
+;;;XG MIB Counters Control
+120DC030 000007EC
+;;;PPFC control
+120DC060 000002FF
+;;;Port MAC Control Register4
+120DC084 00000210
+;;;Port MAC Control Register5
+120DC088 0000900C
+;;;Port MAC Control Register0
+120DD000 00000201
+;;;Port MAC Control Register1
+120DD004 000002F9
+;;;Port MAC Control Register2
+120DD008 00000400
+;;;Port FIFOs Thresholds Configuration
+120DD010 00007BE3
+;;;Port MAC Control Register3
+120DD01C 00006000
+;;;Port Metal Fix
+120DD02C 00000080
+;;;XG MIB Counters Control
+120DD030 000007EC
+;;;PPFC control
+120DD060 000002FF
+;;;Port MAC Control Register4
+120DD084 00000210
+;;;Port MAC Control Register5
+120DD088 0000900C
+;;;Port MAC Control Register0
+120DF000 00000201
+;;;Port MAC Control Register1
+120DF004 000002F9
+;;;Port MAC Control Register2
+120DF008 00000400
+;;;Port FIFOs Thresholds Configuration
+120DF010 00007BE3
+;;;Port MAC Control Register3
+120DF01C 00006000
+;;;Port Metal Fix
+120DF02C 00000080
+;;;XG MIB Counters Control
+120DF030 000007EC
+;;;PPFC control
+120DF060 000002FF
+;;;Port MAC Control Register4
+120DF084 00000210
+;;;Port MAC Control Register5
+120DF088 0000900C
+;;;FCA Control
+12180600 00000011
+;;;DB register 0
+12180604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1218062C 000000FF 8 4
+;;;MAC DA 0 to 15
+12180654 00000001
+;;;MAC DA 16 to 31
+12180658 0000C200
+;;;MAC DA 32 to 47
+1218065C 00000180
+;;;L2 control register 0
+1218066C 00008808
+;;;L2 control register 1
+12180670 00000001
+;;;PFC Priority Mask
+12180704 000000FF
+;;;Metal Fix Register
+12180718 0000FF00
+;;;MAC DA 0
+12180C00 00000088
+;;;MAC DA 1
+12180C04 00000099
+;;;MAC DA 2
+12180C08 000000AA
+;;;MAC SA 0
+12180C0C 00000123
+;;;EtherType
+12180C18 00006666
+;;;Packet length
+12180C20 0000003C
+;;;Packet count
+12180C24 00000001
+;;;MAC DA Increment limit
+12180C2C 00000400
+;;;Data pattern 1
+12180C54 00000701
+;;;Data pattern 2
+12180C58 00000E02
+;;;Data pattern 3
+12180C5C 00001503
+;;;Data pattern 4
+12180C60 00001C04
+;;;Data pattern 5
+12180C64 00002305
+;;;Data pattern 6
+12180C68 00002A06
+;;;Data pattern 7
+12180C6C 00003107
+;;;Data pattern 8
+12180C70 00003808
+;;;Data pattern 9
+12180C74 00003F09
+;;;Data pattern 10
+12180C78 0000460A
+;;;Data pattern 11
+12180C7C 00004D0B
+;;;Data pattern 12
+12180C80 0000540C
+;;;Data pattern 13
+12180C84 00005B0D
+;;;Data pattern 14
+12180C88 0000620E
+;;;Data pattern 15
+12180C8C 0000690F
+;;;Data pattern 16
+12180C90 00007010
+;;;Data pattern 17
+12180C94 00007711
+;;;Data pattern 18
+12180C98 00007E12
+;;;Data pattern 19
+12180C9C 00008513
+;;;Data pattern 20
+12180CA0 00008C14
+;;;Data pattern 21
+12180CA4 00009315
+;;;Data pattern 22
+12180CA8 00009A16
+;;;Data pattern 23
+12180CAC 0000A117
+;;;Data pattern 24
+12180CB0 0000A818
+;;;Data pattern 25
+12180CB4 0000AF19
+;;;Data pattern 26
+12180CB8 0000B61A
+;;;Data pattern 27
+12180CBC 0000BD1B
+;;;Data pattern 28
+12180CC0 0000C41C
+;;;Data pattern 29
+12180CC4 0000CB1D
+;;;Data pattern 30
+12180CC8 0000D21E
+;;;Data pattern 31
+12180CCC 0000D91F
+;;;FCA Control
+12181600 00000011
+;;;DB register 0
+12181604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1218162C 000000FF 8 4
+;;;MAC DA 0 to 15
+12181654 00000001
+;;;MAC DA 16 to 31
+12181658 0000C200
+;;;MAC DA 32 to 47
+1218165C 00000180
+;;;L2 control register 0
+1218166C 00008808
+;;;L2 control register 1
+12181670 00000001
+;;;PFC Priority Mask
+12181704 000000FF
+;;;Metal Fix Register
+12181718 0000FF00
+;;;FCA Control
+12182600 00000011
+;;;DB register 0
+12182604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1218262C 000000FF 8 4
+;;;MAC DA 0 to 15
+12182654 00000001
+;;;MAC DA 16 to 31
+12182658 0000C200
+;;;MAC DA 32 to 47
+1218265C 00000180
+;;;L2 control register 0
+1218266C 00008808
+;;;L2 control register 1
+12182670 00000001
+;;;PFC Priority Mask
+12182704 000000FF
+;;;Metal Fix Register
+12182718 0000FF00
+;;;FCA Control
+12183600 00000011
+;;;DB register 0
+12183604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1218362C 000000FF 8 4
+;;;MAC DA 0 to 15
+12183654 00000001
+;;;MAC DA 16 to 31
+12183658 0000C200
+;;;MAC DA 32 to 47
+1218365C 00000180
+;;;L2 control register 0
+1218366C 00008808
+;;;L2 control register 1
+12183670 00000001
+;;;PFC Priority Mask
+12183704 000000FF
+;;;Metal Fix Register
+12183718 0000FF00
+;;;FCA Control
+12184600 00000011
+;;;DB register 0
+12184604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1218462C 000000FF 8 4
+;;;MAC DA 0 to 15
+12184654 00000001
+;;;MAC DA 16 to 31
+12184658 0000C200
+;;;MAC DA 32 to 47
+1218465C 00000180
+;;;L2 control register 0
+1218466C 00008808
+;;;L2 control register 1
+12184670 00000001
+;;;PFC Priority Mask
+12184704 000000FF
+;;;Metal Fix Register
+12184718 0000FF00
+;;;MAC DA 0
+12184C00 00000088
+;;;MAC DA 1
+12184C04 00000099
+;;;MAC DA 2
+12184C08 000000AA
+;;;MAC SA 0
+12184C0C 00000123
+;;;EtherType
+12184C18 00006666
+;;;Packet length
+12184C20 0000003C
+;;;Packet count
+12184C24 00000001
+;;;MAC DA Increment limit
+12184C2C 00000400
+;;;Data pattern 1
+12184C54 00000701
+;;;Data pattern 2
+12184C58 00000E02
+;;;Data pattern 3
+12184C5C 00001503
+;;;Data pattern 4
+12184C60 00001C04
+;;;Data pattern 5
+12184C64 00002305
+;;;Data pattern 6
+12184C68 00002A06
+;;;Data pattern 7
+12184C6C 00003107
+;;;Data pattern 8
+12184C70 00003808
+;;;Data pattern 9
+12184C74 00003F09
+;;;Data pattern 10
+12184C78 0000460A
+;;;Data pattern 11
+12184C7C 00004D0B
+;;;Data pattern 12
+12184C80 0000540C
+;;;Data pattern 13
+12184C84 00005B0D
+;;;Data pattern 14
+12184C88 0000620E
+;;;Data pattern 15
+12184C8C 0000690F
+;;;Data pattern 16
+12184C90 00007010
+;;;Data pattern 17
+12184C94 00007711
+;;;Data pattern 18
+12184C98 00007E12
+;;;Data pattern 19
+12184C9C 00008513
+;;;Data pattern 20
+12184CA0 00008C14
+;;;Data pattern 21
+12184CA4 00009315
+;;;Data pattern 22
+12184CA8 00009A16
+;;;Data pattern 23
+12184CAC 0000A117
+;;;Data pattern 24
+12184CB0 0000A818
+;;;Data pattern 25
+12184CB4 0000AF19
+;;;Data pattern 26
+12184CB8 0000B61A
+;;;Data pattern 27
+12184CBC 0000BD1B
+;;;Data pattern 28
+12184CC0 0000C41C
+;;;Data pattern 29
+12184CC4 0000CB1D
+;;;Data pattern 30
+12184CC8 0000D21E
+;;;Data pattern 31
+12184CCC 0000D91F
+;;;FCA Control
+12185600 00000011
+;;;DB register 0
+12185604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1218562C 000000FF 8 4
+;;;MAC DA 0 to 15
+12185654 00000001
+;;;MAC DA 16 to 31
+12185658 0000C200
+;;;MAC DA 32 to 47
+1218565C 00000180
+;;;L2 control register 0
+1218566C 00008808
+;;;L2 control register 1
+12185670 00000001
+;;;PFC Priority Mask
+12185704 000000FF
+;;;Metal Fix Register
+12185718 0000FF00
+;;;FCA Control
+12186600 00000011
+;;;DB register 0
+12186604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1218662C 000000FF 8 4
+;;;MAC DA 0 to 15
+12186654 00000001
+;;;MAC DA 16 to 31
+12186658 0000C200
+;;;MAC DA 32 to 47
+1218665C 00000180
+;;;L2 control register 0
+1218666C 00008808
+;;;L2 control register 1
+12186670 00000001
+;;;PFC Priority Mask
+12186704 000000FF
+;;;Metal Fix Register
+12186718 0000FF00
+;;;FCA Control
+12187600 00000011
+;;;DB register 0
+12187604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1218762C 000000FF 8 4
+;;;MAC DA 0 to 15
+12187654 00000001
+;;;MAC DA 16 to 31
+12187658 0000C200
+;;;MAC DA 32 to 47
+1218765C 00000180
+;;;L2 control register 0
+1218766C 00008808
+;;;L2 control register 1
+12187670 00000001
+;;;PFC Priority Mask
+12187704 000000FF
+;;;Metal Fix Register
+12187718 0000FF00
+;;;FCA Control
+12188600 00000011
+;;;DB register 0
+12188604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1218862C 000000FF 8 4
+;;;MAC DA 0 to 15
+12188654 00000001
+;;;MAC DA 16 to 31
+12188658 0000C200
+;;;MAC DA 32 to 47
+1218865C 00000180
+;;;L2 control register 0
+1218866C 00008808
+;;;L2 control register 1
+12188670 00000001
+;;;PFC Priority Mask
+12188704 000000FF
+;;;Metal Fix Register
+12188718 0000FF00
+;;;MAC DA 0
+12188C00 00000088
+;;;MAC DA 1
+12188C04 00000099
+;;;MAC DA 2
+12188C08 000000AA
+;;;MAC SA 0
+12188C0C 00000123
+;;;EtherType
+12188C18 00006666
+;;;Packet length
+12188C20 0000003C
+;;;Packet count
+12188C24 00000001
+;;;MAC DA Increment limit
+12188C2C 00000400
+;;;Data pattern 1
+12188C54 00000701
+;;;Data pattern 2
+12188C58 00000E02
+;;;Data pattern 3
+12188C5C 00001503
+;;;Data pattern 4
+12188C60 00001C04
+;;;Data pattern 5
+12188C64 00002305
+;;;Data pattern 6
+12188C68 00002A06
+;;;Data pattern 7
+12188C6C 00003107
+;;;Data pattern 8
+12188C70 00003808
+;;;Data pattern 9
+12188C74 00003F09
+;;;Data pattern 10
+12188C78 0000460A
+;;;Data pattern 11
+12188C7C 00004D0B
+;;;Data pattern 12
+12188C80 0000540C
+;;;Data pattern 13
+12188C84 00005B0D
+;;;Data pattern 14
+12188C88 0000620E
+;;;Data pattern 15
+12188C8C 0000690F
+;;;Data pattern 16
+12188C90 00007010
+;;;Data pattern 17
+12188C94 00007711
+;;;Data pattern 18
+12188C98 00007E12
+;;;Data pattern 19
+12188C9C 00008513
+;;;Data pattern 20
+12188CA0 00008C14
+;;;Data pattern 21
+12188CA4 00009315
+;;;Data pattern 22
+12188CA8 00009A16
+;;;Data pattern 23
+12188CAC 0000A117
+;;;Data pattern 24
+12188CB0 0000A818
+;;;Data pattern 25
+12188CB4 0000AF19
+;;;Data pattern 26
+12188CB8 0000B61A
+;;;Data pattern 27
+12188CBC 0000BD1B
+;;;Data pattern 28
+12188CC0 0000C41C
+;;;Data pattern 29
+12188CC4 0000CB1D
+;;;Data pattern 30
+12188CC8 0000D21E
+;;;Data pattern 31
+12188CCC 0000D91F
+;;;FCA Control
+12189600 00000011
+;;;DB register 0
+12189604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1218962C 000000FF 8 4
+;;;MAC DA 0 to 15
+12189654 00000001
+;;;MAC DA 16 to 31
+12189658 0000C200
+;;;MAC DA 32 to 47
+1218965C 00000180
+;;;L2 control register 0
+1218966C 00008808
+;;;L2 control register 1
+12189670 00000001
+;;;PFC Priority Mask
+12189704 000000FF
+;;;Metal Fix Register
+12189718 0000FF00
+;;;FCA Control
+1218A600 00000011
+;;;DB register 0
+1218A604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1218A62C 000000FF 8 4
+;;;MAC DA 0 to 15
+1218A654 00000001
+;;;MAC DA 16 to 31
+1218A658 0000C200
+;;;MAC DA 32 to 47
+1218A65C 00000180
+;;;L2 control register 0
+1218A66C 00008808
+;;;L2 control register 1
+1218A670 00000001
+;;;PFC Priority Mask
+1218A704 000000FF
+;;;Metal Fix Register
+1218A718 0000FF00
+;;;FCA Control
+1218B600 00000011
+;;;DB register 0
+1218B604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1218B62C 000000FF 8 4
+;;;MAC DA 0 to 15
+1218B654 00000001
+;;;MAC DA 16 to 31
+1218B658 0000C200
+;;;MAC DA 32 to 47
+1218B65C 00000180
+;;;L2 control register 0
+1218B66C 00008808
+;;;L2 control register 1
+1218B670 00000001
+;;;PFC Priority Mask
+1218B704 000000FF
+;;;Metal Fix Register
+1218B718 0000FF00
+;;;FCA Control
+1218C600 00000011
+;;;DB register 0
+1218C604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1218C62C 000000FF 8 4
+;;;MAC DA 0 to 15
+1218C654 00000001
+;;;MAC DA 16 to 31
+1218C658 0000C200
+;;;MAC DA 32 to 47
+1218C65C 00000180
+;;;L2 control register 0
+1218C66C 00008808
+;;;L2 control register 1
+1218C670 00000001
+;;;PFC Priority Mask
+1218C704 000000FF
+;;;Metal Fix Register
+1218C718 0000FF00
+;;;MAC DA 0
+1218CC00 00000088
+;;;MAC DA 1
+1218CC04 00000099
+;;;MAC DA 2
+1218CC08 000000AA
+;;;MAC SA 0
+1218CC0C 00000123
+;;;EtherType
+1218CC18 00006666
+;;;Packet length
+1218CC20 0000003C
+;;;Packet count
+1218CC24 00000001
+;;;MAC DA Increment limit
+1218CC2C 00000400
+;;;Data pattern 1
+1218CC54 00000701
+;;;Data pattern 2
+1218CC58 00000E02
+;;;Data pattern 3
+1218CC5C 00001503
+;;;Data pattern 4
+1218CC60 00001C04
+;;;Data pattern 5
+1218CC64 00002305
+;;;Data pattern 6
+1218CC68 00002A06
+;;;Data pattern 7
+1218CC6C 00003107
+;;;Data pattern 8
+1218CC70 00003808
+;;;Data pattern 9
+1218CC74 00003F09
+;;;Data pattern 10
+1218CC78 0000460A
+;;;Data pattern 11
+1218CC7C 00004D0B
+;;;Data pattern 12
+1218CC80 0000540C
+;;;Data pattern 13
+1218CC84 00005B0D
+;;;Data pattern 14
+1218CC88 0000620E
+;;;Data pattern 15
+1218CC8C 0000690F
+;;;Data pattern 16
+1218CC90 00007010
+;;;Data pattern 17
+1218CC94 00007711
+;;;Data pattern 18
+1218CC98 00007E12
+;;;Data pattern 19
+1218CC9C 00008513
+;;;Data pattern 20
+1218CCA0 00008C14
+;;;Data pattern 21
+1218CCA4 00009315
+;;;Data pattern 22
+1218CCA8 00009A16
+;;;Data pattern 23
+1218CCAC 0000A117
+;;;Data pattern 24
+1218CCB0 0000A818
+;;;Data pattern 25
+1218CCB4 0000AF19
+;;;Data pattern 26
+1218CCB8 0000B61A
+;;;Data pattern 27
+1218CCBC 0000BD1B
+;;;Data pattern 28
+1218CCC0 0000C41C
+;;;Data pattern 29
+1218CCC4 0000CB1D
+;;;Data pattern 30
+1218CCC8 0000D21E
+;;;Data pattern 31
+1218CCCC 0000D91F
+;;;FCA Control
+1218D600 00000011
+;;;DB register 0
+1218D604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1218D62C 000000FF 8 4
+;;;MAC DA 0 to 15
+1218D654 00000001
+;;;MAC DA 16 to 31
+1218D658 0000C200
+;;;MAC DA 32 to 47
+1218D65C 00000180
+;;;L2 control register 0
+1218D66C 00008808
+;;;L2 control register 1
+1218D670 00000001
+;;;PFC Priority Mask
+1218D704 000000FF
+;;;Metal Fix Register
+1218D718 0000FF00
+;;;FCA Control
+1218E600 00000011
+;;;DB register 0
+1218E604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1218E62C 000000FF 8 4
+;;;MAC DA 0 to 15
+1218E654 00000001
+;;;MAC DA 16 to 31
+1218E658 0000C200
+;;;MAC DA 32 to 47
+1218E65C 00000180
+;;;L2 control register 0
+1218E66C 00008808
+;;;L2 control register 1
+1218E670 00000001
+;;;PFC Priority Mask
+1218E704 000000FF
+;;;Metal Fix Register
+1218E718 0000FF00
+;;;FCA Control
+1218F600 00000011
+;;;DB register 0
+1218F604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1218F62C 000000FF 8 4
+;;;MAC DA 0 to 15
+1218F654 00000001
+;;;MAC DA 16 to 31
+1218F658 0000C200
+;;;MAC DA 32 to 47
+1218F65C 00000180
+;;;L2 control register 0
+1218F66C 00008808
+;;;L2 control register 1
+1218F670 00000001
+;;;PFC Priority Mask
+1218F704 000000FF
+;;;Metal Fix Register
+1218F718 0000FF00
+;;;FCA Control
+12190600 00000011
+;;;DB register 0
+12190604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1219062C 000000FF 8 4
+;;;MAC DA 0 to 15
+12190654 00000001
+;;;MAC DA 16 to 31
+12190658 0000C200
+;;;MAC DA 32 to 47
+1219065C 00000180
+;;;L2 control register 0
+1219066C 00008808
+;;;L2 control register 1
+12190670 00000001
+;;;PFC Priority Mask
+12190704 000000FF
+;;;Metal Fix Register
+12190718 0000FF00
+;;;MAC DA 0
+12190C00 00000088
+;;;MAC DA 1
+12190C04 00000099
+;;;MAC DA 2
+12190C08 000000AA
+;;;MAC SA 0
+12190C0C 00000123
+;;;EtherType
+12190C18 00006666
+;;;Packet length
+12190C20 0000003C
+;;;Packet count
+12190C24 00000001
+;;;MAC DA Increment limit
+12190C2C 00000400
+;;;Data pattern 1
+12190C54 00000701
+;;;Data pattern 2
+12190C58 00000E02
+;;;Data pattern 3
+12190C5C 00001503
+;;;Data pattern 4
+12190C60 00001C04
+;;;Data pattern 5
+12190C64 00002305
+;;;Data pattern 6
+12190C68 00002A06
+;;;Data pattern 7
+12190C6C 00003107
+;;;Data pattern 8
+12190C70 00003808
+;;;Data pattern 9
+12190C74 00003F09
+;;;Data pattern 10
+12190C78 0000460A
+;;;Data pattern 11
+12190C7C 00004D0B
+;;;Data pattern 12
+12190C80 0000540C
+;;;Data pattern 13
+12190C84 00005B0D
+;;;Data pattern 14
+12190C88 0000620E
+;;;Data pattern 15
+12190C8C 0000690F
+;;;Data pattern 16
+12190C90 00007010
+;;;Data pattern 17
+12190C94 00007711
+;;;Data pattern 18
+12190C98 00007E12
+;;;Data pattern 19
+12190C9C 00008513
+;;;Data pattern 20
+12190CA0 00008C14
+;;;Data pattern 21
+12190CA4 00009315
+;;;Data pattern 22
+12190CA8 00009A16
+;;;Data pattern 23
+12190CAC 0000A117
+;;;Data pattern 24
+12190CB0 0000A818
+;;;Data pattern 25
+12190CB4 0000AF19
+;;;Data pattern 26
+12190CB8 0000B61A
+;;;Data pattern 27
+12190CBC 0000BD1B
+;;;Data pattern 28
+12190CC0 0000C41C
+;;;Data pattern 29
+12190CC4 0000CB1D
+;;;Data pattern 30
+12190CC8 0000D21E
+;;;Data pattern 31
+12190CCC 0000D91F
+;;;FCA Control
+12191600 00000011
+;;;DB register 0
+12191604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1219162C 000000FF 8 4
+;;;MAC DA 0 to 15
+12191654 00000001
+;;;MAC DA 16 to 31
+12191658 0000C200
+;;;MAC DA 32 to 47
+1219165C 00000180
+;;;L2 control register 0
+1219166C 00008808
+;;;L2 control register 1
+12191670 00000001
+;;;PFC Priority Mask
+12191704 000000FF
+;;;Metal Fix Register
+12191718 0000FF00
+;;;FCA Control
+12192600 00000011
+;;;DB register 0
+12192604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1219262C 000000FF 8 4
+;;;MAC DA 0 to 15
+12192654 00000001
+;;;MAC DA 16 to 31
+12192658 0000C200
+;;;MAC DA 32 to 47
+1219265C 00000180
+;;;L2 control register 0
+1219266C 00008808
+;;;L2 control register 1
+12192670 00000001
+;;;PFC Priority Mask
+12192704 000000FF
+;;;Metal Fix Register
+12192718 0000FF00
+;;;FCA Control
+12193600 00000011
+;;;DB register 0
+12193604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1219362C 000000FF 8 4
+;;;MAC DA 0 to 15
+12193654 00000001
+;;;MAC DA 16 to 31
+12193658 0000C200
+;;;MAC DA 32 to 47
+1219365C 00000180
+;;;L2 control register 0
+1219366C 00008808
+;;;L2 control register 1
+12193670 00000001
+;;;PFC Priority Mask
+12193704 000000FF
+;;;Metal Fix Register
+12193718 0000FF00
+;;;FCA Control
+12194600 00000011
+;;;DB register 0
+12194604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1219462C 000000FF 8 4
+;;;MAC DA 0 to 15
+12194654 00000001
+;;;MAC DA 16 to 31
+12194658 0000C200
+;;;MAC DA 32 to 47
+1219465C 00000180
+;;;L2 control register 0
+1219466C 00008808
+;;;L2 control register 1
+12194670 00000001
+;;;PFC Priority Mask
+12194704 000000FF
+;;;Metal Fix Register
+12194718 0000FF00
+;;;MAC DA 0
+12194C00 00000088
+;;;MAC DA 1
+12194C04 00000099
+;;;MAC DA 2
+12194C08 000000AA
+;;;MAC SA 0
+12194C0C 00000123
+;;;EtherType
+12194C18 00006666
+;;;Packet length
+12194C20 0000003C
+;;;Packet count
+12194C24 00000001
+;;;MAC DA Increment limit
+12194C2C 00000400
+;;;Data pattern 1
+12194C54 00000701
+;;;Data pattern 2
+12194C58 00000E02
+;;;Data pattern 3
+12194C5C 00001503
+;;;Data pattern 4
+12194C60 00001C04
+;;;Data pattern 5
+12194C64 00002305
+;;;Data pattern 6
+12194C68 00002A06
+;;;Data pattern 7
+12194C6C 00003107
+;;;Data pattern 8
+12194C70 00003808
+;;;Data pattern 9
+12194C74 00003F09
+;;;Data pattern 10
+12194C78 0000460A
+;;;Data pattern 11
+12194C7C 00004D0B
+;;;Data pattern 12
+12194C80 0000540C
+;;;Data pattern 13
+12194C84 00005B0D
+;;;Data pattern 14
+12194C88 0000620E
+;;;Data pattern 15
+12194C8C 0000690F
+;;;Data pattern 16
+12194C90 00007010
+;;;Data pattern 17
+12194C94 00007711
+;;;Data pattern 18
+12194C98 00007E12
+;;;Data pattern 19
+12194C9C 00008513
+;;;Data pattern 20
+12194CA0 00008C14
+;;;Data pattern 21
+12194CA4 00009315
+;;;Data pattern 22
+12194CA8 00009A16
+;;;Data pattern 23
+12194CAC 0000A117
+;;;Data pattern 24
+12194CB0 0000A818
+;;;Data pattern 25
+12194CB4 0000AF19
+;;;Data pattern 26
+12194CB8 0000B61A
+;;;Data pattern 27
+12194CBC 0000BD1B
+;;;Data pattern 28
+12194CC0 0000C41C
+;;;Data pattern 29
+12194CC4 0000CB1D
+;;;Data pattern 30
+12194CC8 0000D21E
+;;;Data pattern 31
+12194CCC 0000D91F
+;;;FCA Control
+12195600 00000011
+;;;DB register 0
+12195604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1219562C 000000FF 8 4
+;;;MAC DA 0 to 15
+12195654 00000001
+;;;MAC DA 16 to 31
+12195658 0000C200
+;;;MAC DA 32 to 47
+1219565C 00000180
+;;;L2 control register 0
+1219566C 00008808
+;;;L2 control register 1
+12195670 00000001
+;;;PFC Priority Mask
+12195704 000000FF
+;;;Metal Fix Register
+12195718 0000FF00
+;;;FCA Control
+12196600 00000011
+;;;DB register 0
+12196604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1219662C 000000FF 8 4
+;;;MAC DA 0 to 15
+12196654 00000001
+;;;MAC DA 16 to 31
+12196658 0000C200
+;;;MAC DA 32 to 47
+1219665C 00000180
+;;;L2 control register 0
+1219666C 00008808
+;;;L2 control register 1
+12196670 00000001
+;;;PFC Priority Mask
+12196704 000000FF
+;;;Metal Fix Register
+12196718 0000FF00
+;;;FCA Control
+12197600 00000011
+;;;DB register 0
+12197604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1219762C 000000FF 8 4
+;;;MAC DA 0 to 15
+12197654 00000001
+;;;MAC DA 16 to 31
+12197658 0000C200
+;;;MAC DA 32 to 47
+1219765C 00000180
+;;;L2 control register 0
+1219766C 00008808
+;;;L2 control register 1
+12197670 00000001
+;;;PFC Priority Mask
+12197704 000000FF
+;;;Metal Fix Register
+12197718 0000FF00
+;;;PCS40G Alignment Cycle Control
+12198010 00003FFF
+;;;PCS40G Common Control
+12198014 00003C20
+;;;Channel Configuration
+12198074 000000A0
+;;;Channel0 RX GB Fifo Configuration; Channel1 RX GB Fifo Configuration; Channel2 RX GB Fifo Configuration; Channel3 RX GB Fifo Configuration
+12198078 0000001D 4 4
+;;;Lane0 Alignment Marker 0
+12198088 00007690
+;;;Lane0 Alignment Marker 1
+1219808C 00003E47
+;;;Lane0 Alignment Marker 2
+12198090 0000896F
+;;;Lane0 Alignment Marker 3
+12198094 0000C1B8
+;;;Lane1 Alignment Marker 0
+12198098 0000C4F0
+;;;Lane1 Alignment Marker 1
+1219809C 000063E6
+;;;Lane1 Alignment Marker 2
+121980A0 00003B0F
+;;;Lane1 Alignment Marker 3
+121980A4 00009C19
+;;;Lane2 Alignment Marker 0
+121980A8 000065C5
+;;;Lane2 Alignment Marker 1
+121980AC 0000339B
+;;;Lane2 Alignment Marker 2
+121980B0 00009A3A
+;;;Lane2 Alignment Marker 3
+121980B4 0000CC64
+;;;Lane3 Alignment Marker 0
+121980B8 000079A2
+;;;Lane3 Alignment Marker 1
+121980BC 0000D83D
+;;;Lane3 Alignment Marker 2
+121980C0 0000865D
+;;;Lane3 Alignment Marker 3
+121980C4 000027C2
+;;;Metal Fix
+121980D4 0000FFFF
+;;;FEC DEC DMA control
+121980D8 00000040
+;;;PCS clock reset
+1219814C 00000800
+;;;Test pattern seed A reg 0
+1219815C 0000804F
+;;;Test pattern seed A reg 1
+12198160 0000CAB6
+;;;Test pattern seed A reg 2
+12198164 0000B44D
+;;;Test pattern seed A reg 3
+12198168 000003C8
+;;;Test pattern seed B reg 0
+1219816C 00008884
+;;;Test pattern seed B reg 1
+12198170 000085A3
+;;;Test pattern seed B reg 2
+12198174 000006BB
+;;;Test pattern seed B reg 3
+12198178 00000349
+;;;Encoder configuration
+1219817C 000000F0
+;;;802.3ap Auto-Negotiation Status
+12198204 00000008
+;;;Auto-Negotiation Device Identifier 1
+12198208 00000141
+;;;Auto-Negotiation Device Identifier 2
+1219820C 00000DB0
+;;;Auto-Negotiation Devices In Package 1
+12198214 0000009E
+;;;Auto-Negotiation Devices In Package 2
+12198218 0000C000
+;;;Auto-Negotiation Package Identifier 1
+12198238 00000141
+;;;Auto-Negotiation Package Identifier 2
+1219823C 00000DB0
+;;;802.3ap Auto-Negotiation Advertisement Register 1
+12198240 00000001
+;;;802.3ap Auto-Negotiation Advertisement Register 3
+12198248 0000C000
+;;;802.3ap Next Page Transmit Register / Extended Next Page Transmit Register
+12198258 00002001
+;;;Backplane Ethernet Status Register
+12198270 00000005
+;;;ANEG Control Register 1
+12198284 0000000A
+;;;Global Configuration 0
+12198400 00000046
+;;;Global Configuration 1
+12198404 000000C0
+;;;Global FIFO Threshold Configuration
+12198408 0000B0A3
+;;;Global Max Idle Counter
+1219840C 000007D0
+;;;Metal Fix
+12198440 0000FF00
+;;;Lane Configuration 0; Lane Configuration 0; Lane Configuration 0; Lane Configuration 0; Lane Configuration 0; Lane Configuration 0
+12198450 00000003 6 44
+;;;FCA Control
+12198600 00000011
+;;;DB register 0
+12198604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1219862C 000000FF 8 4
+;;;MAC DA 0 to 15
+12198654 00000001
+;;;MAC DA 16 to 31
+12198658 0000C200
+;;;MAC DA 32 to 47
+1219865C 00000180
+;;;L2 control register 0
+1219866C 00008808
+;;;L2 control register 1
+12198670 00000001
+;;;PFC Priority Mask
+12198704 000000FF
+;;;Metal Fix Register
+12198718 0000FF00
+;;;MAC DA 0
+12198C00 00000088
+;;;MAC DA 1
+12198C04 00000099
+;;;MAC DA 2
+12198C08 000000AA
+;;;MAC SA 0
+12198C0C 00000123
+;;;EtherType
+12198C18 00006666
+;;;Packet length
+12198C20 0000003C
+;;;Packet count
+12198C24 00000001
+;;;MAC DA Increment limit
+12198C2C 00000400
+;;;Data pattern 1
+12198C54 00000701
+;;;Data pattern 2
+12198C58 00000E02
+;;;Data pattern 3
+12198C5C 00001503
+;;;Data pattern 4
+12198C60 00001C04
+;;;Data pattern 5
+12198C64 00002305
+;;;Data pattern 6
+12198C68 00002A06
+;;;Data pattern 7
+12198C6C 00003107
+;;;Data pattern 8
+12198C70 00003808
+;;;Data pattern 9
+12198C74 00003F09
+;;;Data pattern 10
+12198C78 0000460A
+;;;Data pattern 11
+12198C7C 00004D0B
+;;;Data pattern 12
+12198C80 0000540C
+;;;Data pattern 13
+12198C84 00005B0D
+;;;Data pattern 14
+12198C88 0000620E
+;;;Data pattern 15
+12198C8C 0000690F
+;;;Data pattern 16
+12198C90 00007010
+;;;Data pattern 17
+12198C94 00007711
+;;;Data pattern 18
+12198C98 00007E12
+;;;Data pattern 19
+12198C9C 00008513
+;;;Data pattern 20
+12198CA0 00008C14
+;;;Data pattern 21
+12198CA4 00009315
+;;;Data pattern 22
+12198CA8 00009A16
+;;;Data pattern 23
+12198CAC 0000A117
+;;;Data pattern 24
+12198CB0 0000A818
+;;;Data pattern 25
+12198CB4 0000AF19
+;;;Data pattern 26
+12198CB8 0000B61A
+;;;Data pattern 27
+12198CBC 0000BD1B
+;;;Data pattern 28
+12198CC0 0000C41C
+;;;Data pattern 29
+12198CC4 0000CB1D
+;;;Data pattern 30
+12198CC8 0000D21E
+;;;Data pattern 31
+12198CCC 0000D91F
+;;;PCS40G Alignment Cycle Control
+12199010 00003FFF
+;;;PCS40G Common Control
+12199014 00003C20
+;;;Channel Configuration
+12199074 000000A0
+;;;Channel0 RX GB Fifo Configuration; Channel1 RX GB Fifo Configuration; Channel2 RX GB Fifo Configuration; Channel3 RX GB Fifo Configuration
+12199078 0000001D 4 4
+;;;Lane0 Alignment Marker 0
+12199088 00007690
+;;;Lane0 Alignment Marker 1
+1219908C 00003E47
+;;;Lane0 Alignment Marker 2
+12199090 0000896F
+;;;Lane0 Alignment Marker 3
+12199094 0000C1B8
+;;;Lane1 Alignment Marker 0
+12199098 0000C4F0
+;;;Lane1 Alignment Marker 1
+1219909C 000063E6
+;;;Lane1 Alignment Marker 2
+121990A0 00003B0F
+;;;Lane1 Alignment Marker 3
+121990A4 00009C19
+;;;Lane2 Alignment Marker 0
+121990A8 000065C5
+;;;Lane2 Alignment Marker 1
+121990AC 0000339B
+;;;Lane2 Alignment Marker 2
+121990B0 00009A3A
+;;;Lane2 Alignment Marker 3
+121990B4 0000CC64
+;;;Lane3 Alignment Marker 0
+121990B8 000079A2
+;;;Lane3 Alignment Marker 1
+121990BC 0000D83D
+;;;Lane3 Alignment Marker 2
+121990C0 0000865D
+;;;Lane3 Alignment Marker 3
+121990C4 000027C2
+;;;Metal Fix
+121990D4 0000FFFF
+;;;FEC DEC DMA control
+121990D8 00000040
+;;;PCS clock reset
+1219914C 00000800
+;;;Test pattern seed A reg 0
+1219915C 0000804F
+;;;Test pattern seed A reg 1
+12199160 0000CAB6
+;;;Test pattern seed A reg 2
+12199164 0000B44D
+;;;Test pattern seed A reg 3
+12199168 000003C8
+;;;Test pattern seed B reg 0
+1219916C 00008884
+;;;Test pattern seed B reg 1
+12199170 000085A3
+;;;Test pattern seed B reg 2
+12199174 000006BB
+;;;Test pattern seed B reg 3
+12199178 00000349
+;;;Encoder configuration
+1219917C 000000F0
+;;;802.3ap Auto-Negotiation Status
+12199204 00000008
+;;;Auto-Negotiation Device Identifier 1
+12199208 00000141
+;;;Auto-Negotiation Device Identifier 2
+1219920C 00000DB0
+;;;Auto-Negotiation Devices In Package 1
+12199214 0000009E
+;;;Auto-Negotiation Devices In Package 2
+12199218 0000C000
+;;;Auto-Negotiation Package Identifier 1
+12199238 00000141
+;;;Auto-Negotiation Package Identifier 2
+1219923C 00000DB0
+;;;802.3ap Auto-Negotiation Advertisement Register 1
+12199240 00000001
+;;;802.3ap Auto-Negotiation Advertisement Register 3
+12199248 0000C000
+;;;802.3ap Next Page Transmit Register / Extended Next Page Transmit Register
+12199258 00002001
+;;;Backplane Ethernet Status Register
+12199270 00000005
+;;;ANEG Control Register 1
+12199284 0000000A
+;;;FCA Control
+12199600 00000011
+;;;DB register 0
+12199604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1219962C 000000FF 8 4
+;;;MAC DA 0 to 15
+12199654 00000001
+;;;MAC DA 16 to 31
+12199658 0000C200
+;;;MAC DA 32 to 47
+1219965C 00000180
+;;;L2 control register 0
+1219966C 00008808
+;;;L2 control register 1
+12199670 00000001
+;;;PFC Priority Mask
+12199704 000000FF
+;;;Metal Fix Register
+12199718 0000FF00
+;;;PCS40G Alignment Cycle Control
+1219A010 00003FFF
+;;;PCS40G Common Control
+1219A014 00003C20
+;;;Channel Configuration
+1219A074 000000A0
+;;;Channel0 RX GB Fifo Configuration; Channel1 RX GB Fifo Configuration; Channel2 RX GB Fifo Configuration; Channel3 RX GB Fifo Configuration
+1219A078 0000001D 4 4
+;;;Lane0 Alignment Marker 0
+1219A088 00007690
+;;;Lane0 Alignment Marker 1
+1219A08C 00003E47
+;;;Lane0 Alignment Marker 2
+1219A090 0000896F
+;;;Lane0 Alignment Marker 3
+1219A094 0000C1B8
+;;;Lane1 Alignment Marker 0
+1219A098 0000C4F0
+;;;Lane1 Alignment Marker 1
+1219A09C 000063E6
+;;;Lane1 Alignment Marker 2
+1219A0A0 00003B0F
+;;;Lane1 Alignment Marker 3
+1219A0A4 00009C19
+;;;Lane2 Alignment Marker 0
+1219A0A8 000065C5
+;;;Lane2 Alignment Marker 1
+1219A0AC 0000339B
+;;;Lane2 Alignment Marker 2
+1219A0B0 00009A3A
+;;;Lane2 Alignment Marker 3
+1219A0B4 0000CC64
+;;;Lane3 Alignment Marker 0
+1219A0B8 000079A2
+;;;Lane3 Alignment Marker 1
+1219A0BC 0000D83D
+;;;Lane3 Alignment Marker 2
+1219A0C0 0000865D
+;;;Lane3 Alignment Marker 3
+1219A0C4 000027C2
+;;;Metal Fix
+1219A0D4 0000FFFF
+;;;FEC DEC DMA control
+1219A0D8 00000040
+;;;PCS clock reset
+1219A14C 00000800
+;;;Test pattern seed A reg 0
+1219A15C 0000804F
+;;;Test pattern seed A reg 1
+1219A160 0000CAB6
+;;;Test pattern seed A reg 2
+1219A164 0000B44D
+;;;Test pattern seed A reg 3
+1219A168 000003C8
+;;;Test pattern seed B reg 0
+1219A16C 00008884
+;;;Test pattern seed B reg 1
+1219A170 000085A3
+;;;Test pattern seed B reg 2
+1219A174 000006BB
+;;;Test pattern seed B reg 3
+1219A178 00000349
+;;;Encoder configuration
+1219A17C 000000F0
+;;;802.3ap Auto-Negotiation Status
+1219A204 00000008
+;;;Auto-Negotiation Device Identifier 1
+1219A208 00000141
+;;;Auto-Negotiation Device Identifier 2
+1219A20C 00000DB0
+;;;Auto-Negotiation Devices In Package 1
+1219A214 0000009E
+;;;Auto-Negotiation Devices In Package 2
+1219A218 0000C000
+;;;Auto-Negotiation Package Identifier 1
+1219A238 00000141
+;;;Auto-Negotiation Package Identifier 2
+1219A23C 00000DB0
+;;;802.3ap Auto-Negotiation Advertisement Register 1
+1219A240 00000001
+;;;802.3ap Auto-Negotiation Advertisement Register 3
+1219A248 0000C000
+;;;802.3ap Next Page Transmit Register / Extended Next Page Transmit Register
+1219A258 00002001
+;;;Backplane Ethernet Status Register
+1219A270 00000005
+;;;ANEG Control Register 1
+1219A284 0000000A
+;;;Global Configuration 0
+1219A400 00000046
+;;;Global Configuration 1
+1219A404 000000C0
+;;;Global FIFO Threshold Configuration
+1219A408 0000B0A3
+;;;Global Max Idle Counter
+1219A40C 000007D0
+;;;Metal Fix
+1219A440 0000FF00
+;;;Lane Configuration 0; Lane Configuration 0; Lane Configuration 0; Lane Configuration 0; Lane Configuration 0; Lane Configuration 0
+1219A450 00000003 6 44
+;;;FCA Control
+1219A600 00000011
+;;;DB register 0
+1219A604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1219A62C 000000FF 8 4
+;;;MAC DA 0 to 15
+1219A654 00000001
+;;;MAC DA 16 to 31
+1219A658 0000C200
+;;;MAC DA 32 to 47
+1219A65C 00000180
+;;;L2 control register 0
+1219A66C 00008808
+;;;L2 control register 1
+1219A670 00000001
+;;;PFC Priority Mask
+1219A704 000000FF
+;;;Metal Fix Register
+1219A718 0000FF00
+;;;PCS40G Alignment Cycle Control
+1219B010 00003FFF
+;;;PCS40G Common Control
+1219B014 00003C20
+;;;Channel Configuration
+1219B074 000000A0
+;;;Channel0 RX GB Fifo Configuration; Channel1 RX GB Fifo Configuration; Channel2 RX GB Fifo Configuration; Channel3 RX GB Fifo Configuration
+1219B078 0000001D 4 4
+;;;Lane0 Alignment Marker 0
+1219B088 00007690
+;;;Lane0 Alignment Marker 1
+1219B08C 00003E47
+;;;Lane0 Alignment Marker 2
+1219B090 0000896F
+;;;Lane0 Alignment Marker 3
+1219B094 0000C1B8
+;;;Lane1 Alignment Marker 0
+1219B098 0000C4F0
+;;;Lane1 Alignment Marker 1
+1219B09C 000063E6
+;;;Lane1 Alignment Marker 2
+1219B0A0 00003B0F
+;;;Lane1 Alignment Marker 3
+1219B0A4 00009C19
+;;;Lane2 Alignment Marker 0
+1219B0A8 000065C5
+;;;Lane2 Alignment Marker 1
+1219B0AC 0000339B
+;;;Lane2 Alignment Marker 2
+1219B0B0 00009A3A
+;;;Lane2 Alignment Marker 3
+1219B0B4 0000CC64
+;;;Lane3 Alignment Marker 0
+1219B0B8 000079A2
+;;;Lane3 Alignment Marker 1
+1219B0BC 0000D83D
+;;;Lane3 Alignment Marker 2
+1219B0C0 0000865D
+;;;Lane3 Alignment Marker 3
+1219B0C4 000027C2
+;;;Metal Fix
+1219B0D4 0000FFFF
+;;;FEC DEC DMA control
+1219B0D8 00000040
+;;;PCS clock reset
+1219B14C 00000800
+;;;Test pattern seed A reg 0
+1219B15C 0000804F
+;;;Test pattern seed A reg 1
+1219B160 0000CAB6
+;;;Test pattern seed A reg 2
+1219B164 0000B44D
+;;;Test pattern seed A reg 3
+1219B168 000003C8
+;;;Test pattern seed B reg 0
+1219B16C 00008884
+;;;Test pattern seed B reg 1
+1219B170 000085A3
+;;;Test pattern seed B reg 2
+1219B174 000006BB
+;;;Test pattern seed B reg 3
+1219B178 00000349
+;;;Encoder configuration
+1219B17C 000000F0
+;;;802.3ap Auto-Negotiation Status
+1219B204 00000008
+;;;Auto-Negotiation Device Identifier 1
+1219B208 00000141
+;;;Auto-Negotiation Device Identifier 2
+1219B20C 00000DB0
+;;;Auto-Negotiation Devices In Package 1
+1219B214 0000009E
+;;;Auto-Negotiation Devices In Package 2
+1219B218 0000C000
+;;;Auto-Negotiation Package Identifier 1
+1219B238 00000141
+;;;Auto-Negotiation Package Identifier 2
+1219B23C 00000DB0
+;;;802.3ap Auto-Negotiation Advertisement Register 1
+1219B240 00000001
+;;;802.3ap Auto-Negotiation Advertisement Register 3
+1219B248 0000C000
+;;;802.3ap Next Page Transmit Register / Extended Next Page Transmit Register
+1219B258 00002001
+;;;Backplane Ethernet Status Register
+1219B270 00000005
+;;;ANEG Control Register 1
+1219B284 0000000A
+;;;FCA Control
+1219B600 00000011
+;;;DB register 0
+1219B604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1219B62C 000000FF 8 4
+;;;MAC DA 0 to 15
+1219B654 00000001
+;;;MAC DA 16 to 31
+1219B658 0000C200
+;;;MAC DA 32 to 47
+1219B65C 00000180
+;;;L2 control register 0
+1219B66C 00008808
+;;;L2 control register 1
+1219B670 00000001
+;;;PFC Priority Mask
+1219B704 000000FF
+;;;Metal Fix Register
+1219B718 0000FF00
+;;;PCS40G Alignment Cycle Control
+1219C010 00003FFF
+;;;PCS40G Common Control
+1219C014 00003C20
+;;;Channel Configuration
+1219C074 000000A0
+;;;Channel0 RX GB Fifo Configuration; Channel1 RX GB Fifo Configuration; Channel2 RX GB Fifo Configuration; Channel3 RX GB Fifo Configuration
+1219C078 0000001D 4 4
+;;;Lane0 Alignment Marker 0
+1219C088 00007690
+;;;Lane0 Alignment Marker 1
+1219C08C 00003E47
+;;;Lane0 Alignment Marker 2
+1219C090 0000896F
+;;;Lane0 Alignment Marker 3
+1219C094 0000C1B8
+;;;Lane1 Alignment Marker 0
+1219C098 0000C4F0
+;;;Lane1 Alignment Marker 1
+1219C09C 000063E6
+;;;Lane1 Alignment Marker 2
+1219C0A0 00003B0F
+;;;Lane1 Alignment Marker 3
+1219C0A4 00009C19
+;;;Lane2 Alignment Marker 0
+1219C0A8 000065C5
+;;;Lane2 Alignment Marker 1
+1219C0AC 0000339B
+;;;Lane2 Alignment Marker 2
+1219C0B0 00009A3A
+;;;Lane2 Alignment Marker 3
+1219C0B4 0000CC64
+;;;Lane3 Alignment Marker 0
+1219C0B8 000079A2
+;;;Lane3 Alignment Marker 1
+1219C0BC 0000D83D
+;;;Lane3 Alignment Marker 2
+1219C0C0 0000865D
+;;;Lane3 Alignment Marker 3
+1219C0C4 000027C2
+;;;Metal Fix
+1219C0D4 0000FFFF
+;;;FEC DEC DMA control
+1219C0D8 00000040
+;;;PCS clock reset
+1219C14C 00000800
+;;;Test pattern seed A reg 0
+1219C15C 0000804F
+;;;Test pattern seed A reg 1
+1219C160 0000CAB6
+;;;Test pattern seed A reg 2
+1219C164 0000B44D
+;;;Test pattern seed A reg 3
+1219C168 000003C8
+;;;Test pattern seed B reg 0
+1219C16C 00008884
+;;;Test pattern seed B reg 1
+1219C170 000085A3
+;;;Test pattern seed B reg 2
+1219C174 000006BB
+;;;Test pattern seed B reg 3
+1219C178 00000349
+;;;Encoder configuration
+1219C17C 000000F0
+;;;802.3ap Auto-Negotiation Status
+1219C204 00000008
+;;;Auto-Negotiation Device Identifier 1
+1219C208 00000141
+;;;Auto-Negotiation Device Identifier 2
+1219C20C 00000DB0
+;;;Auto-Negotiation Devices In Package 1
+1219C214 0000009E
+;;;Auto-Negotiation Devices In Package 2
+1219C218 0000C000
+;;;Auto-Negotiation Package Identifier 1
+1219C238 00000141
+;;;Auto-Negotiation Package Identifier 2
+1219C23C 00000DB0
+;;;802.3ap Auto-Negotiation Advertisement Register 1
+1219C240 00000001
+;;;802.3ap Auto-Negotiation Advertisement Register 3
+1219C248 0000C000
+;;;802.3ap Next Page Transmit Register / Extended Next Page Transmit Register
+1219C258 00002001
+;;;Backplane Ethernet Status Register
+1219C270 00000005
+;;;ANEG Control Register 1
+1219C284 0000000A
+;;;FCA Control
+1219C600 00000011
+;;;DB register 0
+1219C604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1219C62C 000000FF 8 4
+;;;MAC DA 0 to 15
+1219C654 00000001
+;;;MAC DA 16 to 31
+1219C658 0000C200
+;;;MAC DA 32 to 47
+1219C65C 00000180
+;;;L2 control register 0
+1219C66C 00008808
+;;;L2 control register 1
+1219C670 00000001
+;;;PFC Priority Mask
+1219C704 000000FF
+;;;Metal Fix Register
+1219C718 0000FF00
+;;;PCS40G Alignment Cycle Control
+1219D010 00003FFF
+;;;PCS40G Common Control
+1219D014 00003C20
+;;;Channel Configuration
+1219D074 000000A0
+;;;Channel0 RX GB Fifo Configuration; Channel1 RX GB Fifo Configuration; Channel2 RX GB Fifo Configuration; Channel3 RX GB Fifo Configuration
+1219D078 0000001D 4 4
+;;;Lane0 Alignment Marker 0
+1219D088 00007690
+;;;Lane0 Alignment Marker 1
+1219D08C 00003E47
+;;;Lane0 Alignment Marker 2
+1219D090 0000896F
+;;;Lane0 Alignment Marker 3
+1219D094 0000C1B8
+;;;Lane1 Alignment Marker 0
+1219D098 0000C4F0
+;;;Lane1 Alignment Marker 1
+1219D09C 000063E6
+;;;Lane1 Alignment Marker 2
+1219D0A0 00003B0F
+;;;Lane1 Alignment Marker 3
+1219D0A4 00009C19
+;;;Lane2 Alignment Marker 0
+1219D0A8 000065C5
+;;;Lane2 Alignment Marker 1
+1219D0AC 0000339B
+;;;Lane2 Alignment Marker 2
+1219D0B0 00009A3A
+;;;Lane2 Alignment Marker 3
+1219D0B4 0000CC64
+;;;Lane3 Alignment Marker 0
+1219D0B8 000079A2
+;;;Lane3 Alignment Marker 1
+1219D0BC 0000D83D
+;;;Lane3 Alignment Marker 2
+1219D0C0 0000865D
+;;;Lane3 Alignment Marker 3
+1219D0C4 000027C2
+;;;Metal Fix
+1219D0D4 0000FFFF
+;;;FEC DEC DMA control
+1219D0D8 00000040
+;;;PCS clock reset
+1219D14C 00000800
+;;;Test pattern seed A reg 0
+1219D15C 0000804F
+;;;Test pattern seed A reg 1
+1219D160 0000CAB6
+;;;Test pattern seed A reg 2
+1219D164 0000B44D
+;;;Test pattern seed A reg 3
+1219D168 000003C8
+;;;Test pattern seed B reg 0
+1219D16C 00008884
+;;;Test pattern seed B reg 1
+1219D170 000085A3
+;;;Test pattern seed B reg 2
+1219D174 000006BB
+;;;Test pattern seed B reg 3
+1219D178 00000349
+;;;Encoder configuration
+1219D17C 000000F0
+;;;802.3ap Auto-Negotiation Status
+1219D204 00000008
+;;;Auto-Negotiation Device Identifier 1
+1219D208 00000141
+;;;Auto-Negotiation Device Identifier 2
+1219D20C 00000DB0
+;;;Auto-Negotiation Devices In Package 1
+1219D214 0000009E
+;;;Auto-Negotiation Devices In Package 2
+1219D218 0000C000
+;;;Auto-Negotiation Package Identifier 1
+1219D238 00000141
+;;;Auto-Negotiation Package Identifier 2
+1219D23C 00000DB0
+;;;802.3ap Auto-Negotiation Advertisement Register 1
+1219D240 00000001
+;;;802.3ap Auto-Negotiation Advertisement Register 3
+1219D248 0000C000
+;;;802.3ap Next Page Transmit Register / Extended Next Page Transmit Register
+1219D258 00002001
+;;;Backplane Ethernet Status Register
+1219D270 00000005
+;;;ANEG Control Register 1
+1219D284 0000000A
+;;;FCA Control
+1219D600 00000011
+;;;DB register 0
+1219D604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1219D62C 000000FF 8 4
+;;;MAC DA 0 to 15
+1219D654 00000001
+;;;MAC DA 16 to 31
+1219D658 0000C200
+;;;MAC DA 32 to 47
+1219D65C 00000180
+;;;L2 control register 0
+1219D66C 00008808
+;;;L2 control register 1
+1219D670 00000001
+;;;PFC Priority Mask
+1219D704 000000FF
+;;;Metal Fix Register
+1219D718 0000FF00
+;;;MAC DA 0
+1219DC00 00000088
+;;;MAC DA 1
+1219DC04 00000099
+;;;MAC DA 2
+1219DC08 000000AA
+;;;MAC SA 0
+1219DC0C 00000123
+;;;EtherType
+1219DC18 00006666
+;;;Packet length
+1219DC20 0000003C
+;;;Packet count
+1219DC24 00000001
+;;;MAC DA Increment limit
+1219DC2C 00000400
+;;;Data pattern 1
+1219DC54 00000701
+;;;Data pattern 2
+1219DC58 00000E02
+;;;Data pattern 3
+1219DC5C 00001503
+;;;Data pattern 4
+1219DC60 00001C04
+;;;Data pattern 5
+1219DC64 00002305
+;;;Data pattern 6
+1219DC68 00002A06
+;;;Data pattern 7
+1219DC6C 00003107
+;;;Data pattern 8
+1219DC70 00003808
+;;;Data pattern 9
+1219DC74 00003F09
+;;;Data pattern 10
+1219DC78 0000460A
+;;;Data pattern 11
+1219DC7C 00004D0B
+;;;Data pattern 12
+1219DC80 0000540C
+;;;Data pattern 13
+1219DC84 00005B0D
+;;;Data pattern 14
+1219DC88 0000620E
+;;;Data pattern 15
+1219DC8C 0000690F
+;;;Data pattern 16
+1219DC90 00007010
+;;;Data pattern 17
+1219DC94 00007711
+;;;Data pattern 18
+1219DC98 00007E12
+;;;Data pattern 19
+1219DC9C 00008513
+;;;Data pattern 20
+1219DCA0 00008C14
+;;;Data pattern 21
+1219DCA4 00009315
+;;;Data pattern 22
+1219DCA8 00009A16
+;;;Data pattern 23
+1219DCAC 0000A117
+;;;Data pattern 24
+1219DCB0 0000A818
+;;;Data pattern 25
+1219DCB4 0000AF19
+;;;Data pattern 26
+1219DCB8 0000B61A
+;;;Data pattern 27
+1219DCBC 0000BD1B
+;;;Data pattern 28
+1219DCC0 0000C41C
+;;;Data pattern 29
+1219DCC4 0000CB1D
+;;;Data pattern 30
+1219DCC8 0000D21E
+;;;Data pattern 31
+1219DCCC 0000D91F
+;;;PCS40G Alignment Cycle Control
+1219F010 00003FFF
+;;;PCS40G Common Control
+1219F014 00003C20
+;;;Channel Configuration
+1219F074 000000A0
+;;;Channel0 RX GB Fifo Configuration; Channel1 RX GB Fifo Configuration; Channel2 RX GB Fifo Configuration; Channel3 RX GB Fifo Configuration
+1219F078 0000001D 4 4
+;;;Lane0 Alignment Marker 0
+1219F088 00007690
+;;;Lane0 Alignment Marker 1
+1219F08C 00003E47
+;;;Lane0 Alignment Marker 2
+1219F090 0000896F
+;;;Lane0 Alignment Marker 3
+1219F094 0000C1B8
+;;;Lane1 Alignment Marker 0
+1219F098 0000C4F0
+;;;Lane1 Alignment Marker 1
+1219F09C 000063E6
+;;;Lane1 Alignment Marker 2
+1219F0A0 00003B0F
+;;;Lane1 Alignment Marker 3
+1219F0A4 00009C19
+;;;Lane2 Alignment Marker 0
+1219F0A8 000065C5
+;;;Lane2 Alignment Marker 1
+1219F0AC 0000339B
+;;;Lane2 Alignment Marker 2
+1219F0B0 00009A3A
+;;;Lane2 Alignment Marker 3
+1219F0B4 0000CC64
+;;;Lane3 Alignment Marker 0
+1219F0B8 000079A2
+;;;Lane3 Alignment Marker 1
+1219F0BC 0000D83D
+;;;Lane3 Alignment Marker 2
+1219F0C0 0000865D
+;;;Lane3 Alignment Marker 3
+1219F0C4 000027C2
+;;;Metal Fix
+1219F0D4 0000FFFF
+;;;FEC DEC DMA control
+1219F0D8 00000040
+;;;PCS clock reset
+1219F14C 00000800
+;;;Test pattern seed A reg 0
+1219F15C 0000804F
+;;;Test pattern seed A reg 1
+1219F160 0000CAB6
+;;;Test pattern seed A reg 2
+1219F164 0000B44D
+;;;Test pattern seed A reg 3
+1219F168 000003C8
+;;;Test pattern seed B reg 0
+1219F16C 00008884
+;;;Test pattern seed B reg 1
+1219F170 000085A3
+;;;Test pattern seed B reg 2
+1219F174 000006BB
+;;;Test pattern seed B reg 3
+1219F178 00000349
+;;;Encoder configuration
+1219F17C 000000F0
+;;;802.3ap Auto-Negotiation Status
+1219F204 00000008
+;;;Auto-Negotiation Device Identifier 1
+1219F208 00000141
+;;;Auto-Negotiation Device Identifier 2
+1219F20C 00000DB0
+;;;Auto-Negotiation Devices In Package 1
+1219F214 0000009E
+;;;Auto-Negotiation Devices In Package 2
+1219F218 0000C000
+;;;Auto-Negotiation Package Identifier 1
+1219F238 00000141
+;;;Auto-Negotiation Package Identifier 2
+1219F23C 00000DB0
+;;;802.3ap Auto-Negotiation Advertisement Register 1
+1219F240 00000001
+;;;802.3ap Auto-Negotiation Advertisement Register 3
+1219F248 0000C000
+;;;802.3ap Next Page Transmit Register / Extended Next Page Transmit Register
+1219F258 00002001
+;;;Backplane Ethernet Status Register
+1219F270 00000005
+;;;ANEG Control Register 1
+1219F284 0000000A
+;;;FCA Control
+1219F600 00000011
+;;;DB register 0
+1219F604 00002003
+;;;Port Speed Timer 0; Port Speed Timer 1; Port Speed Timer 2; Port Speed Timer 3; Port Speed Timer 4; Port Speed Timer 5; Port Speed Timer 6; Port Speed Timer 7
+1219F62C 000000FF 8 4
+;;;MAC DA 0 to 15
+1219F654 00000001
+;;;MAC DA 16 to 31
+1219F658 0000C200
+;;;MAC DA 32 to 47
+1219F65C 00000180
+;;;L2 control register 0
+1219F66C 00008808
+;;;L2 control register 1
+1219F670 00000001
+;;;PFC Priority Mask
+1219F704 000000FF
+;;;Metal Fix Register
+1219F718 0000FF00
+;;;PCS40G Alignment Cycle Control
+121B2010 00003FFF
+;;;PCS40G Common Control
+121B2014 00003C20
+;;;Channel Configuration
+121B2074 000000A0
+;;;Channel0 RX GB Fifo Configuration; Channel1 RX GB Fifo Configuration; Channel2 RX GB Fifo Configuration; Channel3 RX GB Fifo Configuration
+121B2078 0000001D 4 4
+;;;Lane0 Alignment Marker 0
+121B2088 00007690
+;;;Lane0 Alignment Marker 1
+121B208C 00003E47
+;;;Lane0 Alignment Marker 2
+121B2090 0000896F
+;;;Lane0 Alignment Marker 3
+121B2094 0000C1B8
+;;;Lane1 Alignment Marker 0
+121B2098 0000C4F0
+;;;Lane1 Alignment Marker 1
+121B209C 000063E6
+;;;Lane1 Alignment Marker 2
+121B20A0 00003B0F
+;;;Lane1 Alignment Marker 3
+121B20A4 00009C19
+;;;Lane2 Alignment Marker 0
+121B20A8 000065C5
+;;;Lane2 Alignment Marker 1
+121B20AC 0000339B
+;;;Lane2 Alignment Marker 2
+121B20B0 00009A3A
+;;;Lane2 Alignment Marker 3
+121B20B4 0000CC64
+;;;Lane3 Alignment Marker 0
+121B20B8 000079A2
+;;;Lane3 Alignment Marker 1
+121B20BC 0000D83D
+;;;Lane3 Alignment Marker 2
+121B20C0 0000865D
+;;;Lane3 Alignment Marker 3
+121B20C4 000027C2
+;;;Metal Fix
+121B20D4 0000FFFF
+;;;FEC DEC DMA control
+121B20D8 00000040
+;;;PCS clock reset
+121B214C 00000800
+;;;Test pattern seed A reg 0
+121B215C 0000804F
+;;;Test pattern seed A reg 1
+121B2160 0000CAB6
+;;;Test pattern seed A reg 2
+121B2164 0000B44D
+;;;Test pattern seed A reg 3
+121B2168 000003C8
+;;;Test pattern seed B reg 0
+121B216C 00008884
+;;;Test pattern seed B reg 1
+121B2170 000085A3
+;;;Test pattern seed B reg 2
+121B2174 000006BB
+;;;Test pattern seed B reg 3
+121B2178 00000349
+;;;Encoder configuration
+121B217C 000000F0
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; SdRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;SERDES External Configuration 1
+13000004 00000801
+;;;SERDES External Configuration 3
+1300000C 00000020
+;;;SERDES Miscellaneous
+13000014 00000100
+;;;SERDES External Configuration 1
+13001004 00000801
+;;;SERDES External Configuration 3
+1300100C 00000020
+;;;SERDES Miscellaneous
+13001014 00000100
+;;;SERDES External Configuration 1
+13002004 00000801
+;;;SERDES External Configuration 3
+1300200C 00000020
+;;;SERDES Miscellaneous
+13002014 00000100
+;;;SERDES External Configuration 1
+13003004 00000801
+;;;SERDES External Configuration 3
+1300300C 00000020
+;;;SERDES Miscellaneous
+13003014 00000100
+;;;SERDES External Configuration 1
+13004004 00000801
+;;;SERDES External Configuration 3
+1300400C 00000020
+;;;SERDES Miscellaneous
+13004014 00000100
+;;;SERDES External Configuration 1
+13005004 00000801
+;;;SERDES External Configuration 3
+1300500C 00000020
+;;;SERDES Miscellaneous
+13005014 00000100
+;;;SERDES External Configuration 1
+13006004 00000801
+;;;SERDES External Configuration 3
+1300600C 00000020
+;;;SERDES Miscellaneous
+13006014 00000100
+;;;SERDES External Configuration 1
+13007004 00000801
+;;;SERDES External Configuration 3
+1300700C 00000020
+;;;SERDES Miscellaneous
+13007014 00000100
+;;;SERDES External Configuration 1
+13008004 00000801
+;;;SERDES External Configuration 3
+1300800C 00000020
+;;;SERDES Miscellaneous
+13008014 00000100
+;;;SERDES External Configuration 1
+13009004 00000801
+;;;SERDES External Configuration 3
+1300900C 00000020
+;;;SERDES Miscellaneous
+13009014 00000100
+;;;SERDES External Configuration 1
+1300A004 00000801
+;;;SERDES External Configuration 3
+1300A00C 00000020
+;;;SERDES Miscellaneous
+1300A014 00000100
+;;;SERDES External Configuration 1
+1300B004 00000801
+;;;SERDES External Configuration 3
+1300B00C 00000020
+;;;SERDES Miscellaneous
+1300B014 00000100
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; EqRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;Ingress Statistic Mirroring to Analyzer Port Configuration
+14000000 0003F801
+;;;Duplication of Packets to CPU Configuration
+14000018 3FFFFFFF
+;;;Analyzer Port Global Configuration
+1400B040 00000003
+;;;TO CPU Ingress Forwarding Restrictions Configuration; TO NETWORK Ingress Forwarding Restrictions Configuration; TO ANALYZER Ingress Forwarding Restrictions Configuration
+14020000 0FFFFFFF 3 4
+;;;Pre-Egress Engine Global Configuration
+14050000 000004E2
+;;;Pre-Egress Engine DFX
+14050008 18300000
+;;;Statistical Rate Limits Table
+14100000 FFFFFFFF 32 4
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; PclRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;Ingress Policy Global Configuration
+15000000 00000001
+;;;Policy Fifos Threshold Configuration
+15000044 019CE72A
+;;;Metal Fix Register
+15000048 FFFFFFFF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; TtiRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;TTI Unit Global Configuration
+16000000 00082201
+;;;TTI Engine Configuration
+1600000C 00000FD0
+;;;TTI IPv4 GRE Ethertype
+16000018 65586558
+;;;Special Ethertypes
+16000028 FFFFFFFF
+;;;MPLS Ethertypes
+16000030 88488847
+;;;IPv6 Extension Value
+16000038 00003232
+;;;IPv6 Solicited-Node Multicast Address Configuration Register0
+16000040 FF000000
+;;;IPv6 Solicited-Node Multicast Address Configuration Register1
+16000044 00000001
+;;;IPv6 Solicited-Node Multicast Address Configuration Register3
+1600004C FF020000
+;;;IPv6 Solicited-Node Multicast Address Mask Register0
+16000050 FF000000
+;;;IPv6 Solicited-Node Multicast Address Mask Register1; IPv6 Solicited-Node Multicast Address Mask Register2; IPv6 Solicited-Node Multicast Address Mask Register3
+16000054 FFFFFFFF 3 4
+;;;Trunk Hash Configuration Register0
+16000070 000FFF00
+;;;Trunk Hash Configuration Register1; Trunk Hash Configuration Register2
+16000074 3FFFFFFF 2 4
+;;;TTI FIFOThreshold Configuration
+160002A4 000000B9
+;;;Metal Fix Register
+160002B0 8000FFFF
+;;;Ingress TPID Configuration_0; Ingress TPID Configuration_1; Ingress TPID Configuration_2; Ingress TPID Configuration_3
+16000300 81008100 4 4
+;;;Ingress TPID Select0; Ingress TPID Select1; Ingress TPID Select2; Ingress TPID Select3; Ingress TPID Select4; Ingress TPID Select5; Ingress TPID Select6; Ingress TPID Select7; Ingress TPID Select8; Ingress TPID Select9; Ingress TPID Select10; Ingress TPID Select11; Ingress TPID Select12; Ingress TPID Select13; Ingress TPID Select14; Ingress TPID Select15; Ingress TPID Select16; Ingress TPID Select17; Ingress TPID Select18; Ingress TPID Select19; Ingress TPID Select20
+; Ingress TPID Select21; Ingress TPID Select22; Ingress TPID Select23; Ingress TPID Select24; Ingress TPID Select25; Ingress TPID Select26; Ingress TPID Select27; Ingress TPID Select28; Ingress TPID Select29; Ingress TPID Select30; Ingress TPID Select31
+16000310 FFFFFFFF 32 4
+;;;TT Ingress TPID Select0; TT Ingress TPID Select1; TT Ingress TPID Select2; TT Ingress TPID Select3; TT Ingress TPID Select4; TT Ingress TPID Select5; TT Ingress TPID Select6; TT Ingress TPID Select7; TT Ingress TPID Select8; TT Ingress TPID Select9; TT Ingress TPID Select10; TT Ingress TPID Select11; TT Ingress TPID Select12; TT Ingress TPID Select13; TT Ingress TPID Select14; TT Ingress TPID Select15; TT Ingress TPID Select16; TT Ingress TPID Select17; TT Ingress TPID Select18
+; TT Ingress TPID Select19; TT Ingress TPID Select20; TT Ingress TPID Select21; TT Ingress TPID Select22; TT Ingress TPID Select23; TT Ingress TPID Select24; TT Ingress TPID Select25; TT Ingress TPID Select26; TT Ingress TPID Select27; TT Ingress TPID Select28; TT Ingress TPID Select29; TT Ingress TPID Select30; TT Ingress TPID Select31
+16000524 FFFFFFFF 32 4
+;;;MAC2ME 0 Low
+16001600 0000FFF0
+;;;MAC2ME 0 Low Mask
+16001608 FFFFFFF0
+;;;MAC2ME 0 High Mask
+1600160C FFFFFFFF
+;;;MAC2ME 1 Low
+16001610 0000FFF0
+;;;MAC2ME 1 Low Mask
+16001618 FFFFFFF0
+;;;MAC2ME 1 High Mask
+1600161C FFFFFFFF
+;;;MAC2ME 2 Low
+16001620 0000FFF0
+;;;MAC2ME 2 Low Mask
+16001628 FFFFFFF0
+;;;MAC2ME 2 High Mask
+1600162C FFFFFFFF
+;;;MAC2ME 3 Low
+16001630 0000FFF0
+;;;MAC2ME 3 Low Mask
+16001638 FFFFFFF0
+;;;MAC2ME 3 High Mask
+1600163C FFFFFFFF
+;;;MAC2ME 4 Low
+16001640 0000FFF0
+;;;MAC2ME 4 Low Mask
+16001648 FFFFFFF0
+;;;MAC2ME 4 High Mask
+1600164C FFFFFFFF
+;;;MAC2ME 5 Low
+16001650 0000FFF0
+;;;MAC2ME 5 Low Mask
+16001658 FFFFFFF0
+;;;MAC2ME 5 High Mask
+1600165C FFFFFFFF
+;;;MAC2ME 6 Low
+16001660 0000FFF0
+;;;MAC2ME 6 Low Mask
+16001668 FFFFFFF0
+;;;MAC2ME 6 High Mask
+1600166C FFFFFFFF
+;;;MAC2ME 7 Low
+16001670 0000FFF0
+;;;MAC2ME 7 Low Mask
+16001678 FFFFFFF0
+;;;MAC2ME 7 High Mask
+1600167C FFFFFFFF
+;;;MAC2ME TCAM Configuration 0
+16001710 00000081
+;;;MAC2ME TCAM Configuration 2
+16001718 00030501
+;;;MAC2ME TCAM Configuration 3
+1600171C 00020200
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; Iplr0\1RegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;Policer Control0; Policer Control0
+17000000 BE830003 2 0
+;;;Policer MRU; Policer MRU
+17000010 00002800 2 0
+;;;Policer Control0; Policer Control0
+18000000 BE830003 2 0
+;;;Policer MRU
+18000010 00002800 2 0
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; MllRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;MLL Global Control
+19000000 00000700
+;;;Multi Target TC Queues Global Configuration
+19000004 00008888
+;;;MLL Status
+19000008 00000001
+;;;MLL Metal Fix
+1900000C 0000FFFF
+;;;DFT
+19000010 18300003
+;;;Multi-target TC Queues Weight Configuration
+19000204 08040201
+;;;Multi-Target Rate Shaping Configuration
+19000210 00000086
+;;;McUc SDWRR and Strict Priority Configuration
+19000214 00006300
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; IpclTccRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;IPCL0 Key Type 2 Lookup ID Register 0; IPCL1 Key Type 2 Lookup ID Register 0; IPCL2 Key Type 2 Lookup ID Register 0
+1A000084 22221111 3 8
+;;;IPCL0 Key Type 2 Lookup ID Register 1; IPCL1 Key Type 2 Lookup ID Register 1; IPCL2 Key Type 2 Lookup ID Register 1
+1A000088 00013132 3 8
+;;;EPCL Key Type 2 Lookup ID Register
+1A00009C A9999888
+;;;Policy TCAM Control
+1A000148 06088887
+;;;Policy TCAM Arbiter Control
+1A000168 60F08888
+;;;Policy TCAM Configuration 0
+1A000208 0000F281
+;;;Policy TCAM Configuration 2
+1A000220 00031701
+;;;Policy TCAM Configuration 3
+1A000238 00020200
+;; TCAM Entry<n> ControlX Word, bit 17 - Entry Spare bit. Should be set to 1. (3K entries)
+1A040004        00020000 3072 0x40
+;; TCAM Entry<n> ControlY Word, bit 17 - Entry Spare bit. Should be set to 1. (3K entries)
+1A040024        00020000 3072 0x40
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; IpvxTccRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;TTI Key Type 2 Lookup ID
+1B000080 00004444
+;;;Router DIP Lookup Key Type 2 Lookup ID
+1B0000A0 00000010
+;;;Router SIP Lookup Key Type 2 Lookup ID
+1B0000A4 00003120
+;;;Routing TCAM Control
+1B000960 064A5297
+;;;Router TCAM Configuration 0
+1B00096C 0000F281
+;;;Routing TCAM Arbiter Control
+1B000970 6F04A529
+;;;Router TCAM Configuration 2
+1B000978 00031601
+;;;Router TCAM Configuration 3
+1B00097C 00020200
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; HaRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;Cascading and Header Insertion Configuration
+1C000004 80000000
+;;;Crc Check Enable Register; Egress DSA Tag Type Configuration
+1C000014 8FFFFFFF 2 C
+;;;Egress VLAN EtherType For Non Extended DSA-tagged Pkts Configuration
+1C000058 00008100
+;;;Mirror To Analyzer Header Configuration; Router Header Alteration Enable MAC SA Modification
+1C000060 8FFFFFFF 2 A4
+;;;Header Alteration Global Configuration
+1C000100 00080408
+;;;Ingress Analyzer VLAN Tag Configuration; Egress Analyzer VLAN Tag Configuration
+1C000408 81000000 2 4
+;;;Tunnel Start Fragment ID Configuration
+1C000410 80000000
+;;;TP-ID Configuration Register&lt;0&gt;; TP-ID Configuration Register&lt;1&gt;; TP-ID Configuration Register&lt;2&gt;; TP-ID Configuration Register&lt;3&gt;
+1C000430 81008100 4 4
+;;;MPLS Ethertype
+1C000480 88488847
+;;;I-Ethertype
+1C000484 00008100
+;;;TS TP-ID Configuration Register&lt;0&gt;; TS TP-ID Configuration Register&lt;1&gt;; TS TP-ID Configuration Register&lt;2&gt;; TS TP-ID Configuration Register&lt;3&gt;
+1C000700 81008100 4 4
+;;;Passenger TPID0_TPID1&lt;0&gt;; Passenger TPID0_TPID1&lt;1&gt;; Passenger TPID0_TPID1&lt;2&gt;; Passenger TPID0_TPID1&lt;3&gt;
+1C000750 81008100 4 4
+;;;FROM_CPU constants to fanout devices
+1C000780 00000002
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; EpclRegistersDefaults.txt ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;Egress Policy Global Configuration
+1D000000 00000080
+;;;Egress Policy DIP Solicitation Data0
+1D000020 FF000000
+;;;Egress Policy DIP Solicitation Data1
+1D000024 00000001
+;;;Egress Policy DIP Solicitation Data3
+1D00002C FF020000
+;;;Egress Policy DIP Solicitation Mask&lt;0&gt;; Egress Policy DIP Solicitation Mask&lt;1&gt;; Egress Policy DIP Solicitation Mask&lt;2&gt;; Egress Policy DIP Solicitation Mask&lt;3&gt;
+1D000030 FFFFFFFF 4 4
+;;;Egress Policy FIFO Configuration
+1D000040 00001F5F
+;;;Egress Policer Global Configuration
+1D000200 00003F00
+ffffffff

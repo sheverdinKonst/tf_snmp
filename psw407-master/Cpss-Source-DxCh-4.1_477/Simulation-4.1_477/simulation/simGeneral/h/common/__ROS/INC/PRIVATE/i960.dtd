@@ -1,0 +1,69 @@
+/*!**************************************************RND Template version 4.1
+ *!                 D A T A   T Y P E   D E F I N I T I O N
+ *!==========================================================================
+ *$ TITLE: Router Server - General definitions for i960
+ *!--------------------------------------------------------------------------
+ *$ FILENAME: X:\simulation\chip_simulation\simulation\h\common\ROS\INC\PRIVATE\i960.dtd
+ *!--------------------------------------------------------------------------
+ *$ SYSTEM, SUBSYSTEM: Router Server, General definitions
+ *!--------------------------------------------------------------------------
+ *$ AUTHORS: Michael,AmitK
+ *!--------------------------------------------------------------------------
+ *$ LATEST UPDATE: 28-May-2007, 11:16 AM CREATION DATE: 29-Dec-94
+ *! 31/Jan/2006, MickeyR: Replacing the PKD definition to PKDT, PKDR & PKDB
+ *!**************************************************************************
+ *!
+ *!**************************************************************************
+ *!
+ *$ GENERAL DESCRIPTION:
+ *!
+ *$ REMARKS:
+ *!
+ *!**************************************************************************
+ *!*/
+
+#define BYTE_ORDER  LITTLE_ENDIAN_MEM_FORMAT
+#define STACK_ORDER STACK_FROM_LOW_TO_HIGH
+
+/*! Processor type definitions. */
+typedef char            INT_8;
+typedef short           INT_16;
+typedef int             INT_32;
+
+typedef unsigned char   UINT_8;
+typedef unsigned short  UINT_16;
+typedef unsigned long   UINT_32;
+
+/* Pointers typedef for arithmetic & logic operations */
+typedef INT_32              INT_ARCH_PTR;
+typedef UINT_32             UINT_ARCH_PTR;
+
+#define FILE_HANDLE FILE *
+
+/* #define PKD */
+#define PKDT
+#define PKDB
+#define PKDR
+
+#define ALIGNMENT_BOUNDARY  1L
+
+#define PRAGMA_NOALIGN  #pragma noalign
+#define PRAGMA_ALIGN    #pragma align
+
+#define PRAGMA_NOALIGN_COND PRAGMA_NOALIGN
+#define PRAGMA_ALIGN_COND   PRAGMA_ALIGN
+
+PRAGMA_NOALIGN
+
+typedef PKDT struct {
+    UINT_32 word1;
+    UINT_32 word2;
+} PKDB  UINT_64;
+
+PRAGMA_ALIGN
+
+
+/* extra "windows" types */
+typedef UINT_32 DWORD;
+typedef void* HANDLE;
+

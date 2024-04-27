@@ -1,0 +1,543 @@
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
+#include "stm32f4xx_rtc.h"
+#include "board.h"
+#include "selftest.h"
+#include "spiflash.h"
+#include "settings.h"
+#include "blbx.h"
+#include "../sntp/sntp.h"
+#include "task.h"
+#include "debug.h"
+
+
+#define FL_BB_READ_MASK	0xFF000000UL
+#define FL_BB_READ	0xFE000000UL
+#define PTR_READ	0x00
+#define FL_BB_WRITE	0xFF000000UL
+#define PTR_WRITE	0x01
+#define FL_BB_US	0xFD000000UL
+#define PTR_US		0x02
+//#define FL_BB_MARKER	0xDDEEAADDUL
+#define FL_BB_MARKER	0x2D333030UL
+#define PTR_SIZE        65536UL
+
+
+u8 bb_init=0;
+
+static bb_params_t bb_params;
+bb_params_t *bb_ptr;
+uint32_t bb_temp_buff[8];
+
+extern struct spi_flash sf;
+
+
+
+static i8 init_bb_ptr(void)
+{
+     struct s{
+       u32 fl_ptr[4];
+       u8  num;
+     }ptrs,*sPtr;
+
+     sPtr = &ptrs;
+     sPtr->num = 0;
+
+     sPtr->fl_ptr[sPtr->num++]=FL_BB_MARKER;
+     if (bb_ptr->bb_write){
+        sPtr->fl_ptr[sPtr->num++]=bb_ptr->bb_write|FL_BB_WRITE;
+     }
+     if (bb_ptr->bb_read){
+        sPtr->fl_ptr[sPtr->num++]=bb_ptr->bb_read|FL_BB_READ;
+     }
+     if (bb_ptr->us_size){
+        sPtr->fl_ptr[sPtr->num++]=(u32)bb_ptr->us_size|FL_BB_US;
+     }
+
+     spi_flash_write(bb_ptr->bb_start_ptr,sPtr->num*sizeof(u32),sPtr->fl_ptr);
+
+     bb_ptr->bb_cur_ptr = bb_ptr->bb_start_ptr + sPtr->num*sizeof(u32);
+
+     return (0);
+}
+
+static i8 write_bb_ptr (u8 ptr_type)
+{
+     u32 fl_ptr;
+
+     fl_ptr = bb_ptr->fl_size - bb_ptr->us_size;
+
+     if (((u32)(bb_ptr->bb_cur_ptr) + sizeof (u32)) >= fl_ptr){
+       if (!(fl_ptr%bb_ptr->fl_esize)&&(bb_ptr->us_size>bb_ptr->us_cur_len)){
+          while (spi_flash_erase(bb_ptr->bb_start_ptr, fl_ptr - bb_ptr->bb_start_ptr)>0);
+       }else{
+          while (spi_flash_erase(bb_ptr->bb_start_ptr, bb_ptr->fl_size - bb_ptr->bb_start_ptr)>0);
+       }
+       if (bb_ptr->us_size==bb_ptr->us_cur_len){
+          bb_ptr->us_size=bb_ptr->us_cur_len=0;
+       }
+       while (init_bb_ptr()>0);
+     }else{
+       switch (ptr_type){
+           case PTR_READ:
+              fl_ptr=bb_ptr->bb_read|FL_BB_READ;
+           break;
+           case PTR_WRITE:
+              fl_ptr=bb_ptr->bb_write|FL_BB_WRITE;
+           break;
+           case PTR_US:
+              fl_ptr=(u32)bb_ptr->us_size|FL_BB_US;
+           break;
+       }
+       while (spi_flash_write(bb_ptr->bb_cur_ptr,sizeof(u32),&fl_ptr)>0);
+       bb_ptr->bb_cur_ptr += sizeof(u32);
+     }
+     return (0);
+}
+
+i8 init_bb (void)
+{
+     u32 fl_ptr;
+     u16 fl_page, num;
+
+     if (spi_flash_probe()){
+        return -1;
+     }
+
+     bb_ptr = &bb_params;
+     memset (bb_ptr,0,sizeof(bb_params_t));
+
+     spi_flash_properties(&bb_ptr->fl_size,&fl_page,&fl_ptr);
+
+     //искуственно ограничим размер флеш, для того, чтобы дальше не писал
+     bb_ptr->fl_size = FL_BB_END;
+
+     bb_ptr->fl_esize = fl_ptr;
+
+     if (bb_ptr->fl_esize<PTR_SIZE){
+        num = PTR_SIZE/fl_page;
+        bb_ptr->bb_start_ptr = bb_ptr->fl_size - ((u32)num*fl_page);
+        if (((u32)num*fl_page)<PTR_SIZE)num++;
+     }else
+        bb_ptr->bb_start_ptr = bb_ptr->fl_size - bb_ptr->fl_esize;
+
+     bb_ptr->bb_cur_read0 = bb_ptr->bb_cur_read1 = bb_ptr->bb_start_ptr + 1;
+
+     bb_ptr->us_size = bb_ptr->us_cur_len = 0;
+     while (spi_flash_read(bb_ptr->bb_start_ptr,sizeof(u32),&fl_ptr)>0);
+     if (fl_ptr!=FL_BB_MARKER){
+//        format_bb ();
+        return (-2);
+     }else
+        bb_ptr->bb_cur_ptr = bb_ptr->bb_start_ptr + sizeof (u32);
+     return 1;
+}
+
+i8 find_bb_ptrs (u32 *buf, u8 len)
+{
+     u8 i;
+
+     len /= sizeof(u32);
+     if (!len||!buf)
+        return -1;
+
+     // читаем
+     while (spi_flash_read(bb_ptr->bb_cur_ptr,len*sizeof(u32),buf)>0);
+
+     // разбираем
+     for (i=0;i<len;i++){
+        if (buf[i]==0xFFFFFFFFUL)
+          break;
+        if ((buf[i]&FL_BB_READ_MASK)==FL_BB_READ)
+          bb_ptr->bb_read = buf[i]&(~FL_BB_READ_MASK);
+        else if ((buf[i]&FL_BB_READ_MASK)==FL_BB_WRITE)
+          bb_ptr->bb_write = buf[i]&(~FL_BB_READ_MASK);
+        else if ((buf[i]&FL_BB_READ_MASK)==FL_BB_US)
+          bb_ptr->us_cur_len = bb_ptr->us_size = buf[i]&0xffff;
+     }
+     bb_ptr->bb_cur_ptr += i * sizeof(u32);
+     if (i<len)
+        return 0;
+
+     return 1;
+}
+
+i8 write_bb (u8 write_mask, char *data, u16 len)
+{
+     union {
+       bb_flags_t bb_flags;
+       u32 bb_ptr;
+       struct {
+         u16 bb_cur_wsector;
+         u16 bb_next_wsector;
+         u16 bb_cur_rsector;
+       }s;
+     }u;
+     i8 res;
+     u8 check_read, overlap;
+
+     if (!write_mask){
+    	DEBUG_MSG(BB_DBG,"BB write_mask == NULL\r\n");
+        return -1;
+     }
+
+     overlap = 0;
+     res = 0;
+     check_read = 0;
+
+     for(;;){
+        u16 n;
+        n = bb_ptr->fl_esize - (bb_ptr->bb_write % bb_ptr->fl_esize);
+        memset (&u,0xFF,sizeof(u));
+        while (spi_flash_read(bb_ptr->bb_write,min(n,sizeof(u)),&u)>0);
+        if (u.bb_ptr==0xffffffffUL)
+           break;
+        bb_ptr->bb_write += sizeof (u.bb_flags) + u.bb_flags.len;
+        if (bb_ptr->bb_write >= bb_ptr->bb_start_ptr){
+           bb_ptr->bb_write = FL_BB_START;
+           if (overlap++){
+        	   DEBUG_MSG(BB_DBG,"BB overlap\r\n");
+        	   return -1;
+           }
+        }
+     }
+
+     overlap = 0;
+
+     if (bb_ptr->bb_write >= bb_ptr->bb_start_ptr || (bb_ptr->bb_write + sizeof (u.bb_flags) + len) > bb_ptr->bb_start_ptr){
+        bb_ptr->bb_write = FL_BB_START;
+        DEBUG_MSG(BB_DBG,"BB overlap 1\r\n");
+        overlap = 1;
+     }
+     u.s.bb_next_wsector = (bb_ptr->bb_write + sizeof (u.bb_flags) + len) / bb_ptr->fl_esize;
+     u.s.bb_cur_wsector = bb_ptr->bb_write / bb_ptr->fl_esize;
+
+     if (overlap || u.s.bb_next_wsector != u.s.bb_cur_wsector){
+        u.s.bb_cur_rsector = bb_ptr->bb_read / bb_ptr->fl_esize;
+        if ((overlap || u.s.bb_cur_rsector > u.s.bb_cur_wsector) && u.s.bb_cur_rsector <= u.s.bb_next_wsector){
+          if (bb_ptr->bb_cur_read0>=bb_ptr->bb_read)
+             check_read=1<<0;
+          if (bb_ptr->bb_cur_read1>=bb_ptr->bb_read)
+             check_read=1<<1;
+          while (u.s.bb_cur_rsector <= u.s.bb_next_wsector){
+            while (spi_flash_read(bb_ptr->bb_read,sizeof(u.bb_flags),&u.bb_flags)>0);
+
+            bb_ptr->bb_read += sizeof (u.bb_flags) + u.bb_flags.len;
+            u.s.bb_cur_rsector = bb_ptr->bb_read / bb_ptr->fl_esize;
+          }
+          if (bb_ptr->bb_read >= bb_ptr->bb_start_ptr){
+             bb_ptr->bb_read = FL_BB_START;
+             if ((check_read&(1<<0)))
+                bb_ptr->bb_cur_read0=bb_ptr->bb_read;
+             if ((check_read&(1<<1)))
+                bb_ptr->bb_cur_read1=bb_ptr->bb_read;
+
+             DEBUG_MSG(BB_DBG,"bb_ptr->bb_read %lu\r\n",bb_ptr->bb_read);
+          }
+
+
+
+          if ((check_read&(1<<0))&&(bb_ptr->bb_cur_read0<bb_ptr->bb_read)){
+             bb_ptr->bb_cur_read0=bb_ptr->bb_read;
+             DEBUG_MSG(BB_DBG,"bb_ptr->bb_cur_read0 %lu\r\n",bb_ptr->bb_cur_read0);
+          }
+          if ((check_read&(1<<1))&&(bb_ptr->bb_cur_read1<bb_ptr->bb_read)){
+             bb_ptr->bb_cur_read1=bb_ptr->bb_read;
+             DEBUG_MSG(BB_DBG,"bb_ptr->bb_cur_read1 %lu\r\n",bb_ptr->bb_cur_read1);
+          }
+          while (write_bb_ptr (PTR_READ)>0);
+          res = -2;
+        }
+        u.s.bb_cur_wsector = (bb_ptr->bb_write / bb_ptr->fl_esize);
+        while (spi_flash_erase(bb_ptr->fl_esize * ((u32)u.s.bb_cur_wsector + 1 - overlap), bb_ptr->fl_esize * (u.s.bb_next_wsector - u.s.bb_cur_wsector + overlap))>0);
+     }
+     u.bb_flags.flags=write_mask;
+     u.bb_flags.len=len;
+     while (spi_flash_write(bb_ptr->bb_write,sizeof(u.bb_flags),&u.bb_flags)>0);
+     bb_ptr->bb_write += sizeof (u.bb_flags);
+     while (spi_flash_write(bb_ptr->bb_write,len,data)>0);
+
+     bb_ptr->bb_write += len;
+     while (write_bb_ptr (PTR_WRITE)>0);
+     DEBUG_MSG(BB_DBG,"BB return %d\r\n",res);
+     return res;
+}
+
+i8 read_bb (u8 read_mask, u8 *data, u16 *len)
+{
+     return read_bb_next (0,read_mask, data, len);
+}
+
+i8 read_bb_first (u8 num, u8 read_mask, u8 *data, u16 *len)
+{
+     switch (num){
+         case 1:
+            bb_ptr->bb_cur_read0 = bb_ptr->bb_read;
+         break;
+         case 2:
+            bb_ptr->bb_cur_read1 = bb_ptr->bb_read;
+         break;
+     }
+     return read_bb_next (num,read_mask, data, len);
+}
+
+i8 read_bb_next (u8 num, u8 read_mask, u8 *data, u16 *len)
+{
+     union {
+       bb_flags_t bb_flags;
+       u32 bb_ptr;
+     }u;
+     u32 bb_read;
+
+     switch (num){
+         default:
+            bb_read = bb_ptr->bb_read;
+         break;
+         case 1:
+            bb_read = bb_ptr->bb_cur_read0;
+         break;
+         case 2:
+            bb_read = bb_ptr->bb_cur_read1;
+         break;
+     }
+     if (bb_read > bb_ptr->bb_start_ptr ||
+         (bb_ptr->bb_read <= bb_ptr->bb_write&&(bb_read < bb_ptr->bb_read||bb_read > bb_ptr->bb_write))||
+         (bb_ptr->bb_read >  bb_ptr->bb_write&&(bb_read < bb_ptr->bb_read&&bb_read > bb_ptr->bb_write)))
+        bb_read = bb_ptr->bb_read;
+
+     while (1){
+       if (bb_read == bb_ptr->bb_write){
+          return 1;
+       }
+       while (spi_flash_read(bb_read,sizeof(u.bb_flags),&u.bb_flags)>0);
+       if (bb_read >= bb_ptr->bb_start_ptr || (bb_read+sizeof(u.bb_flags)+u.bb_flags.len) > bb_ptr->bb_start_ptr){
+          bb_read = FL_BB_START;
+          continue;
+       }
+       if ((read_mask==0xf&&u.bb_flags.flags) || (u.bb_flags.flags&read_mask)==read_mask){
+         if (*len>u.bb_flags.len)
+            *len=u.bb_flags.len;
+         while (spi_flash_read(bb_read + sizeof (u.bb_flags),*len,data)>0);
+         break;
+       }
+       bb_read += sizeof (u.bb_flags) + u.bb_flags.len;
+     }
+     switch (num){
+         case 1:
+            bb_ptr->bb_cur_read0 = bb_read + sizeof (u.bb_flags) + u.bb_flags.len;
+            if (bb_ptr->bb_cur_read0 >= bb_ptr->bb_start_ptr)
+               bb_ptr->bb_cur_read0 = 0;
+         break;
+         case 2:
+            bb_ptr->bb_cur_read1 = bb_read + sizeof (u.bb_flags) + u.bb_flags.len;
+            if (bb_ptr->bb_cur_read1 >= bb_ptr->bb_start_ptr)
+               bb_ptr->bb_cur_read1 = 0;
+         break;
+     }
+     return 0;
+}
+
+u32 get_bb_num_records(u16 record_len)
+{
+     u32 num_records;
+     if (!bb_ptr->fl_size||bb_ptr->bb_read == bb_ptr->bb_write)
+        return 0;
+     if (bb_ptr->bb_read<bb_ptr->bb_write)
+        num_records = (bb_ptr->bb_write - bb_ptr->bb_read)/(record_len+sizeof(bb_flags_t));
+     else
+        num_records = (bb_ptr->bb_start_ptr - bb_ptr->bb_read + bb_ptr->bb_write)/(record_len+sizeof(bb_flags_t));
+     return (num_records);
+}
+
+i8 erase_bb (u8 erase_mask)
+{
+     union {
+       bb_flags_t bb_flags;
+       u32 bb_ptr;
+     }u;
+     u32 bb_read;
+
+     bb_read = bb_ptr->bb_read;
+
+
+     while (1){
+       if (bb_read == bb_ptr->bb_write){
+          return -1;
+       }
+       while (spi_flash_read(bb_read,sizeof(u.bb_flags),&u.bb_flags)>0);
+
+       if (bb_read >= bb_ptr->bb_start_ptr || (bb_read+sizeof(u.bb_flags)+u.bb_flags.len) > bb_ptr->bb_start_ptr){
+              bb_read = FL_BB_START;
+              continue;
+       }
+       if ((erase_mask==0xf&&u.bb_flags.flags)||(u.bb_flags.flags&erase_mask)==erase_mask){
+         u.bb_flags.flags &= ~erase_mask;
+         if (u.bb_flags.flags||bb_read != bb_ptr->bb_read){
+            while (spi_flash_write(bb_read,sizeof(u.bb_flags),&u.bb_flags)>0);
+            return -1;
+         }else{
+           while (!u.bb_flags.flags){
+             bb_ptr->bb_read += sizeof(u.bb_flags) + u.bb_flags.len;
+             if (bb_ptr->bb_read == bb_ptr->bb_write)
+                break;
+             while (spi_flash_read(bb_ptr->bb_read,sizeof(u.bb_flags),&u.bb_flags)>0);
+
+             if (bb_ptr->bb_read >= bb_ptr->bb_start_ptr || (bb_ptr->bb_read+sizeof(u.bb_flags)+u.bb_flags.len) > bb_ptr->bb_start_ptr){
+               bb_ptr->bb_read = FL_BB_START;
+               if (bb_ptr->bb_read == bb_ptr->bb_write)
+                  break;
+               while (spi_flash_read(bb_ptr->bb_read,sizeof(u.bb_flags),&u.bb_flags)>0);
+             }
+           }
+           while (write_bb_ptr (PTR_READ)>0);
+           break;
+         }
+       }else
+         bb_read += sizeof(u.bb_flags) + u.bb_flags.len;
+     }
+     return 0;
+}
+
+i8 eraseall_bb (void)
+{
+     bb_ptr->bb_read = bb_ptr->bb_write;
+
+     while( write_bb_ptr (PTR_READ)>0);
+
+     return (0);
+}
+
+i8 format_bb (void)
+{
+	for(u32 i=FL_BB_START;i<sf.params.page_size;i+=256)
+		spi_flash_erase(i,256);
+
+     while (spi_flash_erase(bb_ptr->bb_start_ptr, bb_ptr->fl_size - bb_ptr->bb_start_ptr)>0);
+
+     bb_ptr->bb_read = bb_ptr->bb_write = FL_BB_START;
+
+     while (spi_flash_erase(bb_ptr->bb_write, bb_ptr->fl_esize)>0);
+
+     bb_ptr->bb_cur_read0 = bb_ptr->bb_cur_read1 = bb_ptr->bb_start_ptr + 1;
+     bb_ptr->us_size = bb_ptr->us_cur_len = 0;
+
+     while (init_bb_ptr()>0);
+
+     return (0);
+}
+
+/*запись логов в BlackBox с указание временной метки*/
+//i8 write_log_bb(char *buffer){
+i8 write_log_bb(char *text, u16 type){
+#ifdef BB_LOG
+char tmp[BB_MSG_LEN];
+RTC_TimeTypeDef RTC_Time;
+RTC_DateTypeDef RTC_Date;
+
+	memset(tmp,0,BB_MSG_LEN);
+	//если активна ф-я SNTP, записываем штамп времени
+	if((get_sntp_state()==ENABLE)&&(date.year)){
+		sprintf(tmp,"%02d/%02d/%d %02d:%02d:%02d: ",date.day,date.month,(date.year+2000),date.hour,date.min,date.sec);
+		//if(strlen(tmp)>(BB_MSG_LEN-3)){
+			strcat(tmp,text);
+		//}else
+		//	return -1;
+		tmp[strlen(tmp)]=0;
+	}else{
+	//иначе пишем время в сек со старта PSW
+		RTC_GetTime(RTC_Format_BIN,&RTC_Time);
+		RTC_GetDate(RTC_Format_BCD,&RTC_Date);
+		sprintf(tmp,"%dd.%02dh.%02dm.%02ds.",RTC_Date.RTC_Date,
+				(RTC_Time.RTC_Hours),(RTC_Time.RTC_Minutes),(RTC_Time.RTC_Seconds));
+		//sprintf(tmp,"%lu: ",RTC_GetCounter());
+		//if(strlen(tmp)>(BB_MSG_LEN-3)){
+			strcat(tmp,text);
+		//}else
+		//	return -1;
+		tmp[strlen(tmp)]=0;
+	}
+
+	/*записываем данные*/
+	if(bb_init==1){
+		tmp[BB_MSG_LEN-2] = 0;
+		tmp[BB_MSG_LEN-1] = (u8)(type>>8);
+		tmp[BB_MSG_LEN] = (u8)type;
+		return write_bb(0x0F,tmp, BB_MSG_LEN);
+	}
+	else
+		return 1;
+#else
+	return 0;
+#endif
+}
+
+/*чтение логов из BlackBox*/
+/*каждый вызов read_log_bb возвращает следующую запись*/
+i8 read_log_bb(char *msg, u16 *len){
+*len=64;
+i8 ret=0;
+	//if(bb_ptr->bb_cur_read0==NULL)
+		//return read_bb_next(0,0x0F,(u8 *)msg,&len);
+	//else
+#ifdef BB_LOG
+	if(bb_init)
+		ret=read_bb_next(1,0x0F,(u8 *)msg,len);
+	msg[*len]=0;
+	return ret;
+#endif
+}
+
+
+u8 init_flash(void){
+u8 TimeOut=0;
+u8 repeat=0;
+
+#ifdef BB_LOG
+	init:
+	if(repeat<10){
+		switch(init_bb()){
+			case -1:
+				ADD_ALARM(ERROR_INIT_BB);
+				break;
+			case 0: bb_init=1; break;
+			case 1:TimeOut=10;
+				   while((find_bb_ptrs(bb_temp_buff,8))/*&&(TimeOut)*/){
+					   TimeOut--;
+				   }
+					bb_init=1;
+				break;
+			case -2:format_bb();repeat++;goto init;
+		}
+	}
+	else{
+		ADD_ALARM(ERROR_INIT_BB);
+		return 1;
+	}
+#else
+    if (spi_flash_probe()){
+    	ADD_ALARM(ERROR_INIT_BB);
+    	bb_init=0;
+       return 1;
+    }
+#endif
+return 1;
+}
+
+
+void xEraseBB_Task(void *pvParameters){
+uint16_t len1;
+u32 p;
+	len1=0xFFFF;
+	format_bb();
+	eraseall_bb();
+	for(p=FL_BB_START;p<(FL_BB_END);p+=65536){
+		spi_flash_erase(p,65536);
+	}
+	eraseall_bb();
+	DEBUG_MSG(BB_DBG,"erase black box compleat\r\n");
+	vTaskDelete(NULL);
+	while (1);
+}

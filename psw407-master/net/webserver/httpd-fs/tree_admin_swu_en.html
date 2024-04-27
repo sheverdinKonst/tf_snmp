@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="css/sdmenu.css" />
+	<!-- scripts -->
+	<script type="text/javascript" src="js/scripts.js"></script>
+	
+	<script type="text/javascript">
+	function open_url(url,help_url) 
+	{
+		parent.ContentFrame.location.href= url;
+		parent.HelpFrame.location.href = help_url;
+	}
+	
+	function SDMenu(id) {
+		if (!document.getElementById || !document.getElementsByTagName)
+			return false;
+		this.menu = document.getElementById(id);
+		this.submenus = this.menu.getElementsByTagName("div");
+		this.speed = 2;
+		this.markCurrent = true;
+		this.oneSmOnly = true;
+	}
+	SDMenu.prototype.init = function() {
+		var mainInstance = this;
+		for (var i = 0; i < this.submenus.length; i++)
+			this.submenus[i].getElementsByTagName("span")[0].onclick = function() {
+				mainInstance.toggleMenu(this.parentNode);
+			};
+		if (this.markCurrent) {
+			var links = this.menu.getElementsByTagName("a");
+			for (var i = 0; i < links.length; i++)
+				if (links[i].href == document.location.href) {
+					links[i].className = "current";
+					break;
+				}
+		}
+	};
+	SDMenu.prototype.toggleMenu = function(submenu) {
+		if (submenu.className == "collapsed")
+			this.expandMenu(submenu);
+		else if (submenu.className != "collapsed2")
+			this.collapseMenu(submenu);
+	};
+	SDMenu.prototype.expandMenu = function(submenu) {
+		var fullHeight = submenu.getElementsByTagName("span")[0].offsetHeight;
+		var links = submenu.getElementsByTagName("a");
+		for (var i = 0; i < links.length; i++)
+			fullHeight += links[i].offsetHeight;
+		var moveBy = Math.round(this.speed * links.length );
+		
+		var mainInstance = this;
+		var intId = setInterval(function() {
+			var curHeight = submenu.offsetHeight;
+			var newHeight = curHeight + moveBy;
+			if (newHeight < fullHeight)
+				submenu.style.height = newHeight + "px";
+			else {
+				clearInterval(intId);
+				submenu.style.height = "";
+				submenu.className = "";
+			}
+		}, 30);
+		this.collapseOthers(submenu);
+	};
+	SDMenu.prototype.collapseMenu = function(submenu) {
+		var minHeight = submenu.getElementsByTagName("span")[0].offsetHeight;
+		var moveBy = Math.round(this.speed * submenu.getElementsByTagName("a").length * 2);
+		var mainInstance = this;
+		var intId = setInterval(function() {
+			var curHeight = submenu.offsetHeight;
+			var newHeight = curHeight - moveBy;
+			if (newHeight > minHeight)
+				submenu.style.height = newHeight + "px";
+			else {
+				clearInterval(intId);
+				submenu.style.height = "";
+				submenu.className = "collapsed";
+			}
+		}, 30);
+	};
+	SDMenu.prototype.collapseOthers = function(submenu) {
+		if (this.oneSmOnly) {
+			for (var i = 0; i < this.submenus.length; i++)
+				if (this.submenus[i] != submenu && this.submenus[i].className != "collapsed" && this.submenus[i].className != "collapsed2")
+					this.collapseMenu(this.submenus[i]);
+		}
+	};
+	var myMenu;
+	window.onload = function() {
+		myMenu = new SDMenu("my_menu");
+		myMenu.init();
+	};
+	</script>
+  </head>
+  
+   <!--<body  background= "img/back.gif">-->
+   <body bgcolor = "#eeeeee"> 
+   
+<noscript>
+<b><h1>JavaScript is not installed!</h1></b>
+</noscript>
+    <div style="float: left" id="my_menu" class="sdmenu" >
+	  <div class="collapsed2" onclick="open_url('/main.shtml','/help_en/info_help.html');">
+	  <span>Main</span></div>
+	  <hr>	  
+      <div class="collapsed"><span>Basic Settings</span>
+        <a onclick="open_url('/info/description.shtml','/help_en/description_help.html')">Device Description</a>
+		<a onclick="open_url('/settings/settings_ntwk.shtml','/help_en/settings_ntwk_help.html')">Network Settings</a>
+		<a onclick="open_url('/settings/settings_admin.shtml','/help_en/settings_admin_help.html')">User Accounts</a>
+		<a onclick="open_url('/settings/telnet.shtml','/help_en/telnet_help.html')">Telnet</a>
+		<a onclick="open_url('/mngt/sntp.shtml','/help_en/sntp_help.html')">SNTP</a>
+		<a onclick="open_url('/mngt/managment.shtml','/help_en/managment_help.html')">Language</a>
+	  </div>
+	  
+	  <hr>	  
+      <div class="collapsed"><span>Ports</span>
+        <a onclick="open_url('/settings/FEGE_set.shtml','/help_en/FEGE_set_help.html')">Port Settings</a>
+		<a onclick="open_url('/info/FEGE_stat.shtml','/help_en/FEGE_stat_help.html')">Port Status</a>
+		<a onclick="open_url('/settings/aggregation.shtml','/help_en/aggregation_help.html')">Link Aggregation</a>
+		<a onclick="open_url('/settings/mirror.shtml','/help_en/mirror_help.html')">Port Mirroring</a>
+	  </div>
+	  
+	  <hr>	  
+      <div class="collapsed"><span>Events</span>
+        <a onclick="open_url('/mngt/eventlist.shtml','/help_en/eventlist_help.html')">Event List</a>
+		<a onclick="open_url('/mngt/syslog.shtml','/help_en/syslog_help.html')">Syslog</a>
+		<a onclick="open_url('/mngt/smtp.shtml','/help_en/smtp_help.html')">SMTP</a>
+	  </div>
+	  
+	  <hr>	  
+      <div class="collapsed"><span>VLAN</span>
+        <!--<a onclick="open_url('/vlan/VLAN_perport.shtml','/help_en/VLAN_perport.html')">Port Based VLAN</a>-->
+		<a onclick="open_url('/vlan/VLAN_8021q.shtml','/help_en/VLAN_8021q.html')">802.1Q Static VLAN</a>
+		<!--<a onclick="open_url('/vlan/VLAN_trunk.shtml','/help_en/VLAN_trunk.html')">VLAN Trunking</a>-->
+	  </div>
+	  
+	  <hr>	  
+      <div class="collapsed"><span>QoS</span>
+        <a onclick="open_url('/qos/QoS_general.shtml','/help_en/QoS_general_help.html')">General Settings</a>
+		<a onclick="open_url('/qos/swu_rate_limit.shtml','/help_en/swu_rate_limit_help.html')">Rate Limit</a>
+		<a onclick="open_url('/qos/QoS_cos.shtml','/help_en/QoS_cos_help.html')">CoS</a>
+		<a onclick="open_url('/qos/QoS_tos.shtml','/help_en/QoS_tos_help.html')">ToS</a>
+	  </div>
+	  
+	  <hr>	  
+      <div class="collapsed"><span>RSTP</span>
+        <a onclick="open_url('/STP/RSTP.shtml','/help_en/RSTP_help.html')">RSTP Settings</a>
+		<a onclick="open_url('/STP/RSTP_stat.shtml','/help_en/RSTP_stat_help.html')">RSTP Status</a>
+	  </div>
+	  
+	  
+	  <hr>	  
+      <div class="collapsed"><span>IGMP</span>
+        <a onclick="open_url('/igmp/igmp.shtml','/help_en/igmp_help.html')">IGMP Snooping</a>
+		<a onclick="open_url('/igmp/groups.shtml','/help_en/igmp_groups_help.html')">IGMP Groups List</a>
+	  </div>
+	  <div class="collapsed"><span>LLDP</span>
+        <a onclick="open_url('/lldp/lldpsett.shtml','/help_en/lldpsett_help.html')">LLDP Settings</a>
+		<a onclick="open_url('/lldp/lldpstat.shtml','/help_en/lldpstat_help.html')">LLDP Statistics</a>
+	  </div>	
+	  <hr>	  
+      <div class="collapsed"><span>SNMP</span>
+		<a onclick="open_url('/mngt/snmp.shtml','/help_en/snmp_help.html')">SNMP</a>
+	  </div>
+ 
+  
+	  <hr>	  
+      <div class="collapsed"><span>Diagnostic Tools</span>
+        <a onclick="open_url('/tools/VCT.shtml','/help_en/VCT_help.html')">Virtual Cable Tester</a>
+		<a onclick="open_url('/tools/ping.shtml','/help_en/ping_help.html')">Ping</a>
+	  </div>
+	  
+	  <hr>	  
+      <div class="collapsed"><span>Statistics</span>
+        <a onclick="open_url('/info/Port_stat.shtml','/help_en/Port_stat_help.html')">Port Statistics</a>
+		<a onclick="open_url('/info/ARP.shtml','/help_en/ARP_help.html')">ARP Table</a>
+		<a onclick="open_url('/info/MAC.shtml','/help_en/MAC_help.html')">MAC Table</a>
+		<a onclick="open_url('/info/dns_stat.shtml','/help_en/dns_stat_help.html')">DNS Table</a>
+		<a onclick="open_url('/info/cpuinfo.shtml','/help_en/cpuinfo_help.html')">Device Info</a>
+		<a onclick="open_url('/log.shtml','/help_en/log_help.html')">Log</a>
+	  </div>
+	  
+	  <hr>	  
+      <div class="collapsed"><span>Update/Backup</span>
+        <a onclick="open_url('/mngt/update.shtml','/help_en/update_help.html')">Update Firmware</a>
+		<a onclick="open_url('/savesett.shtml','/help_en/savesett_help.html')">Backup/Recovery</a>
+	  </div>
+	  
+	  <hr>	  
+      <div class="collapsed"><span>Reboot/Default</span>
+        <a onclick="open_url('/default.shtml','/help_en/default_help.html')">Factory Default</a>
+		<a onclick="open_url('/mngt/reboot.shtml','/help_en/reboot_help.html')">Reboot</a>
+	  </div>
+	
+
+    </div>
+  
+  </body>
+</html>

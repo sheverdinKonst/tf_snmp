@@ -1,0 +1,31 @@
+ <html>
+ <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+ <body bgcolor = "#eeeeee">
+ <b><p align="center"> Event List</p></b>
+ <br><br> 
+This tab specifies the events that will trigger the sending of Syslog, SMTP messages or SNMP traps, if they are configured. 
+<br><br>
+<li><b>Port.link</b> - change the status of the link 
+<li><b>Port.PoE</b> - change the status of PoE 
+<li><b>STP/RSTP</b> - change the topology of the STP/RSTP redundancy protocols 
+<li><b>Autorestart.link</b> - the link disappeared with the <b>Auto Restart</b> function active, the IP camera will be restarted 
+<li><b>Autorestart.ping</b> - the remote device did not respond to PING with the <b>Auto Restart</b> function is active, the IP camera will be restarted 
+<li><b>System</b> - change the system state (restart, update, reset to factory settings, etc.) 
+<li><b>UPS</b> - changes in the operation of the UPS (only in the version with the UPS) 
+<li><b>Inputs/Outputs</b> - event from the access control system (dry contacts and tamper sensor) 
+<li><b>MAC Filtering</b> - an attempt was made to access the switch from the MAC address, which is not listed as allowed.
+<br><br>
+For the <b>Syslog</b> protocol, you can also set severity levels that vary from 0 to 7, 
+where 0 is the highest level of importance.<br>
+The following range of levels is generally accepted:<br>
+<li><b>(0) Emergency</b>: the system is inoperable 
+<li><b>(1) Alert</b>: the system requires immediate intervention 
+<li><b>(2) Critical</b>: the state of the system is critical 
+<li><b>(3) Error</b>: error messages 
+<li><b>(4) Warning</b>: warnings about possible problems 
+<li><b>(5) Notice</b>: messages of normal, but important events 
+<li><b>(6) Informational</b>: information messages 
+<li><b>(7) Debug</b>: debugging messages
+</body></html>

@@ -1,0 +1,65 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; XG XPCS Lane Status Sync OK
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Stacking Ports
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Port 25 is configured to XAUI interface and 10G data speed
+;; 6 lanes of port 25
+0880665C 00000010       6       0x44
+;; 6 lanes of port 26
+;; Port 26 is configured to RXAUI interface and 10G data speed
+08806A5C 00000010       6       0x44
+;; 6 lanes of port 27
+;; Port 27 is configured to SGMII interface mode and 2.5G data speed
+08806E5C 00000010       6       0x44
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Ports XG XPCS Global Status Sync OK
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Stacking Ports
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Port 24 is configured 1000 BASE-X interface mode
+08806210 00000001
+;; Port 25 is configured to XAUI interface and 10G data speed
+08806610 00000001
+;; Port 26 is configured to RXAUI interface and 10G data speed
+08806a10 00000001
+;; Port 27 is configured to SGMII interface mode and 2.5G data speed
+08806E10 00000001
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Port Status Register0 Sync OK
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Network Ports
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Port 0 is configured to SGMII interface mode and 2.5G data speed
+0A800010 00004000
+;; Port 4 is configured to 1000 BASE-X interface mode
+0A801010 00004000
+;; Port 8 is configured to SGMII interface mode and 1G data speed
+0A802010 00004000
+;; Port 12 is configured to 1000 BASE-X interface mode
+0A803010 00004000
+;; Port 16 is configured to 1000 BASE-X interface mode
+0A804010 00004000
+;; Port 20 is configured to 1000 BASE-X interface mode
+0A805010 00004000
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Stacking Ports
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Port 24 is configured to 1000 BASE-X interface mode
+0A806010 00004000
+;; Port 25 is configured to XAUI interface and 10G data speed
+0880640C 00004000
+;; Port 26 is configured to RXAUI interface and 10G data speed
+0880680c 00004000
+;; Port 27 is configured to SGMII interface mode and 2.5G data speed
+08806C0C 00004000
+;;
+;;
+ffffffff
+

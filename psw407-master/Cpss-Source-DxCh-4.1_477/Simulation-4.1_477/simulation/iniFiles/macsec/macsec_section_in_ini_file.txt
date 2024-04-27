@@ -1,0 +1,38 @@
+;
+; this file refer to the macsec device with id = X
+;
+;; switch side                                      network side
+;;                           macsec
+;;                   =====================
+;; devX_port0  ------|   channel 0       |******  devX_port1
+;;                   |-------------------|
+;; devX_port2  ------|   channel 1       |******  devX_port3
+;;                   |-------------------|
+;; devX_port4  ------|   channel 2       |******  devX_port5
+;;                   |-------------------|
+;; devX_port6  ------|   channel 3       |******  devX_port7
+;;                   =====================
+
+device_type0 = macsec
+registers0 = X:\cpss\SW\prestera\simulation\registerFiles\macsec\macsec.registers_default_val.txt
+;;
+;; additional lion registers setting  (used to override defaults)
+;;
+registers0_01 = X:\cpss\SW\prestera\simulation\registerFiles\macsec\macsec.registers_additional_def_val.txt
+
+[internal connections]
+;; connect the macsec ports to 2 devices :
+;;   device Y on switch side (simulate PCS connection -- to dx/pm)
+;;   device Z on network side (simulate PCS connection -- to phy)
+;;
+;; switch side connections
+devY_port0 = devX_port0
+devY_port1 = devX_port2
+devY_port2 = devX_port4
+devY_port3 = devX_port6
+;; network side connections
+devX_port1 = devZ_port0
+devX_port3 = devZ_port1
+devX_port5 = devZ_port2
+devX_port7 = devZ_port3
+

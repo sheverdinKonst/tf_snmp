@@ -1,0 +1,1583 @@
+/*
+ * events_handler.c
+ *
+ *  Created on: 13.02.2014
+ *      Author: Tsepelev
+ */
+
+#include <stdio.h>
+#include <string.h>
+#include "stm32f4xx.h"
+#include "stm32f4xx_gpio.h"
+#include "../deffines.h"
+#include "board.h"
+#include "events_handler.h"
+#include "../syslog/msg_build.h"
+#include "../syslog/syslog.h"
+#include "../snmp/snmp.h"
+#include "blbx.h"
+#include "task.h"
+#include "FreeRTOS.h"
+#include "queue.h"
+
+static u8 dry_contact_state[NUM_ALARMS]={0,0,0};
+
+extern u8 init_ok;
+
+static char message_text[MESSAGE_LEN];
+extern char mail_text[512+256];
+//static struct snmp_msg_tmp_t snmp_msg_tmp;
+
+char port[6];
+char link[6];
+char wdt_state[10];
+char state[10];
+
+uip_ipaddr_t ip;
+extern xQueueHandle SyslogQueue,SmtpQueue,SnmpTrapQueue;
+
+
+#define EMPTY_TRAP
+
+/*if(get_snmp_state() == 1){ \
+				snmp_msg_tmp.gentrap = SNMP_GENTRAP_ENTERPRISESPC; \
+				snmp_msg_tmp.spectrap[0]=0;							\
+				snmp_msg_tmp.varbind[0].flag=1;						 \
+				snmp_msg_tmp.varbind[0].objname[0]=0x2b;\
+				snmp_msg_tmp.varbind[0].objname[1]=6;\
+				snmp_msg_tmp.varbind[0].objname[2]=1;\
+				snmp_msg_tmp.varbind[0].objname[3]=4;\
+				snmp_msg_tmp.varbind[0].objname[4]=1;\
+				snmp_msg_tmp.varbind[0].objname[5]=0x82;\
+				snmp_msg_tmp.varbind[0].objname[6]=0xC8;\
+				snmp_msg_tmp.varbind[0].objname[7]=0x23;\
+				snmp_msg_tmp.varbind[0].objname[8]=3;\
+				snmp_msg_tmp.varbind[0].objname[9]=2;\
+				snmp_msg_tmp.varbind[0].objname[10]=3;\
+				snmp_msg_tmp.varbind[0].objname[11]=6;\
+				snmp_msg_tmp.varbind[0].len = 12;\
+				snmp_msg_tmp.varbind[0].value=1;\
+				snmp_msg_tmp.varbind[1].flag=0;\
+			}\
+*/
+
+static void addtext(char *text){
+	if(strlen(text) < MESSAGE_LEN)
+		strcpy(message_text,text);
+}
+
+static char *add_port(u8 port1){
+	switch(port1){
+		case 0: strcpy(port,"FE1");break;
+		case 1: strcpy(port,"FE2");break;
+		case 2: strcpy(port,"FE3");break;
+		case 3: strcpy(port,"FE4");break;
+		case 4: strcpy(port,"GE1");break;
+		case 5: strcpy(port,"GE2");break;
+	}
+	return port;
+}
+
+static char *add_link_state(u8 state){
+	switch(state){
+		case 0:strcpy(link,"Down");break;
+		case 1:strcpy(link,"Up");break;
+	}
+	return link;
+}
+
+
+static char *add_mode(u8 state){
+	switch(state){
+		case 0:strcpy(wdt_state,"Disable");break;
+		case 1:strcpy(wdt_state,"Link");break;
+		case 2:strcpy(wdt_state,"Ping");break;
+	}
+	return wdt_state;
+}
+
+static char *add_state(u8 state1){
+	switch(state1){
+		case 0:strcpy(state,"Disable");break;
+		case 1:strcpy(state,"Enable");break;
+		case 2:strcpy(state,"Passive");break;
+	}
+	return state;
+}
+
+static char *add_front(u8 front){
+	switch(front){
+		case 1:strcpy(state,"Connected");break;
+		case 2:strcpy(state,"Open");break;
+	}
+	return state;
+}
+
+static char *add_rule(u8 rule){
+	switch(rule){
+		case 0:strcpy(state,"CoS only");break;
+		case 1:strcpy(state,"ToS Only");break;
+		case 2:strcpy(state,"CoS and ToS");break;
+	}
+	return state;
+}
+
+static char *add_proto(u8 proto){
+	switch(proto){
+		case 0:strcpy(state,"STP");break;
+		case 2:strcpy(state,"RSTP");break;
+	}
+	return state;
+}
+
+
+static char *add_duplex(u8 state1){
+	switch(state1){
+		case 0:strcpy(state,"Auto");break;
+		case 1:strcpy(state,"10M Half");break;
+		case 2:strcpy(state,"10M Full");break;
+		case 3:strcpy(state,"100M Half");break;
+		case 4:strcpy(state,"100M Full");break;
+	}
+	return state;
+}
+
+/*
+void event_handle_init(void){
+	//создаём очередь для отправки сообщений
+	//глубина очереди MSG_QUEUE_LEN
+	EventQueue = xQueueCreate(MSG_QUEUE_LEN,MESSAGE_LEN);
+	if(EventQueue == NULL){
+		init_ok = 0;
+		return;
+	}
+}*/
+
+
+void send_events(u32 type,void *ptr){
+
+char tmp[128];
+u32 temp32;
+u8 temp8;
+i8 level;
+struct snmp_msg_t snmp_msg_tmp;
+snmp_msg_tmp.varbind[0].flag = 0;
+
+
+	if(settings_is_loaded()==0)
+		return;
+
+	memset(tmp,0,sizeof(tmp));
+	memset(message_text,0,sizeof(message_text));
+
+	switch(type){
+		case EVENT_LINK_FE1:
+		case EVENT_LINK_FE2:
+		case EVENT_LINK_FE3:
+		case EVENT_LINK_FE4:
+		case EVENT_LINK_GE1:
+		case EVENT_LINK_GE2:
+			temp8 = *(u8 *)ptr;
+			sprintf(tmp,"Port %s Link %s",add_port(type-EVENT_LINK_FE1),add_link_state(temp8));
+			addtext(tmp);
+
+			if(get_snmp_state() == 1){
+				if(temp8 == 1)//link up
+					snmp_msg_tmp.gentrap = SNMP_GENTRAP_LINKUP;
+				else
+					snmp_msg_tmp.gentrap = SNMP_GENTRAP_LINKDOWN;
+				snmp_msg_tmp.spectrap[0]=0;
+
+				//ifIndex.Port = Port
+				snmp_msg_tmp.varbind[0].flag=1;
+				snmp_msg_tmp.varbind[0].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[0].objname[1]=6;
+				snmp_msg_tmp.varbind[0].objname[2]=1;
+				snmp_msg_tmp.varbind[0].objname[3]=2;
+				snmp_msg_tmp.varbind[0].objname[4]=1;
+				snmp_msg_tmp.varbind[0].objname[5]=2;
+				snmp_msg_tmp.varbind[0].objname[6]=2;
+				snmp_msg_tmp.varbind[0].objname[7]=1;
+				snmp_msg_tmp.varbind[0].objname[8]=1;
+				snmp_msg_tmp.varbind[0].objname[9]=(type - EVENT_LINK_FE1 + 1);//if_num 1..6
+				snmp_msg_tmp.varbind[0].len = 10;
+				snmp_msg_tmp.varbind[0].value=(type - EVENT_LINK_FE1 + 1);
+
+				//ifAdminStatus.Port = state
+				snmp_msg_tmp.varbind[1].flag=1;
+				snmp_msg_tmp.varbind[1].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[1].objname[1]=6;
+				snmp_msg_tmp.varbind[1].objname[2]=1;
+				snmp_msg_tmp.varbind[1].objname[3]=2;
+				snmp_msg_tmp.varbind[1].objname[4]=1;
+				snmp_msg_tmp.varbind[1].objname[5]=2;
+				snmp_msg_tmp.varbind[1].objname[6]=2;
+				snmp_msg_tmp.varbind[1].objname[7]=1;
+				snmp_msg_tmp.varbind[1].objname[8]=7;
+				snmp_msg_tmp.varbind[1].objname[9]=(type - EVENT_LINK_FE1 + 1);//if_num 1..6
+				snmp_msg_tmp.varbind[1].len = 10;
+				if(get_port_sett_state(type - EVENT_LINK_FE1) == 1)
+					snmp_msg_tmp.varbind[1].value=SNMP_UP;//up
+				else
+					snmp_msg_tmp.varbind[1].value=SNMP_DOWN;//down
+
+				//ifOperStatus
+				snmp_msg_tmp.varbind[2].flag=1;
+				snmp_msg_tmp.varbind[2].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[2].objname[1]=6;
+				snmp_msg_tmp.varbind[2].objname[2]=1;
+				snmp_msg_tmp.varbind[2].objname[3]=2;
+				snmp_msg_tmp.varbind[2].objname[4]=1;
+				snmp_msg_tmp.varbind[2].objname[5]=2;
+				snmp_msg_tmp.varbind[2].objname[6]=2;
+				snmp_msg_tmp.varbind[2].objname[7]=1;
+				snmp_msg_tmp.varbind[2].objname[8]=8;
+				snmp_msg_tmp.varbind[2].objname[9]=(type - EVENT_LINK_FE1 + 1);//if_num 1..6
+				snmp_msg_tmp.varbind[2].len = 10;
+				if(temp8 == 1)
+					snmp_msg_tmp.varbind[2].value=SNMP_UP;
+				else
+					snmp_msg_tmp.varbind[2].value=SNMP_DOWN;
+				snmp_msg_tmp.varbind[3].flag=0;
+			}
+			break;
+
+
+		case EVENT_POE_A_FE1:
+		case EVENT_POE_A_FE2:
+		case EVENT_POE_A_FE3:
+		case EVENT_POE_A_FE4:
+			temp8 = *(u8 *)ptr;
+			sprintf(tmp,"Port %s PoE A %s",add_port(type-EVENT_POE_A_FE1),add_link_state(temp8));
+			addtext(tmp);
+
+			if(get_snmp_state() == 1){
+				snmp_msg_tmp.gentrap = SNMP_GENTRAP_ENTERPRISESPC;
+				snmp_msg_tmp.spectrap[0]=0;
+
+				//ifIndex.Port = Port
+				snmp_msg_tmp.varbind[0].flag=1;
+				snmp_msg_tmp.varbind[0].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[0].objname[1]=6;
+				snmp_msg_tmp.varbind[0].objname[2]=1;
+				snmp_msg_tmp.varbind[0].objname[3]=2;
+				snmp_msg_tmp.varbind[0].objname[4]=1;
+				snmp_msg_tmp.varbind[0].objname[5]=2;
+				snmp_msg_tmp.varbind[0].objname[6]=2;
+				snmp_msg_tmp.varbind[0].objname[7]=1;
+				snmp_msg_tmp.varbind[0].objname[8]=1;
+				snmp_msg_tmp.varbind[0].objname[9]=(type - EVENT_POE_A_FE1 + 1);//if_num 1..6
+				snmp_msg_tmp.varbind[0].len = 10;
+				snmp_msg_tmp.varbind[0].value=(type - EVENT_POE_A_FE1 + 1);
+
+				//ifAdminStatus.Port = state
+				snmp_msg_tmp.varbind[1].flag=1;
+				snmp_msg_tmp.varbind[1].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[1].objname[1]=6;
+				snmp_msg_tmp.varbind[1].objname[2]=1;
+				snmp_msg_tmp.varbind[1].objname[3]=2;
+				snmp_msg_tmp.varbind[1].objname[4]=1;
+				snmp_msg_tmp.varbind[1].objname[5]=105;
+				snmp_msg_tmp.varbind[1].objname[6]=0;
+				snmp_msg_tmp.varbind[1].objname[7]=(type - EVENT_POE_A_FE1 + 1);//if_num 1..6
+				snmp_msg_tmp.varbind[1].len = 8;
+				if(temp8 == 1)
+					snmp_msg_tmp.varbind[1].value=SNMP_UP;
+				else
+					snmp_msg_tmp.varbind[1].value=SNMP_DOWN;
+				snmp_msg_tmp.varbind[2].flag=0;
+			}
+			break;
+
+		case EVENT_POE_B_FE1:
+		case EVENT_POE_B_FE2:
+		case EVENT_POE_B_FE3:
+		case EVENT_POE_B_FE4:
+			sprintf(tmp,"Port %s PoE B %s",add_port(type-EVENT_POE_B_FE1),add_link_state(*(u8 *)ptr));
+			addtext(tmp);
+			if(get_snmp_state() == 1){
+				snmp_msg_tmp.gentrap = SNMP_GENTRAP_ENTERPRISESPC;
+				snmp_msg_tmp.spectrap[0]=0;
+				//ifIndex.Port = Port
+				snmp_msg_tmp.varbind[0].flag=1;
+				snmp_msg_tmp.varbind[0].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[0].objname[1]=6;
+				snmp_msg_tmp.varbind[0].objname[2]=1;
+				snmp_msg_tmp.varbind[0].objname[3]=2;
+				snmp_msg_tmp.varbind[0].objname[4]=1;
+				snmp_msg_tmp.varbind[0].objname[5]=2;
+				snmp_msg_tmp.varbind[0].objname[6]=2;
+				snmp_msg_tmp.varbind[0].objname[7]=1;
+				snmp_msg_tmp.varbind[0].objname[8]=1;
+				snmp_msg_tmp.varbind[0].objname[9]=(type - EVENT_POE_B_FE1 + 1);//if_num 1..6
+				snmp_msg_tmp.varbind[0].len = 10;
+				snmp_msg_tmp.varbind[0].value=(type - EVENT_POE_B_FE1 + 1);
+
+				//ifAdminStatus.Port = state
+				snmp_msg_tmp.varbind[1].flag=1;
+				snmp_msg_tmp.varbind[1].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[1].objname[1]=6;
+				snmp_msg_tmp.varbind[1].objname[2]=1;
+				snmp_msg_tmp.varbind[1].objname[3]=2;
+				snmp_msg_tmp.varbind[1].objname[4]=1;
+				snmp_msg_tmp.varbind[1].objname[5]=105;
+				snmp_msg_tmp.varbind[1].objname[6]=0;
+				snmp_msg_tmp.varbind[1].objname[7]=(type - EVENT_POE_B_FE1 + 1);//if_num 1..6
+				snmp_msg_tmp.varbind[1].len = 8;
+				if(temp8 == 1)
+					snmp_msg_tmp.varbind[1].value=SNMP_UP;
+				else
+					snmp_msg_tmp.varbind[1].value=SNMP_DOWN;
+				snmp_msg_tmp.varbind[2].flag=0;
+			}
+			break;
+
+		case EVENTS_SENSOR0:
+			sprintf(tmp,"Sensor 0 (Tamper) is active!");
+			addtext(tmp);
+			if(get_snmp_state() == 1){
+				snmp_msg_tmp.gentrap = SNMP_GENTRAP_ENTERPRISESPC;
+				snmp_msg_tmp.spectrap[0]=0;
+				//sensor 0 is active
+				snmp_msg_tmp.varbind[0].flag=1;
+				snmp_msg_tmp.varbind[0].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[0].objname[1]=6;
+				snmp_msg_tmp.varbind[0].objname[2]=1;
+				snmp_msg_tmp.varbind[0].objname[3]=4;
+				snmp_msg_tmp.varbind[0].objname[4]=1;
+				snmp_msg_tmp.varbind[0].objname[5]=0x82;//
+				snmp_msg_tmp.varbind[0].objname[6]=0xC8;//oid = 42019
+				snmp_msg_tmp.varbind[0].objname[7]=0x23;//
+				snmp_msg_tmp.varbind[0].objname[8]=3;
+				snmp_msg_tmp.varbind[0].objname[9]=2;
+				snmp_msg_tmp.varbind[0].objname[10]=3;
+				snmp_msg_tmp.varbind[0].objname[11]=5;
+				snmp_msg_tmp.varbind[0].objname[12]=1;
+				snmp_msg_tmp.varbind[0].len = 13;
+				snmp_msg_tmp.varbind[0].value=1;
+				snmp_msg_tmp.varbind[1].flag=0;
+			}
+			break;
+
+		case EVENTS_SENSOR1:
+			sprintf(tmp,"Sensor 1 (Dry contact) is active!");
+			addtext(tmp);
+			if(get_snmp_state() == 1){
+				snmp_msg_tmp.gentrap = SNMP_GENTRAP_ENTERPRISESPC;
+				snmp_msg_tmp.spectrap[0]=0;
+				//sensor 0 is active
+				snmp_msg_tmp.varbind[0].flag=1;
+				snmp_msg_tmp.varbind[0].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[0].objname[1]=6;
+				snmp_msg_tmp.varbind[0].objname[2]=1;
+				snmp_msg_tmp.varbind[0].objname[3]=4;
+				snmp_msg_tmp.varbind[0].objname[4]=1;
+				snmp_msg_tmp.varbind[0].objname[5]=0x82;//
+				snmp_msg_tmp.varbind[0].objname[6]=0xC8;//oid = 42019
+				snmp_msg_tmp.varbind[0].objname[7]=0x23;//
+				snmp_msg_tmp.varbind[0].objname[8]=3;
+				snmp_msg_tmp.varbind[0].objname[9]=2;
+				snmp_msg_tmp.varbind[0].objname[10]=3;
+				snmp_msg_tmp.varbind[0].objname[11]=5;
+				snmp_msg_tmp.varbind[0].objname[12]=2;
+				snmp_msg_tmp.varbind[0].len = 13;
+				snmp_msg_tmp.varbind[0].value=1;
+				snmp_msg_tmp.varbind[1].flag=0;
+			}
+			break;
+
+		case EVENTS_SENSOR2:
+			sprintf(tmp,"Sensor 2 (Dry contact) is active!");
+			addtext(tmp);
+			if(get_snmp_state() == 1){
+				snmp_msg_tmp.gentrap = SNMP_GENTRAP_ENTERPRISESPC;
+				snmp_msg_tmp.spectrap[0]=0;
+				//sensor 0 is active
+				snmp_msg_tmp.varbind[0].flag=1;
+				snmp_msg_tmp.varbind[0].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[0].objname[1]=6;
+				snmp_msg_tmp.varbind[0].objname[2]=1;
+				snmp_msg_tmp.varbind[0].objname[3]=4;
+				snmp_msg_tmp.varbind[0].objname[4]=1;
+				snmp_msg_tmp.varbind[0].objname[5]=0x82;//
+				snmp_msg_tmp.varbind[0].objname[6]=0xC8;//oid = 42019
+				snmp_msg_tmp.varbind[0].objname[7]=0x23;//
+				snmp_msg_tmp.varbind[0].objname[8]=3;
+				snmp_msg_tmp.varbind[0].objname[9]=2;
+				snmp_msg_tmp.varbind[0].objname[10]=3;
+				snmp_msg_tmp.varbind[0].objname[11]=5;
+				snmp_msg_tmp.varbind[0].objname[12]=3;
+				snmp_msg_tmp.varbind[0].len = 13;
+				snmp_msg_tmp.varbind[0].value=1;
+				snmp_msg_tmp.varbind[1].flag=0;
+			}
+			break;
+
+		case EVENT_NOREPLY_LINK_FE1:
+		case EVENT_NOREPLY_LINK_FE2:
+		case EVENT_NOREPLY_LINK_FE3:
+		case EVENT_NOREPLY_LINK_FE4:
+			sprintf(tmp,"Port %s Autorestart: no link",add_port(type-EVENT_NOREPLY_LINK_FE1));
+			addtext(tmp);
+			if(get_snmp_state() == 1){
+				snmp_msg_tmp.gentrap = SNMP_GENTRAP_ENTERPRISESPC;
+				snmp_msg_tmp.spectrap[0]=0;
+
+				//ifIndex.Port = Port
+				snmp_msg_tmp.varbind[0].flag=1;
+				snmp_msg_tmp.varbind[0].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[0].objname[1]=6;
+				snmp_msg_tmp.varbind[0].objname[2]=1;
+				snmp_msg_tmp.varbind[0].objname[3]=2;
+				snmp_msg_tmp.varbind[0].objname[4]=1;
+				snmp_msg_tmp.varbind[0].objname[5]=2;
+				snmp_msg_tmp.varbind[0].objname[6]=2;
+				snmp_msg_tmp.varbind[0].objname[7]=1;
+				snmp_msg_tmp.varbind[0].objname[8]=1;
+				snmp_msg_tmp.varbind[0].objname[9]=(type - EVENT_NOREPLY_LINK_FE1 + 1);//if_num 1..6
+				snmp_msg_tmp.varbind[0].len = 10;
+				snmp_msg_tmp.varbind[0].value=(type - EVENT_NOREPLY_LINK_FE1 + 1);
+
+				//special function: no link
+				snmp_msg_tmp.varbind[1].flag=1;
+				snmp_msg_tmp.varbind[1].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[1].objname[1]=6;
+				snmp_msg_tmp.varbind[1].objname[2]=1;
+				snmp_msg_tmp.varbind[1].objname[3]=4;
+				snmp_msg_tmp.varbind[1].objname[4]=1;
+				snmp_msg_tmp.varbind[1].objname[5]=0x82;//
+				snmp_msg_tmp.varbind[1].objname[6]=0xC8;//oid = 42019
+				snmp_msg_tmp.varbind[1].objname[7]=0x23;//
+				snmp_msg_tmp.varbind[1].objname[8]=3;
+				snmp_msg_tmp.varbind[1].objname[9]=2;
+				snmp_msg_tmp.varbind[1].objname[10]=3;
+				snmp_msg_tmp.varbind[1].objname[11]=2;
+				snmp_msg_tmp.varbind[1].objname[12]=1;
+				snmp_msg_tmp.varbind[1].objname[13]=(type - EVENT_NOREPLY_LINK_FE1 + 1);//if_num 1..6
+				snmp_msg_tmp.varbind[1].len = 14;
+				snmp_msg_tmp.varbind[1].value=1;
+				snmp_msg_tmp.varbind[2].flag=0;
+			}
+
+			break;
+
+		case EVENT_NOREPLY_PING_FE1:
+		case EVENT_NOREPLY_PING_FE2:
+		case EVENT_NOREPLY_PING_FE3:
+		case EVENT_NOREPLY_PING_FE4:
+			sprintf(tmp,"Port %s Autorestart: no reply to Ping",add_port(type-EVENT_NOREPLY_PING_FE1));
+			addtext(tmp);
+			if(get_snmp_state() == 1){
+				snmp_msg_tmp.gentrap = SNMP_GENTRAP_ENTERPRISESPC;
+				snmp_msg_tmp.spectrap[0]=0;
+
+				//ifIndex.Port = Port
+				snmp_msg_tmp.varbind[0].flag=1;
+				snmp_msg_tmp.varbind[0].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[0].objname[1]=6;
+				snmp_msg_tmp.varbind[0].objname[2]=1;
+				snmp_msg_tmp.varbind[0].objname[3]=2;
+				snmp_msg_tmp.varbind[0].objname[4]=1;
+				snmp_msg_tmp.varbind[0].objname[5]=2;
+				snmp_msg_tmp.varbind[0].objname[6]=2;
+				snmp_msg_tmp.varbind[0].objname[7]=1;
+				snmp_msg_tmp.varbind[0].objname[8]=1;
+				snmp_msg_tmp.varbind[0].objname[9]=(type - EVENT_NOREPLY_PING_FE1 + 1);//if_num 1..6
+				snmp_msg_tmp.varbind[0].len = 10;
+				snmp_msg_tmp.varbind[0].value=(type - EVENT_NOREPLY_PING_FE1 + 1);
+
+				//special function: no ping
+				snmp_msg_tmp.varbind[1].flag=1;
+				snmp_msg_tmp.varbind[1].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[1].objname[1]=6;
+				snmp_msg_tmp.varbind[1].objname[2]=1;
+				snmp_msg_tmp.varbind[1].objname[3]=4;
+				snmp_msg_tmp.varbind[1].objname[4]=1;
+				snmp_msg_tmp.varbind[1].objname[5]=0x82;//
+				snmp_msg_tmp.varbind[1].objname[6]=0xC8;//oid = 42019
+				snmp_msg_tmp.varbind[1].objname[7]=0x23;//
+				snmp_msg_tmp.varbind[1].objname[8]=3;
+				snmp_msg_tmp.varbind[1].objname[9]=2;
+				snmp_msg_tmp.varbind[1].objname[10]=3;
+				snmp_msg_tmp.varbind[1].objname[11]=2;
+				snmp_msg_tmp.varbind[1].objname[12]=2;
+				snmp_msg_tmp.varbind[1].objname[13]=(type - EVENT_NOREPLY_PING_FE1 + 1);//if_num 1..6
+				snmp_msg_tmp.varbind[1].len = 14;
+				snmp_msg_tmp.varbind[1].value=1;
+				snmp_msg_tmp.varbind[2].flag=0;
+			}
+			break;
+
+
+		case EVENT_START_PWR:
+			sprintf(tmp,"Start after power reset");
+			addtext(tmp);
+			if(get_snmp_state() == 1){
+				snmp_msg_tmp.gentrap = SNMP_GENTRAP_ENTERPRISESPC;
+				snmp_msg_tmp.spectrap[0]=0;
+				snmp_msg_tmp.varbind[0].flag=1;
+				snmp_msg_tmp.varbind[0].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[0].objname[1]=6;
+				snmp_msg_tmp.varbind[0].objname[2]=1;
+				snmp_msg_tmp.varbind[0].objname[3]=4;
+				snmp_msg_tmp.varbind[0].objname[4]=1;
+				snmp_msg_tmp.varbind[0].objname[5]=0x82;//
+				snmp_msg_tmp.varbind[0].objname[6]=0xC8;//oid = 42019
+				snmp_msg_tmp.varbind[0].objname[7]=0x23;//
+				snmp_msg_tmp.varbind[0].objname[8]=3;
+				snmp_msg_tmp.varbind[0].objname[9]=2;
+				snmp_msg_tmp.varbind[0].objname[10]=3;
+				snmp_msg_tmp.varbind[0].objname[11]=3;
+				snmp_msg_tmp.varbind[0].objname[12]=5;
+				snmp_msg_tmp.varbind[0].len = 13;
+				snmp_msg_tmp.varbind[0].value=1;
+				snmp_msg_tmp.varbind[1].flag=0;
+			}
+			break;
+
+		case EVENT_START_RST:
+			sprintf(tmp,"Start after reset");
+			addtext(tmp);
+			if(get_snmp_state() == 1){
+				snmp_msg_tmp.gentrap = SNMP_GENTRAP_ENTERPRISESPC;
+				snmp_msg_tmp.spectrap[0]=0;
+				snmp_msg_tmp.varbind[0].flag=1;
+				snmp_msg_tmp.varbind[0].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[0].objname[1]=6;
+				snmp_msg_tmp.varbind[0].objname[2]=1;
+				snmp_msg_tmp.varbind[0].objname[3]=4;
+				snmp_msg_tmp.varbind[0].objname[4]=1;
+				snmp_msg_tmp.varbind[0].objname[5]=0x82;//
+				snmp_msg_tmp.varbind[0].objname[6]=0xC8;//oid = 42019
+				snmp_msg_tmp.varbind[0].objname[7]=0x23;//
+				snmp_msg_tmp.varbind[0].objname[8]=3;
+				snmp_msg_tmp.varbind[0].objname[9]=2;
+				snmp_msg_tmp.varbind[0].objname[10]=3;
+				snmp_msg_tmp.varbind[0].objname[11]=3;
+				snmp_msg_tmp.varbind[0].objname[12]=4;
+				snmp_msg_tmp.varbind[0].len = 13;
+				snmp_msg_tmp.varbind[0].value=1;
+				snmp_msg_tmp.varbind[1].flag=0;
+			}
+			break;
+
+		case EVENT_WEBINTERFACE_LOGIN:
+			sprintf(tmp,"Web-interface authentication: Ok");
+			addtext(tmp);
+			if(get_snmp_state() == 1){
+				snmp_msg_tmp.gentrap = SNMP_GENTRAP_ENTERPRISESPC;
+				snmp_msg_tmp.spectrap[0]=0;
+				snmp_msg_tmp.varbind[0].flag=1;
+				snmp_msg_tmp.varbind[0].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[0].objname[1]=6;
+				snmp_msg_tmp.varbind[0].objname[2]=1;
+				snmp_msg_tmp.varbind[0].objname[3]=4;
+				snmp_msg_tmp.varbind[0].objname[4]=1;
+				snmp_msg_tmp.varbind[0].objname[5]=0x82;//
+				snmp_msg_tmp.varbind[0].objname[6]=0xC8;//oid = 42019
+				snmp_msg_tmp.varbind[0].objname[7]=0x23;//
+				snmp_msg_tmp.varbind[0].objname[8]=3;
+				snmp_msg_tmp.varbind[0].objname[9]=2;
+				snmp_msg_tmp.varbind[0].objname[10]=3;
+				snmp_msg_tmp.varbind[0].objname[11]=3;
+				snmp_msg_tmp.varbind[0].objname[12]=5;
+				snmp_msg_tmp.varbind[0].len = 13;
+				snmp_msg_tmp.varbind[0].value=1;
+				snmp_msg_tmp.varbind[1].flag=0;
+			}
+			break;
+
+		case EVENT_UPDATE_FIRMWARE:
+			temp32 = (*(u32 *)ptr);
+			sprintf(tmp,"Update firmware %x.%x.%x",(u8)(temp32>>16),(u8)(temp32>>8),(u8)(temp32));
+			addtext(tmp);
+			if(get_snmp_state() == 1){
+				snmp_msg_tmp.gentrap = SNMP_GENTRAP_ENTERPRISESPC;
+				snmp_msg_tmp.spectrap[0]=0;
+				snmp_msg_tmp.varbind[0].flag=1;
+				snmp_msg_tmp.varbind[0].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[0].objname[1]=6;
+				snmp_msg_tmp.varbind[0].objname[2]=1;
+				snmp_msg_tmp.varbind[0].objname[3]=4;
+				snmp_msg_tmp.varbind[0].objname[4]=1;
+				snmp_msg_tmp.varbind[0].objname[5]=0x82;//
+				snmp_msg_tmp.varbind[0].objname[6]=0xC8;//oid = 42019
+				snmp_msg_tmp.varbind[0].objname[7]=0x23;//
+				snmp_msg_tmp.varbind[0].objname[8]=3;
+				snmp_msg_tmp.varbind[0].objname[9]=2;
+				snmp_msg_tmp.varbind[0].objname[10]=3;
+				snmp_msg_tmp.varbind[0].objname[11]=3;
+				snmp_msg_tmp.varbind[0].objname[12]=1;
+				snmp_msg_tmp.varbind[0].len = 13;
+				snmp_msg_tmp.varbind[0].value=temp32;
+				snmp_msg_tmp.varbind[1].flag=0;
+			}
+			break;
+
+		case EVENT_CLEAR_ARP:
+			sprintf(tmp,"Clear ARP cash");
+			addtext(tmp);
+			if(get_snmp_state() == 1){
+				snmp_msg_tmp.gentrap = SNMP_GENTRAP_ENTERPRISESPC;
+				snmp_msg_tmp.spectrap[0]=0;
+				snmp_msg_tmp.varbind[0].flag=1;
+				snmp_msg_tmp.varbind[0].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[0].objname[1]=6;
+				snmp_msg_tmp.varbind[0].objname[2]=1;
+				snmp_msg_tmp.varbind[0].objname[3]=4;
+				snmp_msg_tmp.varbind[0].objname[4]=1;
+				snmp_msg_tmp.varbind[0].objname[5]=0x82;//
+				snmp_msg_tmp.varbind[0].objname[6]=0xC8;//oid = 42019
+				snmp_msg_tmp.varbind[0].objname[7]=0x23;//
+				snmp_msg_tmp.varbind[0].objname[8]=3;
+				snmp_msg_tmp.varbind[0].objname[9]=2;
+				snmp_msg_tmp.varbind[0].objname[10]=3;
+				snmp_msg_tmp.varbind[0].objname[11]=3;
+				snmp_msg_tmp.varbind[0].objname[12]=7;
+				snmp_msg_tmp.varbind[0].len = 13;
+				snmp_msg_tmp.varbind[0].value=1;
+				snmp_msg_tmp.varbind[1].flag=0;
+			}
+			break;
+
+		case EVENT_STP_REINIT:
+			sprintf(tmp,"STP topology changed");
+			addtext(tmp);
+			if(get_snmp_state() == 1){
+				snmp_msg_tmp.gentrap = SNMP_GENTRAP_ENTERPRISESPC;
+				snmp_msg_tmp.spectrap[0]=0;
+				snmp_msg_tmp.varbind[0].flag=1;
+				snmp_msg_tmp.varbind[0].objname[0]=0x2b;
+				snmp_msg_tmp.varbind[0].objname[1]=6;
+				snmp_msg_tmp.varbind[0].objname[2]=1;
+				snmp_msg_tmp.varbind[0].objname[3]=4;
+				snmp_msg_tmp.varbind[0].objname[4]=1;
+				snmp_msg_tmp.varbind[0].objname[5]=0x82;//
+				snmp_msg_tmp.varbind[0].objname[6]=0xC8;//oid = 42019
+				snmp_msg_tmp.varbind[0].objname[7]=0x23;//
+				snmp_msg_tmp.varbind[0].objname[8]=3;
+				snmp_msg_tmp.varbind[0].objname[9]=2;
+				snmp_msg_tmp.varbind[0].objname[10]=3;
+				snmp_msg_tmp.varbind[0].objname[11]=1;
+				snmp_msg_tmp.varbind[0].len = 12;
+				snmp_msg_tmp.varbind[0].value=1;
+				snmp_msg_tmp.varbind[1].flag=0;
+			}
+			break;
+
+
+		//группа set
+		case EVENT_SET_NETIP:
+			ip[0] = *(u16 *)(ptr);
+			ip[1] = *(u16 *)(ptr+2);
+			sprintf(tmp,"Network settings edit: IP address %d.%d.%d.%d",
+					uip_ipaddr1(ip),uip_ipaddr2(ip),uip_ipaddr3(ip),uip_ipaddr4(ip));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENT_SET_NETMASK:
+			ip[0] = *(u16 *)(ptr);
+			ip[1] = *(u16 *)(ptr+2);
+			sprintf(tmp,"Network settings edit: Netmask %d.%d.%d.%d",
+					uip_ipaddr1(ip),uip_ipaddr2(ip),uip_ipaddr3(ip),uip_ipaddr4(ip));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENT_SET_NETGATE:
+			ip[0] = *(u16 *)(ptr);
+			ip[1] = *(u16 *)(ptr+2);
+			sprintf(tmp,"Network settings edit: Gateway IP address: %d.%d.%d.%d",
+					uip_ipaddr1(&ip),uip_ipaddr2(&ip),uip_ipaddr3(&ip),uip_ipaddr4(&ip));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENT_SET_NETDNS:
+			ip[0] = *(u16 *)(ptr);
+			ip[1] = *(u16 *)(ptr+2);
+			sprintf(tmp,"Network settings edit: DNS IP address: %d.%d.%d.%d",
+					uip_ipaddr1(&ip),uip_ipaddr2(&ip),uip_ipaddr3(&ip),uip_ipaddr4(&ip));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENT_SET_MAC:
+			tmp[0]=*(u8 *)(ptr);
+			tmp[1]=*(u8 *)(ptr+1);
+			tmp[2]=*(u8 *)(ptr+2);
+			tmp[3]=*(u8 *)(ptr+3);
+			tmp[4]=*(u8 *)(ptr+4);
+			tmp[5]=*(u8 *)(ptr+5);
+			sprintf(tmp,"Network settings edit: MAC: %02X:%02X:%02X:%02X:%02X:%02X",
+					tmp[0],tmp[1],tmp[2],tmp[3],tmp[4],tmp[5]);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+
+
+		case EVENTS_WDT_MODE_FE1:
+		case EVENTS_WDT_MODE_FE2:
+		case EVENTS_WDT_MODE_FE3:
+		case EVENTS_WDT_MODE_FE4:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Autorestart settings edit: Port %s, Mode %s",add_port(type-EVENTS_WDT_MODE_FE1),add_mode(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_WDT_IP_FE1:
+		case EVENTS_WDT_IP_FE2:
+		case EVENTS_WDT_IP_FE3:
+		case EVENTS_WDT_IP_FE4:
+			ip[0] = *(u16 *)(ptr);
+			ip[1] = *(u16 *)(ptr+2);
+			sprintf(tmp,"Autorestart settings edit: Port %s IP address %d.%d.%d.%d",
+					add_port(type-EVENTS_WDT_IP_FE1),uip_ipaddr1(&ip),uip_ipaddr2(&ip),uip_ipaddr3(&ip),uip_ipaddr4(&ip));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_PORT_ST_FE1:
+		case EVENTS_SET_PORT_ST_FE2:
+		case EVENTS_SET_PORT_ST_FE3:
+		case EVENTS_SET_PORT_ST_FE4:
+		case EVENTS_SET_PORT_ST_GE1:
+		case EVENTS_SET_PORT_ST_GE2:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Port settings edit: Port %s, State %s",add_port(type-EVENTS_SET_PORT_ST_FE1),add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+
+		case EVENTS_SET_PORT_DPLX_FE1:
+		case EVENTS_SET_PORT_DPLX_FE2:
+		case EVENTS_SET_PORT_DPLX_FE3:
+		case EVENTS_SET_PORT_DPLX_FE4:
+		case EVENTS_SET_PORT_DPLX_GE1:
+		case EVENTS_SET_PORT_DPLX_GE2:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Port settings edit: Port %s, Speed & Duplex %s",add_port(type-EVENTS_SET_PORT_DPLX_FE1),add_duplex(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+
+		case EVENTS_SET_PORT_FLOW_FE1:
+		case EVENTS_SET_PORT_FLOW_FE2:
+		case EVENTS_SET_PORT_FLOW_FE3:
+		case EVENTS_SET_PORT_FLOW_FE4:
+		case EVENTS_SET_PORT_FLOW_GE1:
+		case EVENTS_SET_PORT_FLOW_GE2:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Port settings edit: Port %s, Flow control %s",add_port(type-EVENTS_SET_PORT_FLOW_FE1),add_duplex(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_PORT_SS_FE1:
+		case EVENTS_SET_PORT_SS_FE2:
+		case EVENTS_SET_PORT_SS_FE3:
+		case EVENTS_SET_PORT_SS_FE4:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Soft start edit: Port %s, State %s",add_port(type-EVENTS_SET_PORT_SS_FE1),add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_PORT_POE_A_FE1:
+		case EVENTS_SET_PORT_POE_A_FE2:
+		case EVENTS_SET_PORT_POE_A_FE3:
+		case EVENTS_SET_PORT_POE_A_FE4:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Port settings edit: Port %s, PoE A State %s",add_port(type-EVENTS_SET_PORT_POE_A_FE1),add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_PORT_POE_B_FE1:
+		case EVENTS_SET_PORT_POE_B_FE2:
+		case EVENTS_SET_PORT_POE_B_FE3:
+		case EVENTS_SET_PORT_POE_B_FE4:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Port settings edit: Port %s, PoE B State %s",add_port(type-EVENTS_SET_PORT_POE_B_FE1),add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_PORT_POE_A_FE1_LIM:
+		case EVENTS_SET_PORT_POE_A_FE2_LIM:
+		case EVENTS_SET_PORT_POE_A_FE3_LIM:
+		case EVENTS_SET_PORT_POE_A_FE4_LIM:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Port settings edit: Port %s, PoE A Limit %s",add_port(type-EVENTS_SET_PORT_POE_B_FE1),add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_PORT_POE_B_FE1_LIM:
+		case EVENTS_SET_PORT_POE_B_FE2_LIM:
+		case EVENTS_SET_PORT_POE_B_FE3_LIM:
+		case EVENTS_SET_PORT_POE_B_FE4_LIM:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Port settings edit: Port %s, PoE B Limit %s",add_port(type-EVENTS_SET_PORT_POE_B_FE1),add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_LANG:
+			temp8 = (*(u8 *)ptr);
+			if(temp8 == RUS)
+				sprintf(tmp,"Interface settings edit: Language RUS");
+			else
+				sprintf(tmp,"Interface settings edit: Language ENG");
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_LOGIN:
+			sprintf(tmp,"Interface settings edit: Login %s",(char *)ptr);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_NAME:
+			sprintf(tmp,"Interface settings edit: Device Name %s",(char *)ptr);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_LOCATION:
+			sprintf(tmp,"Interface settings edit: Device Location %s",(char *)ptr);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_COMPANY:
+			sprintf(tmp,"Interface settings edit: Service Company %s",(char *)ptr);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+
+		case EVENTS_SET_SMTP_STATE:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"SMTP settings edit: State %s",add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_SMTP_IP:
+			ip[0] = *(u16 *)(ptr);
+			ip[1] = *(u16 *)(ptr+2);
+			sprintf(tmp,"SMTP settings edit: Server IP address %d.%d.%d.%d",
+				uip_ipaddr1(&ip),uip_ipaddr2(&ip),uip_ipaddr3(&ip),uip_ipaddr4(&ip));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_SMTP_TO:
+			sprintf(tmp,"SMTP settings edit: To %s",(char *)(ptr));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_SMTP_TO2:
+			sprintf(tmp,"SMTP settings edit: To2 %s",(char *)(ptr));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_SMTP_TO3:
+			sprintf(tmp,"SMTP settings edit: To3 %s",(char *)(ptr));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_SMTP_FROM:
+			sprintf(tmp,"SMTP settings edit: From %s",(char *)(ptr));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_SMTP_SUBJ:
+			sprintf(tmp,"SMTP settings edit: Subject %s",(char *)(ptr));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+
+		case EVENTS_SET_SMTP_LOGIN:
+			sprintf(tmp,"SMTP settings edit: Login %s",(char *)(ptr));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_SMTP_PASS:
+			sprintf(tmp,"SMTP settings edit: Password %s",(char *)(ptr));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_SMTP_PORT:
+			sprintf(tmp,"SMTP settings edit: Port %d",*(u16 *)(ptr));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_SNTP_STATE:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"SNTP settings edit: State %s",add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_SNTP_IP:
+			ip[0] = *(u16 *)(ptr);
+			ip[1] = *(u16 *)(ptr+2);
+			sprintf(tmp,"SNTP settings edit: Server IP address %d.%d.%d.%d",
+				uip_ipaddr1(&ip),uip_ipaddr2(&ip),uip_ipaddr3(&ip),uip_ipaddr4(&ip));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_SNTP_TZONE:
+			sprintf(tmp,"SNTP settings edit: Timezone UTC %02d:0",*(i8 *)ptr);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_SNTP_PERIOD:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"SNTP settings edit: Synchronization period %dmin.",temp8);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SET_SYSLOG_STATE:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Syslog settings edit: State %s",add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+
+		case EVENTS_SET_SYSLOG_IP:
+			ip[0] = *(u16 *)(ptr);
+			ip[1] = *(u16 *)(ptr+2);
+			sprintf(tmp,"Syslog settings edit: Server IP address %d.%d.%d.%d",
+				uip_ipaddr1(&ip),uip_ipaddr2(&ip),uip_ipaddr3(&ip),uip_ipaddr4(&ip));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+#if 0
+		case EVENTS_EVENTLIST_BASE_S:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Event list settings edit: Base settings group, State %s",add_state(temp8));
+			addtext(tmp);
+			break;
+
+		case EVENTS_EVENTLIST_PORT_S:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Event list settings edit: Port settings group, State %s",add_state(temp8));
+			addtext(tmp);
+			break;
+
+
+		case EVENTS_EVENTLIST_VLAN_S:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Event list settings edit: VLAN settings group, State %s",add_state(temp8));
+			addtext(tmp);
+			break;
+
+		case EVENTS_EVENTLIST_STP_S:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Event list settings edit: STP settings group, State %s",add_state(temp8));
+			addtext(tmp);
+			break;
+
+		case EVENTS_EVENTLIST_QOS_S:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Event list settings edit: QoS settings group, State %s",add_state(temp8));
+			addtext(tmp);
+			break;
+
+		case EVENTS_EVENTLIST_OTHER_S:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Event list settings edit: Other settings group, State %s",add_state(temp8));
+			addtext(tmp);
+			break;
+
+		case EVENTS_EVENTLIST_LINK_T:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Event list settings edit: Link change group, State %s",add_state(temp8));
+			addtext(tmp);
+			break;
+
+		case EVENTS_EVENTLIST_POE_T:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Event list settings edit: PoE change group, State %s",add_state(temp8));
+			addtext(tmp);
+			break;
+
+		case EVENTS_EVENTLIST_STP_T:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Event list settings edit: STP events group, State %s",add_state(temp8));
+			addtext(tmp);
+			break;
+
+		case EVENTS_EVENTLIST_SLINK_T:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Event list settings edit: Special Function (Link), State %s",add_state(temp8));
+			addtext(tmp);
+			break;
+
+		case EVENTS_EVENTLIST_SPING_T:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Event list settings edit: Special Function (Ping), State %s",add_state(temp8));
+			addtext(tmp);
+			break;
+
+		case EVENTS_EVENTLIST_SYSTEM_T:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Event list settings edit: System events group, State %s",add_state(temp8));
+			addtext(tmp);
+			break;
+
+		case EVENTS_EVENTLIST_UPS_T:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Event list settings edit: UPS events group, State %s",add_state(temp8));
+			addtext(tmp);
+			break;
+
+		case EVENTS_EVENTLIST_ALARM_T:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Event list settings edit: Alarm events group, State %s",add_state(temp8));
+			addtext(tmp);
+			break;
+#endif
+
+		case EVENTS_EVENTLIST_BASE_S:
+		case EVENTS_EVENTLIST_PORT_S:
+		case EVENTS_EVENTLIST_VLAN_S:
+		case EVENTS_EVENTLIST_STP_S:
+		case EVENTS_EVENTLIST_QOS_S:
+		case EVENTS_EVENTLIST_OTHER_S:
+		case EVENTS_EVENTLIST_LINK_T:
+		case EVENTS_EVENTLIST_POE_T:
+		case EVENTS_EVENTLIST_STP_T:
+		case EVENTS_EVENTLIST_SLINK_T:
+		case EVENTS_EVENTLIST_SPING_T:
+		case EVENTS_EVENTLIST_SYSTEM_T:
+		case EVENTS_EVENTLIST_UPS_T:
+		case EVENTS_EVENTLIST_ALARM_T:
+			sprintf(tmp,"Event list settings edit");
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_ALARM1_STATE:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Alarm settings edit: Line 1, State %s",add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_ALARM2_STATE:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Alarm settings edit: Line 2, State %s",add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_ALARM3_STATE:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Alarm settings edit: Line 3, State %s",add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_ALARM1_FRONT:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Alarm settings edit: Line 1, Alarm state %s",add_front(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_ALARM2_FRONT:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Alarm settings edit: Line 2, Alarm state %s",add_front(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_ALARM3_FRONT:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Alarm settings edit: Line 3, Alarm state %s",add_front(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_RATELIM_MODE_FE1:
+		case EVENTS_RATELIM_MODE_FE2:
+		case EVENTS_RATELIM_MODE_FE3:
+		case EVENTS_RATELIM_MODE_FE4:
+		case EVENTS_RATELIM_MODE_GE1:
+		case EVENTS_RATELIM_MODE_GE2:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Rate Limit settings edit: Port %s, Limit mode %d",add_port(type-EVENTS_RATELIM_MODE_FE1),(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_RATELIM_RX_FE1:
+		case EVENTS_RATELIM_RX_FE2:
+		case EVENTS_RATELIM_RX_FE3:
+		case EVENTS_RATELIM_RX_FE4:
+		case EVENTS_RATELIM_RX_GE1:
+		case EVENTS_RATELIM_RX_GE2:
+			temp32 = (*(u32 *)ptr);
+			sprintf(tmp,"Rate Limit settings edit: Port %s, RX Limit %lu",add_port(type-EVENTS_RATELIM_RX_FE1),(temp32));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_RATELIM_TX_FE1:
+		case EVENTS_RATELIM_TX_FE2:
+		case EVENTS_RATELIM_TX_FE3:
+		case EVENTS_RATELIM_TX_FE4:
+		case EVENTS_RATELIM_TX_GE1:
+		case EVENTS_RATELIM_TX_GE2:
+			temp32 = (*(u32 *)ptr);
+			sprintf(tmp,"Rate Limit settings edit: Port %s, TX Limit %lu",add_port(type-EVENTS_RATELIM_RX_FE1),(temp32));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_COS_STATE_FE1:
+		case EVENTS_COS_STATE_FE2:
+		case EVENTS_COS_STATE_FE3:
+		case EVENTS_COS_STATE_FE4:
+		case EVENTS_COS_STATE_GE1:
+		case EVENTS_COS_STATE_GE2:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"QoS settings edit: Port %s, CoS State %s",add_port(type-EVENTS_COS_STATE_FE1),add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+
+		case EVENTS_TOS_STATE_FE1:
+		case EVENTS_TOS_STATE_FE2:
+		case EVENTS_TOS_STATE_FE3:
+		case EVENTS_TOS_STATE_FE4:
+		case EVENTS_TOS_STATE_GE1:
+		case EVENTS_TOS_STATE_GE2:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"QoS settings edit: Port %s, ToS State %s",add_port(type-EVENTS_TOS_STATE_FE1),add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_QOS_RULE_FE1:
+		case EVENTS_QOS_RULE_FE2:
+		case EVENTS_QOS_RULE_FE3:
+		case EVENTS_QOS_RULE_FE4:
+		case EVENTS_QOS_RULE_GE1:
+		case EVENTS_QOS_RULE_GE2:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"QoS settings edit: Port %s, Rule %s",add_port(type-EVENTS_QOS_RULE_FE1),add_rule(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_QOS_DEFPRI_FE1:
+		case EVENTS_QOS_DEFPRI_FE2:
+		case EVENTS_QOS_DEFPRI_FE3:
+		case EVENTS_QOS_DEFPRI_FE4:
+		case EVENTS_QOS_DEFPRI_GE1:
+		case EVENTS_QOS_DEFPRI_GE2:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"QoS settings edit: Port %s, Default priority %d",add_port(type-EVENTS_QOS_DEFPRI_FE1),temp8);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_QOS_STATE:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"QoS settings edit: State %s",add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_QOS_POLICY:
+			temp8 = (*(u8 *)ptr);
+			if (temp8 == 0)
+				sprintf(tmp,"QoS settings edit: Policy  Strict priority");
+			else
+				sprintf(tmp,"QoS settings edit: Policy  Weighted fair priority");
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_PB_VLAN_STATE:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Port Base VLAN settings edit: State %s",add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+
+		case EVENTS_VLAN_STATE:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"VLAN settings edit: State %s",add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_VLAN_MVID:
+			temp32 = (*(u16 *)ptr);
+			sprintf(tmp,"VLAN settings edit: Managment VID %lu",temp32);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_VLAN_STATE_FE1:
+		case EVENTS_VLAN_STATE_FE2:
+		case EVENTS_VLAN_STATE_FE3:
+		case EVENTS_VLAN_STATE_FE4:
+		case EVENTS_VLAN_STATE_GE1:
+		case EVENTS_VLAN_STATE_GE2:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"VLAN settings edit: Port %s, State %s",add_port(type-EVENTS_VLAN_STATE_FE1),add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_VLAN_DVID_FE1:
+		case EVENTS_VLAN_DVID_FE2:
+		case EVENTS_VLAN_DVID_FE3:
+		case EVENTS_VLAN_DVID_FE4:
+		case EVENTS_VLAN_DVID_GE1:
+		case EVENTS_VLAN_DVID_GE2:
+			temp32 = (*(u16 *)ptr);
+			sprintf(tmp,"VLAN settings edit: Port %s, Default VID %lu",add_port(type-EVENTS_VLAN_DVID_FE1),temp32);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+
+		case EVENTS_VLAN_EDIT:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"VLAN settings edit: VLAN#%d edit",temp8);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+
+
+		case EVENTS_STP_STATE:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"STP settings edit: State %s",add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_STP_PROTO:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"STP settings edit: Protocol %s",add_proto(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_STP_PRI:
+			temp32 = (*(u16 *)ptr);
+			sprintf(tmp,"STP settings edit: Bridge priority %lu",temp32);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_STP_MAGE:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"STP settings edit: Bridge Max Age %d",temp8);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_STP_HTIME:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"STP settings edit: Bridge Hello Time %d",temp8);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_STP_FDELAY:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"STP settings edit: Forward Delay Time %d",temp8);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_STP_HCNT:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"STP settings edit: Bridge Hold Count %d",temp8);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_STP_MDELAY:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"STP settings edit: Bridge Migrate Delay %d",temp8);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_STP_PORT_EN_FE1:
+		case EVENTS_STP_PORT_EN_FE2:
+		case EVENTS_STP_PORT_EN_FE3:
+		case EVENTS_STP_PORT_EN_FE4:
+		case EVENTS_STP_PORT_EN_GE1:
+		case EVENTS_STP_PORT_EN_GE2:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"STP settings edit: Port %s, State %s",add_port(type-EVENTS_STP_PORT_EN_FE1),add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_STP_PORT_ST_FE1:
+		case EVENTS_STP_PORT_ST_FE2:
+		case EVENTS_STP_PORT_ST_FE3:
+		case EVENTS_STP_PORT_ST_FE4:
+		case EVENTS_STP_PORT_ST_GE1:
+		case EVENTS_STP_PORT_ST_GE2:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"STP settings edit: Port %s, State %s",add_port(type-EVENTS_STP_PORT_ST_FE1),add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_STP_PORT_PRI_FE1:
+		case EVENTS_STP_PORT_PRI_FE2:
+		case EVENTS_STP_PORT_PRI_FE3:
+		case EVENTS_STP_PORT_PRI_FE4:
+		case EVENTS_STP_PORT_PRI_GE1:
+		case EVENTS_STP_PORT_PRI_GE2:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"STP settings edit: Port %s, Priority %d",add_port(type-EVENTS_STP_PORT_ST_FE1),temp8);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_STP_PORT_COST_FE1:
+		case EVENTS_STP_PORT_COST_FE2:
+		case EVENTS_STP_PORT_COST_FE3:
+		case EVENTS_STP_PORT_COST_FE4:
+		case EVENTS_STP_PORT_COST_GE1:
+		case EVENTS_STP_PORT_COST_GE2:
+			temp32 = (*(u32 *)ptr);
+			sprintf(tmp,"STP settings edit: Port %s, Cost %lu",add_port(type-EVENTS_STP_PORT_ST_FE1),temp32);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_CALLIBRATE_KOEF1_FE1:
+		case EVENTS_CALLIBRATE_KOEF1_FE2:
+		case EVENTS_CALLIBRATE_KOEF1_FE3:
+		case EVENTS_CALLIBRATE_KOEF1_FE4:
+			sprintf(tmp,"Callibrate RX Line Port %s",add_port(type - EVENTS_CALLIBRATE_KOEF1_FE1));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_CALLIBRATE_KOEF2_FE1:
+		case EVENTS_CALLIBRATE_KOEF2_FE2:
+		case EVENTS_CALLIBRATE_KOEF2_FE3:
+		case EVENTS_CALLIBRATE_KOEF2_FE4:
+			sprintf(tmp,"Callibrate TX Line Port %s",add_port(type - EVENTS_CALLIBRATE_KOEF2_FE1));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SNMP_STATE:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"SNMP settings edit: State %s",add_state(temp8));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SNMP_IP:
+			ip[0] = *(u16 *)(ptr);
+			ip[1] = *(u16 *)(ptr+2);
+			sprintf(tmp,"SNMP settings edit: Server IP address %d.%d.%d.%d",
+				uip_ipaddr1(&ip),uip_ipaddr2(&ip),uip_ipaddr3(&ip),uip_ipaddr4(&ip));
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SNMP_VERS:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"SNMP settings edit: Version %d",temp8);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_SS_TIME:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Soft Start settings edit: Time %dh.",temp8);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_DEFAULT:
+			sprintf(tmp,"Default settings");
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		case EVENTS_TELNET_STATE:
+			temp8 = (*(u8 *)ptr);
+			sprintf(tmp,"Telnet settings edit: state %d",temp8);
+			addtext(tmp);
+			EMPTY_TRAP
+			break;
+
+		default:
+			sprintf(tmp,"unknown message: code %lu",type);
+			addtext(tmp);
+			break;
+	}
+
+	//смотрим разрешение работ и получаем level
+	level = if_need_send(type);
+	//printf("level %d\r\n",level);
+
+	if((level>=0)&&(level<8)){
+		//send syslog
+		if(get_syslog_state() == 1){
+			printf("send syslog\r\n");
+			memset(syslog_text.text,0,sizeof(syslog_text.text));
+			syslog_text.level = level;
+			addsysloghead(syslog_text.level,syslog_text.text);
+			strcat(syslog_text.text,message_text);
+			//добавляем в очередь сообщений
+			xQueueSend(SyslogQueue,&syslog_text,0);
+		}
+
+		//send e-mail
+		if(get_smtp_state()==ENABLE){
+			printf("add to e-mail text\r\n");
+			//добавляем в очередь сообщений
+			xQueueSend(SmtpQueue,message_text,0);
+		}
+
+		//send snmp traps
+		if(get_snmp_state()==1){
+			//if no var bind, no send
+			if(snmp_msg_tmp.varbind[0].flag){
+				xQueueSend(SnmpTrapQueue,&snmp_msg_tmp,0);
+				printf("add to snmp trap\r\n");
+			}
+		}
+	}
+
+	printf("%s\r\n",message_text);
+
+	//пишем в лог
+	#if BB_LOG
+		if(write_log_bb(message_text))
+			init_ok=0;
+	#endif
+}
+
+//изменение линка на порту
+void if_link_changed(void){
+static u8 init = 0;
+	for(u8 i=0;i<PORT_NUM;i++)
+		if((status.port_stat[i].last_link != status.port_stat[i].link) && (init == 1))
+			send_events(EVENT_LINK_FE1+i,&status.port_stat[i].link);
+
+	for(u8 i=0;i<PORT_NUM;i++)
+		status.port_stat[i].last_link = status.port_stat[i].link;
+
+	init = 1;
+}
+
+
+//изменение линка на порту
+void if_poe_changed(void){
+	static u8 init = 0;
+	//poe a
+	for(u8 i=0;i<FE_PORT_NUM;i++)
+		if((status.port_stat[i].poe_a_last != status.port_stat[i].poe_a) && (init == 1))
+			send_events(EVENT_POE_A_FE1+i,&status.port_stat[i].poe_a);
+
+	for(u8 i=0;i<FE_PORT_NUM;i++)
+		status.port_stat[i].poe_a_last = status.port_stat[i].poe_a;
+
+	//poe b
+	for(u8 i=0;i<FE_PORT_NUM;i++)
+		if((status.port_stat[i].poe_b_last != status.port_stat[i].poe_b) && (init == 1))
+			send_events(EVENT_POE_B_FE1+i,&status.port_stat[i].poe_b);
+
+	for(u8 i=0;i<FE_PORT_NUM;i++)
+		status.port_stat[i].poe_b_last = status.port_stat[i].poe_b;
+
+	init = 1;
+}
+
+
+void set_dry_contact_state(u8 channel,u8 state){
+	if(channel > NUM_ALARMS)
+		return;
+	dry_contact_state[channel] = state;
+}
+u8 get_dry_contact_state(u8 channel){
+	return dry_contact_state[channel];
+}
+
+void sensor_line_events(void){
+static u8 last_state[3]={0,0,0};
+
+	if(get_alarm_state(0)==1){
+		if(get_sensor_state(0) == Bit_RESET){
+			vTaskDelay(200*MSEC);
+			if((get_sensor_state(0) == Bit_RESET)&&(get_sensor_state(0)!=last_state[0])){
+				send_events(EVENTS_SENSOR0,NULL);
+			}
+		}
+		last_state[0] = get_sensor_state(0);
+	}
+
+	if(get_alarm_state(1)==1){
+		if(((get_sensor_state(1) == Bit_RESET) &&(get_alarm_front(1)==1))||
+				((get_sensor_state(1) == Bit_SET) &&(get_alarm_front(1)==2))){
+			vTaskDelay(200*MSEC);
+			if(((get_sensor_state(1) == Bit_RESET) &&(get_alarm_front(1)==1))||
+					((get_sensor_state(1) == Bit_SET) &&(get_alarm_front(1)==2))){
+				if(get_sensor_state(1)!=last_state[1])
+					send_events(EVENTS_SENSOR1,NULL);
+			}
+		}
+		last_state[1] = get_sensor_state(1);
+	}
+
+	if(get_alarm_state(2)==1){
+		if(((get_sensor_state(2) == Bit_RESET) &&(get_alarm_front(2)==1))||
+				((get_sensor_state(2) == Bit_SET) &&(get_alarm_front(2)==2))){
+			vTaskDelay(50*MSEC);
+			if(((get_sensor_state(2) == Bit_RESET) &&(get_alarm_front(2)==1))||
+					((get_sensor_state(2) == Bit_SET) &&(get_alarm_front(2)==2))){
+				if(get_sensor_state(2)!=last_state[2])
+					send_events(EVENTS_SENSOR2,NULL);
+				}
+		}
+		last_state[2] = get_sensor_state(2);
+	}
+}
+
+
+

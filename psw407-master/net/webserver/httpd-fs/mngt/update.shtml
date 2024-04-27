@@ -1,0 +1,6 @@
+<script language="JavaScript" type="text/javascript">
+ function cancel(){
+  document.getElementById("Update").value="0";
+ }
+</script>
+%! update

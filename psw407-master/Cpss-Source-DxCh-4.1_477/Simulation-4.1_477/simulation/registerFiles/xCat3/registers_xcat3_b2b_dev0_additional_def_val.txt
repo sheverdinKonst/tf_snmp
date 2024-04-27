@@ -1,0 +1,8 @@
+;;;;;;Addr=0x  Val=0x Repeat=0d Skip=0x
+;;;;
+;;;; update the device type -- to xCat3
+;;;; F400 - PonCat3 GE device - CPSS_98DX3336_CNS 
+0000004c 000F4000
+;;;;
+ffffffff
+

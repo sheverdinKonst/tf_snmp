@@ -1,0 +1,1047 @@
+/*
+ * описание портов ввода/вывода коммутатора
+ * low level definition of SW board
+ *
+ * generate: 23/05/2013
+ *
+ * обозначение типа линии:
+ * LED - светодиод
+ * BTN - кнопка
+ * LINE - линия
+ */
+#ifndef _SW_BOARD_H
+#define _SW_BOARD_H
+
+#include "stm32f4xx.h"
+#include "../uip/uip.h"
+#include "../net/snmp/snmpd/snmpd-conf.h"
+#include "../snmp/snmpd/snmpd-types.h"
+
+#define TOGLE_LED	2
+
+#define GE1 (COOPER_PORT_NUM)
+#define GE2 (COOPER_PORT_NUM+1)
+
+/**********************************************************************************/
+/*****************************плата SW*********************************************/
+/**********************************************************************************/
+/* Common */
+
+#define BTN_DEFAULT_PIN 		GPIO_Pin_1 //кнопка DEFAULT
+#define BTN_DEFAULT_GPIO 		GPIOE
+
+//for all PSW (exclude PSW-1G)
+#define LED_DEFAULT_PIN_V1   		GPIO_Pin_2//светодиод DEFAULT
+#define LED_DEFAULT_GPIO_V1			GPIOE
+
+#define LED_CPU_PIN_V1 				GPIO_Pin_0 //светодиод CPU
+#define LED_CPU_GPIO_V1 			GPIOE
+
+//for PSW-1G only
+#define LED_DEFAULT_PIN_V2   		GPIO_Pin_0//светодиод DEFAULT
+#define LED_DEFAULT_GPIO_V2			GPIOE
+
+#define LED_CPU_PIN_V2 				GPIO_Pin_9 //светодиод CPU
+#define LED_CPU_GPIO_V2 			GPIOB
+
+
+// poe controller
+#define POE_INT_PIN				GPIO_Pin_3
+#define POE_INT_GPIO			GPIOE
+
+#define LINE_POE_RST_PIN 		GPIO_Pin_4//линия на перезагрузку PoE контроллера
+#define LINE_POE_RST_GPIO 		GPIOE
+
+//loss of power
+#define LOSS_OF_POWER_PIN		GPIO_Pin_4
+#define LOSS_OFPOWER_GPIO		GPIOE
+
+//dry contact lines
+//датчик вскрытия
+#define OPEN_SENSOR_PIN			GPIO_Pin_6
+#define	OPEN_SENSOR_GPIO		GPIOE
+
+
+
+// для psw 2g+ и psw2g
+#define SENSOR1_PIN_V1			GPIO_Pin_9
+#define SENSOR1_GPIO_V1			GPIOC
+
+#define SENSOR2_PIN_V1			GPIO_Pin_9
+#define SENSOR2_GPIO_V1			GPIOB
+
+
+// для psw 2g4f и 2g6f
+#define SENSOR1_PIN_V2			GPIO_Pin_9
+#define SENSOR1_GPIO_V2			GPIOC
+
+#define SENSOR2_PIN_V2			GPIO_Pin_13
+#define SENSOR2_GPIO_V2			GPIOD
+
+// для psw 1g
+#define SENSOR1_PIN_V3			GPIO_Pin_14
+#define SENSOR1_GPIO_V3			GPIOD
+
+#define SENSOR2_PIN_V3			GPIO_Pin_15
+#define SENSOR2_GPIO_V3			GPIOD
+
+//board id lines
+#define BOARD_ID0_PIN_V1			GPIO_Pin_13
+#define BOARD_ID0_GPIO_V1			GPIOE
+
+#define BOARD_ID1_PIN_V1			GPIO_Pin_14
+#define BOARD_ID1_GPIO_V1			GPIOE
+
+#define BOARD_ID2_PIN_V1			GPIO_Pin_15
+#define BOARD_ID2_GPIO_V1			GPIOE
+
+#define BOARD_ID3_PIN_V1			GPIO_Pin_12
+#define BOARD_ID3_GPIO_V1			GPIOE
+
+
+#define BOARD_ID0_PIN_V2			GPIO_Pin_6
+#define BOARD_ID0_GPIO_V2			GPIOC
+
+#define BOARD_ID1_PIN_V2			GPIO_Pin_7
+#define BOARD_ID1_GPIO_V2			GPIOC
+
+#define BOARD_ID2_PIN_V2			GPIO_Pin_8
+#define BOARD_ID2_GPIO_V2			GPIOC
+
+/* UPS MODE DEFINES  */
+//psw 2g4f
+#define LINE_UPS_DET_PIN_1		GPIO_Pin_8//PC8
+#define LINE_UPS_DET_GPIO_1		GPIOC
+
+#define LINE_UPS_VAC_PIN_1		GPIO_Pin_0//PD0
+#define LINE_UPS_VAC_GPIO_1		GPIOD
+
+#define LINE_UPS_VAKB_PIN_1		GPIO_Pin_1//PD1
+#define LINE_UPS_VAKB_GPIO_1	GPIOD
+
+#define LINE_UPS_VOUT_PIN_1		GPIO_Pin_2//PD2
+#define LINE_UPS_VOUT_GPIO_1	GPIOD
+
+//psw 2g1f
+#define LINE_UPS_DET_PIN_2		GPIO_Pin_3//PD6
+#define LINE_UPS_DET_GPIO_2		GPIOD
+
+#define LINE_UPS_VAC_PIN_2		GPIO_Pin_4//PD3
+#define LINE_UPS_VAC_GPIO_2		GPIOD
+
+#define LINE_UPS_VAKB_PIN_2		GPIO_Pin_5//PD5
+#define LINE_UPS_VAKB_GPIO_2	GPIOD
+
+#define LINE_UPS_VOUT_PIN_2		GPIO_Pin_6//PD4
+#define LINE_UPS_VOUT_GPIO_2	GPIOD
+
+/*интерфейс с Marvell 6095*/
+#define LINE_SW_RESET_PIN 		GPIO_Pin_8
+#define LINE_SW_RESET_GPIO 		GPIOE
+
+#define LINE_SW_GPIO 			GPIOE
+#define LINE_SW_INT_PIN 		GPIO_Pin_11//сигнал прерывания от marvella к процессору
+#define LINE_SFPSD1_PIN 		GPIO_Pin_14//SD sfp1
+#define LINE_SFPSD2_PIN 		GPIO_Pin_15//SD sfp2
+//SFP1
+#define LINE_SFP1_GPIO 			GPIOD
+#define LINE_SFP1_TXFAULT_PIN	GPIO_Pin_8
+#define LINE_SFP1_TXDIS_PIN		GPIO_Pin_9
+#define LINE_SFP1_SDA_PIN		GPIO_Pin_10
+#define LINE_SFP1_SCL_PIN		GPIO_Pin_11
+#define LINE_SFP1_PRESENT_PIN	GPIO_Pin_12
+//SFP2
+#define LINE_SFP2_GPIO 			GPIOD
+#define LINE_SFP2_TXFAULT_PIN	GPIO_Pin_3
+#define LINE_SFP2_TXDIS_PIN	  	GPIO_Pin_4
+#define LINE_SFP2_SDA_PIN 		GPIO_Pin_5
+#define LINE_SFP2_SCL_PIN 		GPIO_Pin_6
+#define LINE_SFP2_PRESENT 		GPIO_Pin_7
+
+//IRP(PSW-2G,2G4F,2G6F+)
+#define LINE_IRP_GPIO_1 		GPIOC
+#define LINE_IRP_SDA_PIN_1 		GPIO_Pin_6
+#define LINE_IRP_SCL_PIN_1 		GPIO_Pin_7
+
+
+//for psw 1 g
+#define LINE_IRP_GPIO_2 		GPIOD
+#define LINE_IRP_SDA_PIN_2 		GPIO_Pin_1
+#define LINE_IRP_SCL_PIN_2 		GPIO_Pin_2
+
+//только для PSW1G
+//SDA - PD1
+//SCL - PD2
+
+#define SW_INT GPIO_Pin_11
+#define SW_SD1 GPIO_Pin_14
+#define SW_SD2 GPIO_Pin_15
+
+#define SFP1_PRESENT GPIO_Pin_12
+#define SFP2_PRESENT GPIO_Pin_7
+
+#define SFP_LOS_SWU	GPIO_Pin_13
+
+
+#define PHY_ADDRESS       		0x1A /*10 port   Relative to STM3210C-EVAL Board */
+
+
+#define REBOOT_POE		1
+#define REBOOT_SWITCH	2
+#define REBOOT_MCU		3
+#define REBOOT_ALL		4
+#define REBOOT_MCU_5S	5 //отложенная перезагрузка
+#define REBOOT_MCU_SWITCH	6
+
+
+/*Marvell ID for chip identification*/
+#define DEV_88E095	0x095
+#define DEV_88E097	0x099
+#define DEV_88E096	0x098
+#define DEV_88E6176	0x176
+#define DEV_88E6240	0x240
+#define DEV_88E6352	0x352
+#define DEV_98DX316	0x316
+#define GlobalRegister 0x1B
+#define Global2Register 0x1C
+
+
+extern u8 engine_id_tmp[64];
+
+
+/*настройки портов*/
+typedef struct {
+#define PORT_DESCR_LEN	32//описание порта
+	//физические настройки
+	u8 state:1;
+	u8 speed_dplx:3;
+	u8 flow_ctrl:1;
+	//autorestart
+	u8 wdt:3;
+	uip_ipaddr_t ip_dest;
+	u16 wdt_speed_up;
+	u16 wdt_speed_down;
+	//for soft start
+	u8 soft_start:1;
+	//settings group
+	u8 poe_a_set:4;
+	u8 poe_b_set:4;
+
+	u8 poe_a_pwr_lim;
+	u8 poe_b_pwr_lim;
+
+	//для GE портов
+	u8 sfp_mode:2; // 0 - auto(old) // 1 - not mngt(не запускаем таймеры)
+
+	u8 mac_filtering:2;
+	char port_descr[PORT_DESCR_LEN];//описание порта
+
+	//что делапть при блокировке порта
+#define PORT_NORMAL		0
+#define MAC_FILT		1//фильтруем только определённый MAC
+#define PORT_FILT		2//при блокировке отключаем порт навсегда
+#define PORT_FILT_TEMP	3//при блокировке отключаем порт на определённое время (5 минут)
+
+#define SPEED_AUTO		0
+#define SPEED_10_HALF	1
+#define SPEED_10_FULL	2
+#define SPEED_100_HALF	3
+#define SPEED_100_FULL	4
+#define SPEED_1000_HALF	5
+#define SPEED_1000_FULL	6
+
+
+#define WDT_NONE 		0
+#define WDT_LINK		1
+#define WDT_PING		2
+#define WDT_SPEED		3
+
+#define POE_DISABLE 	0
+#define POE_AUTO 		1
+#define POE_MANUAL_EN 	2//passive b
+#define POE_ULTRAPOE	3
+#define POE_ONLY_A		4
+#define POE_ONLY_B		5
+#define POE_FORCED_AB	6
+
+#define POE_MAX_PWR 	26
+}sw_port_t;
+
+
+/*настройки интерфейса */
+typedef struct{
+	char username[64];
+	char password[64];
+	u8 rule;
+}users_t;
+
+typedef struct {
+#define HTTPD_MAX_LEN_PASSWD 20
+
+	u8 lang;
+	char http_login64[64];//admins
+	char http_passwd64[64];
+
+#define MAX_USERS_NUM		4
+
+#define NO_RULE				0
+#define ADMIN_RULE			1
+#define USER_RULE			2
+	users_t	users[MAX_USERS_NUM-1];
+
+
+	u8 refr_period;
+
+#define DESCRIPT_LEN 		128
+
+	char system_name[DESCRIPT_LEN];
+	char system_location[DESCRIPT_LEN];
+	char system_contact[DESCRIPT_LEN];
+	//char ext_vendor_name[DESCRIPT_LEN];//имя устройства при использовании стороним вендором
+	//u8 ext_vendor_name_flag;//флаг необходимости использования имени устройства сторонего вендора
+
+
+}interface_sett_t;
+
+/*сетевые настройки коммутатора*/
+typedef struct {
+	 uip_ipaddr_t ip;
+	 uip_ipaddr_t mask;
+	 uip_ipaddr_t gate;
+	 uip_ipaddr_t dns;
+	 u8 mac[6];
+	 u8 default_mac[6];
+	 u32 dsa_tag;//DSA теги
+	 u8 grat_arp;//разрешение приёма самообращенных ARP
+}net_sett_t;
+
+/*настройки dhcp*/
+typedef struct {
+	u16 mode;//0..3
+	//dhcp relay
+	uip_ipaddr_t server_addr;
+	u8 hop_limit;
+	u8 opt82;//включение опции 82
+	//dhcp server
+	uip_ipaddr_t start_ip;
+	uip_ipaddr_t end_ip;
+	uip_ipaddr_t mask;
+	uip_ipaddr_t gate;
+	uip_ipaddr_t dns;
+	u32 lease_time;
+}dhcp_sett_t;
+
+/*настройки smtp*/
+typedef struct {
+	u8 state;
+	u8 aslog;//не используется
+	uip_ipaddr_t server_addr;
+	char domain_name[32];
+	char to[64];
+	char to2[64];
+	char to3[64];
+	char from[64];
+	char subj[64];
+	//аутентификация
+	char login[32];
+	char pass[32];
+	uint16_t port;//номер tcp порта
+} smtp_sett_t;
+
+
+/*настройки snmp*/
+typedef struct {
+	char community[16];
+	u8 privelege;
+	u8 extender[68-16-1];
+}snmp12_community_t;//sizeof == 68
+
+typedef struct{
+	char user_name[64];
+	char auth_pass[64];
+	char priv_pass[64];
+#define NO_AUTH_NO_PRIV	0
+#define AUTH_NO_PRIV	1
+#define AUTH_PRIV		2
+	u8   level;
+}snmp3_user_t;
+
+
+
+typedef struct {
+	u8 state;
+	uip_ipaddr_t server_addr;
+	u8 version;
+	u8 mode;
+#define NUM_COMMUNITIES 2
+#define SNMP_R	1
+#define SNMP_W	2
+#define SNMP_RW 3
+	//snmp12_community_t snmp_commun[NUM_COMMUNITIES];
+	snmp12_community_t snmp1_read_commun;
+	snmp12_community_t snmp1_write_commun;
+#if ENABLE_SNMPv3
+#define NUM_USER 1
+	snmp3_user_t user[NUM_USER];
+	engine_id_t engine_id;
+#endif
+}snmp_sett_t;
+
+/*настройка sntp*/
+typedef struct {
+#define MAX_SERV_NAME	32//максимальная длина имени сервера
+	u8 state;
+	uip_ipaddr_t addr;
+	char serv_name[MAX_SERV_NAME];
+	i8 timezone;
+	u8 period;
+}sntp_sett_t;
+
+/*настройка stp*/
+/*настройки порта*/
+typedef struct {
+  u8  enable:1;//не убирать
+  u8 state:1;//не убирать
+  u8 priority;
+  u32 path_cost;
+  u8 flags;
+#define BSTP_PORTCFG_FLAG_ADMCOST  (1<<0)
+#define BSTP_PORTCFG_FLAG_AUTOEDGE (1<<1)
+#define BSTP_PORTCFG_FLAG_EDGE     (1<<2)
+#define BSTP_PORTCFG_FLAG_AUTOPTP  (1<<3)
+#define BSTP_PORTCFG_FLAG_PTP      (1<<4)
+
+#define MAX_RSTP_HOLD_CNT 255
+#define RSTP_COMPATIBILITY 7
+  //u8 extender[8];
+}stp_port_sett_t;
+
+typedef struct{
+	unsigned char state;//forwarding BPDU
+}stp_forward_bpdu_t;
+
+/*глобальные настройки*/
+typedef struct {
+  unsigned char	 state;
+  unsigned short magic;
+  unsigned char  proto;
+  unsigned short bridge_priority;
+  unsigned short bridge_max_age;
+  unsigned short bridge_htime;
+  unsigned short bridge_fdelay;
+  unsigned short bridge_mdelay;
+  unsigned char  txholdcount;
+}stp_sett_t;
+
+/*настройка syslog*/
+typedef struct {
+	u8 state;
+	uip_ipaddr_t server_addr;
+}syslog_sett_t;
+
+/*список событий / Event List*/
+/*если нужно выделить событие для конкретного порта, накладываем маску
+ * zB base_s & 000000001b*/
+typedef struct {
+	//set
+	u8 base_s;
+	u8 port_s;
+	u8 vlan_s;
+	u8 stp_s;
+	u8 qos_s;
+	u8 ohter_s;
+	//trap
+	u8 port_link_t;
+	u8 port_poe_t;
+	u8 stp_t;
+	u8 spec_link_t;
+	u8 spec_ping_t;
+	u8 spec_speed_t;
+	u8 system_t;
+	u8 ups_t;
+	u8 asc_t;
+	u8 mac_filt_t;
+#define SSTATE (1<<3)
+#define SMASK 0x07
+
+}event_list_t;
+
+/*настройка сухих контактов*/
+typedef struct{
+	u8 state:1;
+	u8 front:2;
+#define RISING	0
+#define FAULING	1
+//#ifdef PSW2G_PLUS
+	#define NUM_ALARMS 3 // 2 для PSW-2G PLUS
+//#else
+//#define NUM_ALARMS 1
+//#endif
+}alarm_t;
+
+/*настройка QoS*/
+//rate limit
+typedef struct{
+#define RL_DISABLED		0
+#define RL_BROADCAST	1
+#define RL_BRCST_MLTCST	2
+	uint8_t mode;
+	uint32_t rx_rate;
+	uint32_t tx_rate;
+} rate_limit_t;
+
+typedef struct{
+	u8 uc;
+	u8 bc;
+	u8 mc;
+	u8 limit;
+} storm_control_t;
+//по портам
+typedef struct{
+	uint8_t cos_state:1;//включение CoS на порту
+	uint8_t tos_state:1;// включение ToS на порту
+	uint8_t rule:2;//правило выбора приоритета:0-TOS приоритетней 1-COS приоритетней, 2 - Tos и CoS
+	uint8_t def_pri:3;//COS приоритет по умолчанию для каждого порта [0..7]
+}qos_port_sett_t;
+//глобальная
+typedef struct {
+	uint8_t policy:1;//выбор типа обслуживания очереди: FIXED_PRI  или 	WEIGHTED_FAIR_PRI (8,4,2,1)
+	uint8_t cos[8];//номер очереди для каждого номера CoS [0..3]
+	uint8_t tos[64];//номер очереди в соответствие номеру tos [0..3]
+	uint8_t state:1;//общее разрешение работы протокола
+	uint8_t unicast_rl;//unicast rate limit
+#define FIXED_PRI 			1
+#define WEIGHTED_FAIR_PRI	0
+
+#define TOS_FIRST 0
+#define COS_FIRST 1
+
+#define COS_ONLY	1
+#define	TOS_ONLY	2
+#define	TOS_AND_COS	0
+
+}qos_sett_t;
+
+
+typedef struct{
+	//maximum number of igmp groups
+	#define MAX_IGMP_GROUPS	200//320
+	u8 igmp_snooping_state:1;
+
+	u8 igmp_send_query:1;
+	u8 igmp_query_mode;
+	//u8 group_num;//actual group cnt
+	u8 port_state[PORT_NUM]; // разрешение igmp на порту
+	u16 query_interval;
+	u8 max_resp_time;
+	u8 group_membship_time;
+	u16 other_querier_time;
+}igmp_sett_t;
+
+/*
+typedef struct{
+	u8 active;
+	uip_ipaddr_t ip;
+	u8 port_flag[PORT_NUM];
+}igmp_group_list_t;
+*/
+
+/*настройка vlan*/
+// vlan на базе порта
+typedef struct{
+	u8 state:1;
+	u8 table[PORT_NUM][PORT_NUM];
+} port_base_vlan_sett_t;
+
+typedef struct{
+	u8 port_vid[PORT_NUM];
+} port_base_vlan_swu_sett_t;
+
+struct pb_vlan_t{
+	u8 state;
+	u8 VLANTable[PORT_NUM][PORT_NUM];
+};
+
+
+//глобальная
+typedef struct{
+	uint8_t state:1;// состояние
+	uint16_t mngvid;//vid для подключения к web интерфейсу
+	uint8_t port_st[PORT_NUM];//настройка порта //0-disabled/1-fallback/2-check/3-secure
+	uint8_t	vlan_trunk_state:1;//vlan trunk
+	uint16_t dvid[PORT_NUM];//default vlan id
+	uint8_t VLANNum;//число сконфигурированных vlan
+#define MAXVlanNum 100
+#define MAXVLAN 4095
+} vlan_sett_t ;
+
+//vlan
+typedef struct  { //не оптимизировать! // не более 80 байт
+	u8 state;
+	uint16_t VID;
+	char VLANNAme[17];// 17 Byte
+	uint8_t Ports[PORT_NUM];//default vlan id];
+	//u8 extender[54];
+} vlan_t;
+
+//калибровки кабельного тестера
+typedef struct{
+	uint16_t koeff_1;//коэф. для пары 1-2
+	uint16_t koeff_2;//3-4
+	u8 length;//длина кабеля
+} port_callibrate_t;
+
+//настройки telnet
+typedef struct{
+#define TELNET_RN	0
+#define TELNET_R	1
+	u8 state;
+	u8 echo;//telnet option echo
+	u8 rn;//режим переноса 0=\r\n или 1=\r
+}telnet_sett_t;
+
+/*настройка TFTP*/
+typedef struct{
+	u8 state;
+	u8 mode;
+	u16 port;
+}tftp_sett_t;
+
+/*MAC bind entries*/
+typedef struct{
+	u8 mac[6];
+	u8 port;
+	u8 active;//флаг активности
+	u8 age_time;
+#define MAC_BIND_MAX_ENTRIES	50//максимальное число записей
+}mac_bind_entries_t;
+
+typedef struct{
+#define PLC_RELAY_OUT	2//число релейных выходов
+#define PLC_INPUTS		3//число входов
+#define PLC_EVENTS		PLC_INPUTS+NUM_ALARMS+1//число событий на один выход
+
+#define NO_PARITY		0
+#define EVEN_PARITY		1
+#define ODD_PARITY		2
+
+#define LOGIC			2
+#define PLC_01 			0
+#define	PLC_02			1
+
+#define PLC_EM_MAX_PASS	10//32//максимальная длина пароля счетчика
+#define PLC_EM_MAX_ID	32//64
+
+	u8 out_state[PLC_RELAY_OUT];
+	u16 em_model;//модель электросчетчика
+	u8 em_baudrate;
+	u8 em_parity;
+	u8 em_databits;
+	u8 em_stopbits;
+	char em_pass[PLC_EM_MAX_PASS];
+	char em_id[PLC_EM_MAX_ID];
+	//настройка входов
+	u8 in_state[PLC_INPUTS];//0 - неактивен, 1 - активен, генерирует событие
+	u8 in_alarm_state[PLC_INPUTS];//аварийный уровень(когда возникает событие):
+	//0 - при размыкании, 1 - при замыкании, 2 - при любом изменении
+
+#define PLC_ON_SHORT		0
+#define PLC_ON_OPEN 		1
+#define PLC_ANY_CHANGE		2
+
+#define PLC_ACTION_SHORT	0
+#define PLC_ACTION_OPEN		1
+#define PLC_ACTION_IMPULSE	2
+
+	u8 in_make[PLC_INPUTS];//действие при срабатывании входа
+
+	u8 out_action[PLC_RELAY_OUT];//действие выхода при срабатывании правила
+	u8 out_event[PLC_RELAY_OUT][PLC_EVENTS];//события
+
+#define PLC_POLLING_INTERVAL	10//интервал опроса счетчика в минутах
+
+}plc_t;
+
+
+typedef struct{
+
+	u8 out_state[PLC_RELAY_OUT];//состояние выходов
+	u8 in_state[PLC_INPUTS];//текущее состояние входов
+	u8 in_state_last[PLC_INPUTS];//текущее состояние входов
+	u8 new_event;//есть новые события (прерывание по изменению входа)
+	u8 ready4events;//фдаг готовности к ожиданию событий
+	u8 hw_vers;//версия платы
+}plc_status_t;
+
+typedef struct{
+
+	u8 hw_vers;//версия платы
+}ups_status_t;
+
+
+typedef struct{
+	u8 delayed_start;//отложенный старт для UPS
+}ups_t;
+
+//Link Aggregation group
+#define LAG_MAX_ENTRIES	5//максимальное число групп агрегации
+#define LAG_MAX_PORTS	8//максимальное число портов в группе
+
+typedef struct{
+	u8 valid_flag;
+	u8 state;
+	u8 master_port;
+	u8 ports[PORT_NUM];
+}lag_entry_t;
+
+//Port Mirroring group
+typedef struct{
+	u8 state;
+	u8 target_port;
+	u8 ports[PORT_NUM];
+}mirror_entry_t;
+
+
+#define MAX_REMOTE_TLP	1//максимальное число удалённых устройств
+#define MAX_INPUT_NUM	3
+#define MAX_OUTPUT_NUM	9
+#define MAX_TLP_EVENTS_NUM 2//число событий для teleport
+#define TLP_DEV_NUM		2
+#define TLP_QUEUE_LEN	2
+
+#define TLP_EVENTS_PREFIX	100// input+prefix = event
+//teleport
+typedef struct{
+	u8 valid;//1
+	u8 type;//тип устройстав на удалённой стороне
+	char name[64];//имя
+	uip_ipaddr_t ip;//ip адрес удалённой стороны
+	uip_ipaddr_t mask;
+	uip_ipaddr_t gate;
+}remote_teleport_t;
+
+//вход
+typedef struct{
+//режимы работы входа
+#define INP_STANDALONE	0//самостоятельный
+#define INP_TELEPORT	1//
+	//настройка входов
+	u8 state;//0 - неактивен, 1 - активен, генерирует событие
+	char name[64];//input description
+	u8 rem_dev;//номер удаленного устройства, привязанного к этому порту
+	u8 rem_port;//номер порта удаленного устройства, привязанного к этому порту
+	u8 inverse;// инвертирование состояния
+}tlp_input_sett_t;
+
+//другие события для Teleport
+typedef struct{
+	u8 state;//0 - неактивен, 1 - активен, генерирует событие
+	u8 rem_dev;//номер удаленного устройства, привязанного к этому порту
+	u8 rem_port;//номер порта удаленного устройства, привязанного к этому порту
+	u8 inverse;// инвертирование состояния
+}tlp_events_sett_t;
+
+
+typedef struct{
+#define LLDP_ENTRY_NUM 20//максимальное число записей
+#define LLDP_CHIDLEN 6//chasis ID len
+#define MIN_LLDP_TI	5//min transmit interval
+#define MAX_LLDP_TI	120//max transmit interval
+#define MIN_LLDP_HM 1//min hold multiplier
+#define MAX_LLDP_HM	10//max hold multiplier
+
+	u8 state;//включение/выключение протокола LLDP
+	u8 transmit_interval;//интервал отправки LLDP-сообщений соседям в сек.
+	u8 hold_multiplier;
+	u16 ttl; //время хранения записи у соседей
+	u8 delay_interval;
+	u8 port_state[PORT_NUM];
+}lldp_settings_t;
+
+/*структура, содержащая все настройки*/
+struct settings_t{
+	net_sett_t net_sett;
+	sw_port_t port_sett[PORT_NUM];
+	interface_sett_t interface_sett;
+	dhcp_sett_t dhcp_sett;
+	smtp_sett_t smtp_sett;
+	snmp_sett_t snmp_sett;
+	sntp_sett_t sntp_sett;
+	stp_port_sett_t stp_port_sett[PORT_NUM];//port_cfg
+	stp_sett_t stp_sett;//bstp_cfg
+	stp_forward_bpdu_t stp_forward_bpdu;
+	syslog_sett_t syslog_sett;
+	event_list_t event_list;
+	alarm_t alarm[NUM_ALARMS];
+	rate_limit_t rate_limit[PORT_NUM];
+	storm_control_t storm_control;
+	qos_port_sett_t qos_port_sett[PORT_NUM];
+	qos_sett_t qos_sett;
+	igmp_sett_t igmp_sett;
+	//igmp_group_list_t igmp_group_list[MAX_IGMP_GROUPS];
+	port_base_vlan_sett_t pb_vlan_sett;
+	port_base_vlan_swu_sett_t pb_vlan_swu_sett;
+	vlan_sett_t vlan_sett;
+	vlan_t vlan[MAXVlanNum];
+	port_callibrate_t port_callibrate[PORT_NUM];
+	u16 sstart_time;
+	telnet_sett_t telnet_sett;
+	tftp_sett_t tftp_sett;
+	u8 downshift_mode;
+	plc_t plc;
+	mac_bind_entries_t mac_bind_entries[MAC_BIND_MAX_ENTRIES];
+	u8 cpu_mac_learning;//
+	ups_t ups;
+	lag_entry_t lag_entry[LAG_MAX_ENTRIES];
+	mirror_entry_t mirror_entry;
+	remote_teleport_t teleport[MAX_REMOTE_TLP];
+	tlp_input_sett_t  input [MAX_INPUT_NUM];
+	tlp_events_sett_t  tlp_events [MAX_TLP_EVENTS_NUM];
+	u8 mv_freeze_ctrl;
+	lldp_settings_t lldp_settings;
+};
+
+
+
+/********************************************************************************************/
+/*status`ная часть*/
+/********************************************************************************************/
+
+
+/*структура содержит состояние портов и переменные для работы*/
+typedef struct {
+	//status group
+	u8 link;// 0,1,2,3 - fe ports  4,5 - gigabit ports //  текущее состояние линка
+	u8 last_link;//прошлое состояние линка
+	u8 poe_a;//текущее состояние пое а
+	u8 poe_a_last;//прошлое состояние пое а
+	u8 poe_b;//текущее состояние пое б
+	u8 poe_b_last;//прошлое состояние пое б
+	u8 error;//ошибки на порту
+	u8 dest_ping;//результат ответа на ping для wdt
+#define MAX_RST_CNT 		3//максимальное число перезагрузок, после этого пререстаём перезагружать
+#define SPEED_STAT_LEN 		30
+#define SPEED_STAT_PERIOD	5
+	u8 rst_cnt;//число перезагрузок для autorestart
+	//for soft start
+	u8 ss_process;//soft start // 1 - идет прогрев // 0 - завершился прогрев
+	/*статистика по переданному трафику*/
+	u32 rx_good;
+	u32 tx_good;
+	u32 rx_good_last;//прошлое значение
+	u32 tx_good_last;//прошлое значение
+	u32 rx_speed;//скорость в  байтах в секунду//текущая
+	u32 tx_speed;//скорость в  байтах в секунду
+	u8 rx_speed_stat[SPEED_STAT_LEN];//статистика по скорости по прорту в мб/сек
+	u8 tx_speed_stat[SPEED_STAT_LEN];//статистика по скорости по прорту в мб/сек
+
+	u32 rx_unicast;
+	u32 rx_broadcast;
+	u32 rx_multicast;
+	u32 tx_unicast;
+	u32 tx_broadcast;
+	u32 tx_multicast;
+
+	//not used
+	//u32 rx_bad;
+	//u32 rx_discard;
+	//u32 rx_filtered;
+	//u32 tx_filtered;
+	//for VCT
+	u8 vct_compleat_ok;
+	u8 rx_status;
+	u8 tx_status;
+	u8 rx_len;
+	u8 tx_len;
+
+	//for swu
+	u8 vct_status[4];//pair 0 status
+	u16 vct_len[4];//pair 0 len
+
+	//for mac filtering
+	u8 error_dis;//находится в состоянии error disable
+	struct timer err_dis_timer;//таймер
+
+	//for testing purposes
+	u8 port_loopback;
+
+}sw_port_stat_t;
+
+
+//not implemented
+typedef struct {
+	u8 dry_cont[NUM_ALARMS];//индикация алармов при событиях сухих контактов //1 - авария / 0 - норм
+	u8 nopass;//не установлен пароль администратра
+}alarm_st_t;
+
+/*статистика по пользователю*/
+typedef struct{
+	char current_username[64];
+	u8 current_user_rule;
+	u32 user_uptime;
+}users_st_t;
+
+//список заблокированных mac
+#define MAX_BLOCKED_PORT_TIME	300000//5 мин
+#define MAX_BLOCKED_MAC	64
+typedef struct{
+	u8 mac[6];
+	u8 port;
+	u8 age_time;//если 0 - значит свободно
+}mac_blocked_t;
+
+typedef struct{
+	u8 sfp_sd_changed;//прерывание по изменению SD на SFP
+}interrupt_t;
+
+
+
+#define INPUT_NUM	(dev.input_num)
+#define OUT_NUM		(dev.output_num)
+//входы
+typedef struct{
+	u8 state;
+	u8 current_state;
+	u8 last_state;
+	u8 led_state;
+	u32 count;
+}input_stat_t;
+
+//удаленные устройства
+typedef struct{
+	u8  conn_state;//состояние подключения
+	u8  conn_state_last;
+	u32 rx_count;
+	u32 tx_count;
+	struct timer arp_timer;
+}remdev_stat_t;
+
+typedef struct{
+#define CPU_STAT_LEN 300//5 мин статистика, каждую 5 сек
+#define CPU_STAT_PERIOD	1000//1 сек
+#define CPU_STAT_10SEC	10
+u8	cpu_level[CPU_STAT_LEN];
+}cpu_stat_t;
+
+
+struct dev_t{
+	u8 dev_type;//тип устройства
+	u8 input_num;//число входов
+	sw_port_stat_t port_stat[PORT_NUM];
+	alarm_st_t alarm;
+	users_st_t user;
+	plc_status_t plc_status;
+	ups_status_t ups_status;
+	mac_blocked_t mac_blocked[MAX_BLOCKED_MAC];
+	interrupt_t interrupts;
+	input_stat_t input[MAX_INPUT_NUM];
+	remdev_stat_t remdev[MAX_REMOTE_TLP];
+	cpu_stat_t cpu_stat;
+};
+
+
+extern struct dev_t dev;
+
+void RCC_Init(void);
+void Led_Init(void);
+void Btn_Init(void);
+void Poe_Line_Init(void);
+void SW_Line_Init(void);
+void psw1g_lines_init(void);
+void board_id_lines_init(void);
+u8 get_board_id(void);
+u8 get_board_id_1(void);
+u8 get_board_id_2(void);
+u8 speed_select(void);
+u8 man_unman_select(void);
+void psw1g_fiber_speed(u16 speed);
+void psw1g_unmanagment(u8 state);
+void Dry_Contact_line_Init(void);
+void INT_Init(void);
+void VCP_Processing(uint8_t *Buf,uint32_t Len);
+void set_led_cpu(u8 state);
+void set_led_default(u8 state);
+
+void get_link_state_timer(void);
+void get_link_state_isr(void);
+
+u8 get_sensor_state(u8 channel);
+
+u8 get_dev_type(void);
+void get_dev_name(char *name);
+void get_dev_name_r(char *name);
+
+u8 get_dev_type_by_num(u8 num);
+void get_dev_name_by_num(u8 num,char *name);
+u8 get_dev_type_num(void);
+u8 get_dev_outputs(u8 type);
+u8 get_dev_inputs(u8 type);
+
+void set_reboot_flag(u8 flag);
+u8 get_reboot_flag(void);
+void reboot_(u8 flag);
+void reboot(u8 flag);
+
+
+
+
+
+void rtc_Init(void);
+void rtc_Reset(void);
+
+int8_t rtc_init(void);
+
+void RTC_Configuration(void);
+
+u32 get_new_fw_vers(void);
+uint32_t TestFirmware(void);
+
+
+int check_ip_addr(uip_ipaddr_t addr);
+
+
+/****************************************************/
+// группа get r статусным параметрам
+u8 get_port_link(u8 port);
+u8 get_port_poe_a(u8 port);
+u8 get_port_poe_b(u8 port);
+
+//int set_port_wdt_ping(u8 port,u8 );
+
+
+
+
+
+u8 get_board_version();
+u8 get_port_error(u8 port);
+u8 get_all_port_error(void);
+void set_port_error(u8 port,u8 err);
+u8 get_all_alarms_error(void);
+
+
+
+
+
+
+
+i8 get_cpu_temper(void);
+i8 get_marvell_temper(void);
+u16 get_poe_temper(void);
+
+
+u8 get_current_user_rule(void);
+void set_current_user_rule(u8 rule);
+
+void get_cpu_id_to_str(char *str);
+
+u8 is_cooper(u8 port);
+u8 is_fiber(u8 port);
+u8 is_gigabit(u8 port);
+void swu_io_config(void);
+
+void cpu_stat_processing(void);
+u8 get_cpu_max(u16 period);
+u8 get_cpu_min(u16 period);
+
+
+#endif

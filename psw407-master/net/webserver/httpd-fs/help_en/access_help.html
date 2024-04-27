@@ -1,0 +1,35 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body bgcolor = "#eeeeee"> 
+<b><p align="center">Inputs/Outputs</p></b>
+<br>
+The switches have digital inputs (dry contacts). The switches have 2 digital inputs. 
+Also, when connecting the expansion board, you can use additional inputs. 
+<br> 
+<br>
+<b>Inputs setting: :</b>
+<li><b>State</b> - enables input operation. An alarm message will be sent, if State is in the Enable state, 
+and Current State matches Alarm State and a tick is set in Inputs/Outputs in the Events List tab. 
+<br>
+<li><b>Alarm State</b> - the state of the input, which is considered to be alarm (<b>Open</b> - open state, <b>Short</b> - closed state). 
+
+<li><b>Current State </b> - current state of the input. 
+<br><br>
+Outputs settings:
+<li><b>Inital State</b> - initial state of the output. After the power is turned on, the output will be in this state. 
+If the output is configured as <b>Logic</b>, then it is in the state defined in the <b>Logic</b> table
+<br><br>
+<b>Logic</b><br>
+It is possible to configure the simplest algorithms for controlling the output. 
+For each input, you can set an event by which the input will go to the selected state: 
+<li><b>Open</b> - relay outputs are open 
+<li><b>Short</b> - relay outputs are closed
+<li><b>Impulse</b> - relay outputs change their state to inverse for 10 seconds, then switch back to the initial state. 
+<br>
+<b>Event</b> field specifies one or more events that will trigger the port. 
+The unification of events occurs according to the rule of logical "OR", which means the output will trigger when at least one condition occurs.
+<br>If none of the conditions is satisfied, the output is in the inverse state.
+</body> 
+</html> 

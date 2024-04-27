@@ -1,0 +1,13 @@
+;;;;;;Addr=0x  Val=0x Repeat=0d Skip=0x
+;;;;
+;;;; update the device type -- to xCat
+;;;; DeviceID [2:2] value 1 -> External CPU mode (the other B2B device in "Internal CPU is active")
+0000004c 000DDB22
+;;;;
+;;;;
+;;;;;;pci registers
+;;;;
+;;;; 0xDDB1 --> 98DX2122 (24+4)
+;;;;
+ffffffff
+

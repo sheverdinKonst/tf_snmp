@@ -1,0 +1,15 @@
+;;;;;;Addr=0x  Val=0x Repeat=0d Skip=0x
+;;;;
+;;;; update the device type -- to specific Lion2
+;;;;
+;;;; NOTE: in this register we also have the 'RevisionID' (bits 0..3) of the silicon
+;;;;
+0000004c 000EC000
+;;;; Functional SAR Status LSB register includes the REAL device ID - bits[21..24]
+;;;; For simulation was chosen div_ID = 2 (CPSS_98CX8297_CNS - EC02)
+018F8200 00400000
+;;
+;; note : write to this register 0x4c will also set the PEX register with the
+;;        needed device type
+ffffffff
+

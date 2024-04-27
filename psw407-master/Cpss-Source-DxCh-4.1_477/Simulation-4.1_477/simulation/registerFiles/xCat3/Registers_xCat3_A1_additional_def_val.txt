@@ -1,0 +1,8 @@
+;;;;;;Addr=0x  Val=0x Repeat=0d Skip=0x
+;;;;
+;;;; update the device type -- to xCat3
+;;;; DDB0 - Pomcat GE device
+0000004c 000F4004
+;;;;
+ffffffff
+

@@ -1,0 +1,10 @@
+;;;;;;Addr=0x  Val=0x Repeat=0d Skip=0x
+;;
+;;  NOTE: Address build from next info :
+;;  (page << 16) + regAddr
+;;
+;; page 0 , reg 3   -->also in page 1
+00000003 00000EB0  2    10000
+;;
+;;
+ffffffff

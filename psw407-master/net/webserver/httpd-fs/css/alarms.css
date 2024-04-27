@@ -1,0 +1,60 @@
+.futu_alert_outer {
+	position: relative;
+	top: 0px; left: 0;
+	width: 70%;
+	z-index:9999;
+}
+.futu_alert_outer .frame {
+	position:relative;
+	z-index:9999;
+}
+.futu_alerts_holder {
+	position:relative;
+	left:0%; top:0;
+	width:100%;
+	z-index:9999;
+}
+
+.futu_alert_btn{
+	right: 50px;
+	top:   20%;
+	position:absolute;
+}
+
+.futu_alerts_holder .futu_alert {
+	position:absolute;
+	top:-1000px;
+	background-color:#FFEBA0;
+	/*font:1.2em Tahoma, sans-serif;*/
+	font-size:1.2em;
+	border:1px solid #FFFFFF;
+	margin-left:60px;
+}
+.futu_alerts_holder .futu_alert .futu_alert_header {
+	font-size:1.2em;
+	margin:10px 20px 0;
+}
+.futu_alerts_holder .futu_alert .futu_alert_text {
+	font-size:0.9em;
+	margin:10px 20px;
+}
+.futu_alerts_holder .futu_alert .futu_alert_close_button {
+	position:absolute;
+	padding:10px;
+	top:0;
+	right:0;
+	outline:none;
+}
+.futu_alerts_holder .info {
+	color:#000000;
+	background-color:#8aff8a;
+}
+.futu_alerts_holder .warning {
+	color:#000000;
+	background-color:#ffeea8;
+}
+
+.futu_alerts_holder .error {
+	color:#000000;
+	background-color:#ff3600;
+}

@@ -1,0 +1,82 @@
+.g1 {
+	background-color:#a4a4a4;
+}
+
+.g2 {
+	background-color:#f4f4f4;
+}
+
+.goodtest{
+    color: green;
+} 
+  
+.badtest{
+    color: red;
+}  
+h2{
+    /* Chrome 1-9, Safari 4-5 */
+    background: -webkit-gradient(linear, right left, left bottom, 
+                color-stop(0%,#FFFFFF), color-stop(100%,#005591));
+    /* Chrome 10+, Safari 5.1+ */
+    background: -webkit-linear-gradient(right, #FFFFFF, #005591);
+	background: -moz-linear-gradient(right, #FFFFFF, #005591); /* Firefox 3.6+ */
+    background: -o-linear-gradient(right, #FFFFFF, #005591); /* Opera 11.10+ */
+
+	
+    padding: 10px;
+    border: 0px solid #333;
+    font-family: "Arial";
+    font-style: normal;
+	color: #FFFFFF;
+}
+
+	
+	
+/*main table*/
+.main_table{
+	background-color:#fdfdfd;
+	background: #fff;
+
+
+/*	width: 100%*/
+	
+}
+
+.l_column{
+	  text-align:left;
+      vertical-align: text-top;
+      padding:5px;
+      border: 1px dotted #a49ba0;
+      border-collapse: collapse;
+      background: #dddddd;
+	  width: 200px;
+}
+.r_column{
+	  text-align:left;
+      vertical-align: text-top;
+      padding:5px;
+      border: 1px dotted #a49ba0;
+      border-collapse: collapse;
+      background: #ededed;
+	  width: 200px;
+}
+.a_column{
+	  text-align:left;
+      vertical-align: text-top;
+      padding:5px;
+      border: 1px dotted #a49ba0;
+      border-collapse: collapse;
+      background: #fdfdfd;
+	  width: 100px;
+}
+
+legend{display:block;
+	width:80%;
+	padding:0;
+	margin-bottom:14pt;
+	font-size:16.5pt;
+	line-height:28pt;
+	color:#333;
+	border:0;
+	border-bottom:1px solid #e5e5e5;
+}

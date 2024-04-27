@@ -1,0 +1,15 @@
+;;;;;;Addr=0x  Val=0x Repeat=0d Skip=0x
+;;;;
+;;;; update the device type -- to specific Bobk-Caelum
+;;;;
+;;;; NOTE: in this register we also have the 'RevisionID' (bits 0..3) of the silicon
+;;;;
+;; DX4235 device ID is 0xBE00
+0000004c 000BE000
+;; set FDB size to 32K instead of 64K
+04000004 07011B3C
+;;
+;; note : write to this register 0x4c will also set the PEX register with the
+;;        needed device type
+ffffffff
+

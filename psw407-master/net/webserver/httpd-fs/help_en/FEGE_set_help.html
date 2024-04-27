@@ -1,0 +1,34 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body bgcolor = "#eeeeee"> 
+<b><p align="center"> Port Settings</p></b>
+<br> 
+<ul>
+<li><b>State</b> - port state. 
+<li><b>Speed/Duplex</b> - Speed/Duplex 
+<li><b>Flow Control</b> - control of data flow. Flow Control is active with Speed/Duplex = Auto 
+<li><b>PoE</b> - Power over Ethernet. There are several options for power supply:<br>
+<ul><li><b>Disabled</b> - PoE is disabled on this port. 
+<li><b>Auto</b> - Main mode, power is transmitted by option A or B, or A and B upon the request of the powered equipment. 
+<li><b>UltraPoE</b> - Power over A and B simultaneously. Adaptation for connection of Beward dome cameras. 
+<li><b>Only A</b> -  Power is transmitted only by option A. 
+<li><b>Only В</b> - Power is transmitted only by option B. 
+<li><b>Passive B</b> - Power is transmitted by option A in the protocol mode and by option B in the non-protocol mode. 
+Mode for operation with TFortis TH-02 and TFortis TH-03 camera housings. 
+<li><b>Forced A+B</b> - Power is transmitted by option A and B in the non-protocol mode. Connection of non-PoE devices is prohibited. 
+</ul>
+<li><b>SFP Link Mode</b> - the operating mode of SFP port. 
+<ul><li><b>Forced</b> - forcing the link to come up when an optical signal is detected (Default mode) 
+<li><b>Auto</b> - automatic mode 
+</ul>
+</ul>
+<br><br><b>Note 1</b>: For PoE option B, it is possible to set the Passive PoE mode. 
+This mode is required for connecting TH-02 and TH-03 camera housings. It should be noted that in this mode, the voltage (55 V) 
+is applied to the Fast Ethernet port, so connecting devices that do not support PoE (for example, a computer) can cause them to fail. 
+If you need a local connection to the Fast Ethernet ports of the PSW-2G+ switch, you must use a 4-wire (2-pair) 
+patch cord or connect through Gigabit Ethernet ports.
+</body>
+</html> 
+

@@ -1,0 +1,2 @@
+set PROJ_NAME=simulation
+set PROJ_BASE=%USER_BASE%\%PROJ_NAME%

@@ -1,0 +1,873 @@
+/* Includes ------------------------------------------------------------------*/
+#include "deffines.h"
+#include <stdio.h>
+#include "stm32f4xx.h"
+#include "usb_dev_lib/Class/cdc/inc/usbd_cdc_core.h"
+#include "vcp/usbd_cdc_vcp.h"
+#include "usb_dev_lib/Core/inc/usbd_usr.h"
+#include "vcp/usbd_desc.h"
+
+#include "h/driver/gtDrvSwRegs.h"
+#include "Salsa2Regs.h"
+
+
+#include "net/webserver/md5.h"
+
+#include "eeprom.h"
+
+#include "flash/spiflash.h"
+#include "flash/blbx.h"
+#include "stm32f4xx_flash.h"
+#include <stm32f4xx_gpio.h>
+#include <stm32f4xx_rcc.h>
+#include <misc.h>
+#include "FreeRTOS.h"
+#include "task.h"
+#include "stm32f4xx_iwdg.h"
+#include "stm32f4x7_eth_bsp.h"
+#include "stm32f4x7_eth.h"
+#include "SMIApi.h"
+#include "names.h"
+#include "settings.h"
+#include "poe_ltc.h"
+#include "poe_tps.h"
+#include "i2c_hard.h"
+#include "i2c_soft.h"
+#include "board.h"
+#include "net/uip/uip.h"
+#include "net/webserver/httpd-fs.h"
+#include "SMIApi.h"
+#include "salsa2.h"
+#include "../stp/bridgestp.h"
+#include "autorestart.h"
+#include "softstart.h"
+#include "blbx.h"
+#include "net/events/events_handler.h"
+#include "net/igmp/igmpv2.h"
+#include "net/igmp/igmp_mv.h"
+#include "net/snmp/snmpd/snmpd.h"
+#include "mii_soft.h"
+#include "UPS_command.h"
+#include "selftest.h"
+#include "net/tftp/tftpclient.h"
+#include "net/telnet/usb_shell.h"
+#include "sfp_cmd.h"
+#include "queue.h"
+#include "eeprom.h"
+#include "plc/plc.h"
+#include "plc/em.h"
+#if SSL_USE
+	#include "net/ssh/ssl_server.h"
+#endif
+#include "net/teleport/teleport.h"
+#include "debug.h"
+#include "main.h"
+
+#include "SpeedDuplex.h"
+
+#if LLDP_USE
+	#include "net/lldp/lldp.h"
+#endif
+#if DOT1X_USE
+//#include "eapol_auth/eapol_auth_sm.h"
+//#include "includes.h"
+#include "net/802.1x/eapol.h"
+#endif
+
+/* Private typedef -----------------------------------------------------------*/
+/* Private define ------------------------------------------------------------*/
+/* Private macro -------------------------------------------------------------*/
+/* Private variables --------------------------------------------------------*/
+	xTaskHandle	xUipTask,xPoeTask, xOtherCommands,xSSTask,xPoECamControl,xSNMPTask;
+	xTaskHandle xEepromTask;
+	xTaskHandle xDefaultHandle;
+
+	unsigned long ulRunTimeStatsClock = 0UL;
+	__ALIGN_BEGIN USB_OTG_CORE_HANDLE    USB_OTG_dev __ALIGN_END ;
+	u16 LedPeriod = 1000;
+	u8 init_ok=1;
+	u8 test_processing_flag = 0;
+
+	xQueueHandle Salsa2Queue;
+	xQueueHandle EventsQueue;
+
+	struct RemainingTimeUPS_t remtime;
+
+
+//todo здесь править версию прошивки
+/******************************************************************************/
+	__attribute__ ((section(".image_version")))///версия текущей прошивки
+	const uint32_t image_version[1]={0x00000204};//addr = 0x02ad
+/******************************************************************************/
+/*** Extern variables ---------------------------------------------------------*/
+	extern u8 dev_addr[6];
+	extern struct alarm_list_t alarm_list[ALARM_REC_NUM];
+	extern xQueueHandle xSettingsQueue;
+	extern xTaskHandle xEraseBBHandle;
+/* Private function prototypes -----------------------------------------------*/
+	void vDefault_ButtTask(void);
+/* Private functions -----------------------------------------------------------------------------*/
+
+
+static void test_processing(void){
+const u16_t broadcast_ipaddr[2] = {0xffff,0xffff};
+static u32 i;
+
+u8 reg;
+u8 addres_bank;
+u8 offset;
+u8 port;
+
+
+static port_sett_t port_sett;
+
+	switch(test_processing_flag){
+	case 0:
+		break;
+
+	case 1:
+	/*	printf("Get SALSA2 stat:\r\n");
+		printf("DEVICE_ID_REG(0x0D14)=%X\r\n",Salsa2_ReadRegField(DEVICE_ID_REG,4,16));
+		printf("get_port_phy_addr 0(0x0141)=%X\r\n",Salsa2_ReadPhyReg(0,get_port_phy_addr(0),2));
+		printf("get_port_phy_addr 1(0x0141)=%X\r\n",Salsa2_ReadPhyReg(4,get_port_phy_addr(4),2));
+		printf("get_port_phy_addr 2(0x0141)=%X\r\n",Salsa2_ReadPhyReg(0,get_port_phy_addr(8),2));
+		printf("get_port_phy_addr 3(0x0141)=%X\r\n",Salsa2_ReadPhyReg(0,get_port_phy_addr(12),2));
+
+		printf("0x1800020C(0x0000800A)=%X\r\n",Salsa2_ReadReg(0x1800020C));
+
+		Salsa2_WriteReg(0x05004054,0x02C40004);// RD ONLY: Set page for disable output clock
+		printf("0x05004054 phy4 (0x03643E80)=%X\r\n",Salsa2_ReadReg(0x05004054));
+
+		for(u8 i=0;i<16;i++){
+			printf("Port %d %lX\r\n",i,Salsa2_ReadReg(PORT_STATUS_REG0+0x400*L2F_port_conv(i)));
+		}
+*/
+
+		port = 7;
+		//start detection & classification Type B
+		//detpb[det]=1  detpb[cls]=1
+		addres_bank = calculate_addr_bank(port);
+		offset = calculate_offset(POE_A,port);
+		reg = 0x11<<(offset);
+		I2c_WriteByteData(addres_bank,DETPB,reg);
+		for(u32 i=0;i<10000;i++)
+			asm("nop");
+		//vTaskDelay(100*MSEC);
+		//read stat
+		//det = 4 - ok
+		//class == 0..4
+		reg = I2c_ReadByte(addres_bank,STATP1+offset);
+		printf("I2c_ReadByte = %x\r\n",reg);
+	    test_processing_flag = 0;
+		break;
+
+
+	case 2:
+		printf("Port 8 foeced up\r\n");
+		set_poe_state(POE_FORCED_AB,7,ENABLE);
+
+		/*printf("salsa reinit\r\n");
+		salsa2_config_processing();
+		config_cpu_port();
+		SwitchPortSet();*/
+		test_processing_flag = 0;
+		break;
+
+	case 3:
+		printf("salsa dump\r\n");
+		salsa2_dump();
+		test_processing_flag = 0;
+		break;
+
+	case 4:
+		for(u8 i=0;i<ALL_PORT_NUM;i++){
+			printf("phy port %d dump",i+1);
+			salsa2_phy_reg_dump(L2F_port_conv(i),Salsa2_get_phyAddr(i));
+		}
+		test_processing_flag = 0;
+		break;
+
+	case 6:
+		DEBUG_MSG(1,"TCP ports\r\n");
+		for(u8 c = 0; c < UIP_CONNS; ++c) {
+			//выводим список всех портов
+			DEBUG_MSG(1,"conn: lport:%d, rport:%d %d.%d.%d.%d, rto=%d, timer=%d, nrtx=%d, flags=",
+			htons(uip_conns[c].lport),htons(uip_conns[c].rport),
+			uip_ipaddr1(uip_conns[c].ripaddr),uip_ipaddr2(uip_conns[c].ripaddr),
+			uip_ipaddr3(uip_conns[c].ripaddr),uip_ipaddr4(uip_conns[c].ripaddr),
+			uip_conns[c].rto,
+			uip_conns[c].timer,
+			uip_conns[c].nrtx);
+			switch(uip_conns[c].tcpstateflags){
+				case UIP_CLOSED:
+					DEBUG_MSG(1,"UIP_CLOSED\r\n");
+					break;
+				case UIP_SYN_RCVD:
+					DEBUG_MSG(1,"UIP_SYN_RCVD\r\n");
+					break;
+				case UIP_SYN_SENT:
+					DEBUG_MSG(1,"UIP_SYN_SENT\r\n");
+					break;
+				case UIP_ESTABLISHED:
+					DEBUG_MSG(1,"UIP_ESTABLISHED\r\n");
+					break;
+				case UIP_FIN_WAIT_1:
+					DEBUG_MSG(1,"UIP_FIN_WAIT_1\r\n");
+					break;
+				case UIP_FIN_WAIT_2:
+					DEBUG_MSG(1,"UIP_FIN_WAIT_2\r\n");
+					break;
+				case UIP_CLOSING:
+					DEBUG_MSG(1,"UIP_CLOSING\r\n");
+					break;
+				case UIP_TIME_WAIT:
+					DEBUG_MSG(1,"UIP_TIME_WAIT\r\n");
+					break;
+				case UIP_LAST_ACK:
+					DEBUG_MSG(1,"UIP_LAST_ACK\r\n");
+					break;
+				case UIP_TS_MASK:
+					DEBUG_MSG(1,"UIP_TS_MASK\r\n");
+					break;
+				case UIP_STOPPED:
+					DEBUG_MSG(1,"UIP_STOPPED\r\n");
+					break;
+			}
+		}
+		test_processing_flag = 0;
+		break;
+
+//	case 7:
+//		printf("close all Telnet sessions\r\n");
+//
+//		test_processing_flag = 0;
+//		break;
+
+	case 8:
+		//тестирование черного ящка
+
+		send_events_u32(EVENT_BB_TEST,i);
+		i++;
+		if(i>100){
+			test_processing_flag = 0;
+			printf("Test BB %lu\r\n",i);
+			i=0;
+		}
+		break;
+
+	case 9:
+		printf("Clear BB OK\r\n");
+		xTaskCreate( xEraseBB_Task, (void*)"erase_bb",256, NULL, DEFAULT_PRIORITY, &xEraseBBHandle );
+		break;
+	}
+}
+
+
+
+void vSalsa2CommandProcessing(void *pvParameters){
+char Buff[20];
+	Salsa2Queue = xQueueCreate(10,18);
+	vTaskDelay(1000*MSEC);
+	while(1){
+		if(xQueueReceive(Salsa2Queue,Buff,0) == pdPASS ){
+			salsa_command(Buff);
+		}
+		vTaskDelay(1000*MSEC);
+	}
+}
+
+
+void vTaskLED(void *pvParameters){
+	vTaskDelay(3000*MSEC);
+	for (;;) {
+		if(init_ok){
+			set_led_cpu(TOGLE_LED);
+			vTaskDelay(LedPeriod*MSEC);
+		}
+		else
+		{
+			for(u8 i=0;i<ALARM_REC_NUM;i++){
+				if(alarm_list[i].alarm_code){
+					//blink error code
+					for(u8 j=0;j<alarm_list[i].alarm_code;j++){
+						set_led_cpu(ENABLE);
+						set_led_default(ENABLE);
+						vTaskDelay(300*MSEC);
+						set_led_cpu(DISABLE);
+						set_led_default(DISABLE);
+						vTaskDelay(300*MSEC);
+					}
+					vTaskDelay(2000*MSEC);
+				}
+			}
+			vTaskDelay(1000*MSEC);
+		}
+	}
+}
+
+void UipTask(void *pvParameters){
+	uip_arp_init();
+	while(1){
+		Uip_Task(NULL);
+
+		//здесь работа с usb консолью
+		if(usb_shell_state()){
+			usb_shell_task();
+		}
+	}
+}
+
+
+void ConfigTask(void *pvParameters) {
+static u16 i;
+char temp[16];
+struct timer link_check, port_stat_timer, ups_plc_timer ,
+atu_timer,mac_timer,plc_em_timer,cpu_stat_timer,
+marvell_freeze_timer;
+//u32 freeze_cnt = 0;
+
+
+	for(u8 i=0;i<ALARM_REC_NUM;i++)
+		alarm_list[i].alarm_code = 0;
+
+
+	RCC_Init();// включение тактирования линий
+
+	Led_Init();
+
+	Btn_Init();
+
+	Poe_Line_Init();
+
+	SW_Line_Init();
+
+	board_id_lines_init();//резисторы для ID платы//определение PSW-2G+ или PSW-2G6F+
+
+
+	// запускаем RTC
+	rtc_Init();
+
+	//Virtual COM Port
+	USBD_Init(&USB_OTG_dev,USB_OTG_FS_CORE_ID,&USR_desc,&USBD_CDC_cb,&USR_cb);
+
+	vTaskDelay(1000*MSEC);
+
+	//hard i2c init
+	I2C_Configuration();
+
+	// configure Ethernet (GPIOs, clocks, MAC, DMA)
+	DEBUG_MSG(PRINTF_DEB,"ETH_BSP_Config\r\n");
+	ETH_BSP_Config();
+
+	DEBUG_MSG(PRINTF_DEB,"black box init\r\n");
+	init_flash();/*подключаем black box*/
+
+	wait_mv_ready();//ждем запуска marvell
+
+
+	//определяем тип устройства
+	DEBUG_MSG(PRINTF_DEB,"get dev id\r\n");
+	get_dev_type();
+
+	if(get_dev_type() == DEV_SWU16){
+		reboot_(REBOOT_SWITCH);
+		vTaskDelay(5000*MSEC);
+	}
+	else{
+		//смотрим причину перезагрузки
+		if(reboot_flag == BTN_RESET){
+			reboot_flag = 0;
+			reboot_(REBOOT_ALL);
+		}
+	}
+
+
+
+	Dry_Contact_line_Init();//used get_dev_type
+
+	ADC_test_init();//for selftest// used get_dev_type
+
+	//soft i2c init // used get_dev_type
+	i2c_init();
+	DEBUG_MSG(PRINTF_DEB,"i2c_init\r\n");
+
+	if(get_dev_type()==DEV_SWU16){
+		swu_io_config();
+		sfp_los_line_init();
+		sfp_set_line_init();
+		salsa2_config_processing();
+
+		//задача для подключеня програмой Salsa2RegAccess
+		xTaskCreate( vSalsa2CommandProcessing, ( signed char * ) "Salsa2", 256, NULL, DEFAULT_PRIORITY,( xTaskHandle * ) NULL);
+	}
+
+
+
+#if PSW1G_SUPPORT
+	if((get_marvell_id() == DEV_88E6176)||(get_marvell_id() == DEV_88E6240)){
+		//reinit Led lines
+		psw1g_lines_init();
+		vTaskDelay(1000*MSEC);
+		if(man_unman_select() == 1){
+			psw1g_unmanagment(ENABLE);
+			vTaskDelay(1000*MSEC);
+			for(u8 i=0;i<POE_PORT_NUM;i++){
+				set_poe_state(POE_A,i,ENABLE);
+			}
+			//set fiber speed
+			if(speed_select() == 1)
+				psw1g_fiber_speed(100);
+			else
+				psw1g_fiber_speed(1000);
+			while(1){
+				IWDG_ReloadCounter();
+			}
+		}
+		else{
+			for(uint8_t i=0;i<MV_PORT_NUM;i++){
+				stp_set_port_state(i,BSTP_IFSTATE_FORWARDING);
+			}
+		}
+	}
+#endif
+
+	DEBUG_MSG(PRINTF_DEB,"PoEControlTask\r\n");
+	if(get_dev_type()!=DEV_SWU16){
+		if(xTaskCreate( PoEControlTask, ( signed char * ) "PoE", configMINIMAL_STACK_SIZE, NULL, DEFAULT_PRIORITY, &xPoeTask) == -1)
+			ADD_ALARM(ERROR_CREATE_POE_TASK);
+	}
+
+
+
+
+
+
+	//получение конфигурации
+	DEBUG_MSG(PRINTF_DEB,"settings_struct_initialization\r\n");
+	settings_struct_initialization(0);
+	settings_load_();
+	//создание очереди для применения настроек
+	xSettingsQueue = xQueueCreate(50,sizeof(u8));
+
+	//очередь для событий
+	EventsQueue = xQueueCreate(20,10);
+
+	//set MAC addres
+	get_net_mac(dev_addr);
+
+
+	//настраиваем CPU порт
+	if(get_dev_type() == DEV_SWU16){
+		config_cpu_port();
+	}
+	else
+		ETH_WritePHYRegister(0x1A, 0x01, 0x003D);//link up port 10  0x003D
+
+
+    if(get_dev_type()!=DEV_SWU16){
+		DEBUG_MSG(PRINTF_DEB,"SoftStartTask\r\n");
+		if(xTaskCreate( SoftStartTask, ( signed char * ) "SS", configMINIMAL_STACK_SIZE, NULL, DEFAULT_PRIORITY, &xSSTask) == -1)
+			ADD_ALARM(ERROR_CREATE_SS_TASK);
+    }
+
+    if(get_dev_type()!=DEV_SWU16){
+		DEBUG_MSG(PRINTF_DEB,"PoECamControl\r\n");
+		if(xTaskCreate( PoECamControl, ( signed char * )"AutoRs", (128*4), NULL, DEFAULT_PRIORITY, &xPoECamControl)
+				==errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY)
+			ADD_ALARM(ERROR_CREATE_POECAM_TASK);
+    }
+
+	DEBUG_MSG(PRINTF_DEB,"OtherCommands\r\n");
+	if(xTaskCreate( OtherCommands, ( signed char * )"Other",128+64, NULL, DEFAULT_PRIORITY, &xOtherCommands )
+			== errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY)
+		ADD_ALARM(ERROR_CREATE_OTHER_TASK);
+
+	DEBUG_MSG(PRINTF_DEB,"ppu_disable\r\n");
+	ppu_disable();
+
+	//после старта, записываем это состояние в лог
+	if(reboot_flag == POWER_RESET)
+		send_events_u32(EVENT_START_PWR,0);
+	else
+		send_events_u32(EVENT_START_RST,0);
+
+
+
+	DEBUG_MSG(PRINTF_DEB,"smi_flush_all\r\n");
+
+	smi_allport_discard();
+	smi_flush_all();
+
+	DEBUG_MSG(PRINTF_DEB,"smi_set_port_dbnum_low\r\n");
+	for(uint8_t i=0;i<MV_PORT_NUM;i++){
+		smi_set_port_dbnum_low(i, 0);
+	}
+	vTaskDelay(1000*MSEC);
+
+	DEBUG_MSG(PRINTF_DEB,"SwitchPortSet\r\n");
+	SwitchPortSet();
+	vTaskDelay(1000*MSEC);
+
+	//todo добавить реализацию 802.1x
+#if DOT1X_USE
+	//EAPOL Authentificator
+	//struct hostapd_data hapd;
+	//ieee802_1x_init(&hapd);
+//	ieee802_1x_init();
+#endif
+
+
+
+#if USE_STP
+	DEBUG_MSG(PRINTF_DEB,"bstp_task_start\r\n");
+	bstp_task_start();//не стоит забывать, что здесь еще объявлен прием igmp, помимо BPDU
+	if((get_marvell_id() == DEV_88E095)||(get_marvell_id() == DEV_88E097)){
+		for(u8 i=0;i<(COOPER_PORT_NUM+FIBER_PORT_NUM);i++){
+			//add all fe ang ge ports
+			sprintf(temp,"port%d",i);
+			if(i<COOPER_PORT_NUM)
+				bstp_add_port(temp,  i, L2F_port_conv(i),  100*1000);
+			else
+				bstp_add_port(temp,  i, L2F_port_conv(i),  1000*1000);
+		}
+	}
+	else if((get_marvell_id() == DEV_88E6176)||(get_marvell_id() == DEV_88E6240)){
+		for(u8 i=0;i<(COOPER_PORT_NUM+FIBER_PORT_NUM);i++){
+			//add all fe and ge ports
+			sprintf(temp,"port%d",i);
+			if(i<COOPER_PORT_NUM)
+				bstp_add_port(temp,  i, i,  100*1000);
+			else
+				bstp_add_port(temp,  i, i,  1000*1000);
+		}
+	}
+	else if(get_marvell_id() == DEV_98DX316){
+		for(u8 i=0;i<(ALL_PORT_NUM);i++){
+			sprintf(temp,"port%d",i);
+			bstp_add_port(temp,  i, i,  1000*1000);
+		}
+	}
+	bstp_reinit();
+
+
+
+	DEBUG_MSG(PRINTF_DEB,"start stp sett\r\n");
+
+	if(get_stp_state()==DISABLE){
+		for(uint8_t i=0;i<MV_PORT_NUM;i++){
+			stp_set_port_state(i,BSTP_IFSTATE_FORWARDING);
+		}
+		if(get_stp_bpdu_fw())
+			sw_rstp_deconfig();
+	}
+
+	vTaskDelay(2000*MSEC);
+	bstp_reinit();
+
+#endif
+	// Initialize interrupt
+	INT_Init();
+	i2c_int_config();
+
+	//прерывания от marvell
+	marvell_int_cfg();
+
+	//poe_interrupt_cfg();
+#if FLASH_FS_USE
+	//файловая таблица с хелпом в ROM
+	//MakeFileTable();
+#endif
+
+
+
+#if LWIP_IGMP
+	//vTaskDelay(5000*MSEC);
+	if(get_igmp_snooping_state() == ENABLE){
+		igmp_init();
+		igmp_task_start();
+		//add broadcast to atu table all ports
+		add_broadcast_to_atu();
+		//sample on fe port
+		for(u8 i=0;i<(COOPER_PORT_NUM+FIBER_PORT_NUM);i++)
+			igmp_start(i);
+	}
+#endif
+
+	DEBUG_MSG(PRINTF_DEB,"start uip\r\n");
+	if(xTaskCreate( UipTask, ( signed char * ) "uip", 6000, NULL, DEFAULT_PRIORITY, &xUipTask) == -1)
+		ADD_ALARM(ERROR_CREATE_UIP_TASK);
+
+
+	vTaskDelay(1000*MSEC);
+
+	timer_set(&link_check, 100 * MSEC  );
+	timer_set(&ups_plc_timer,  1000 * MSEC  );
+	timer_set(&port_stat_timer, 1000 * MSEC  );
+	timer_set(&atu_timer, 2000 * MSEC  );
+	timer_set(&mac_timer, 1000 * MSEC  );
+	timer_set(&plc_em_timer,  30000 * MSEC  );
+	timer_set(&cpu_stat_timer,  CPU_STAT_PERIOD * MSEC  );
+	timer_set(&marvell_freeze_timer,  10000 * MSEC  );
+
+	//DEBUG_MSG(PRINTF_DEB,"SwitchPortSet\r\n");
+	//SwitchPortSet();
+
+#if LLDP_USE
+	lldp_init();
+#endif
+
+	for (;;){
+    	//settings load
+    	if(need_load_settings()){
+    		settings_load_();
+    		need_load_settings_set(0);
+    		DEBUG_MSG(SETTINGS_DBG,"settings_load\r\n");
+    	}
+
+    	//settings save
+    	if(need_save_settings()){
+    		DEBUG_MSG(SETTINGS_DBG,"settings_save\r\n");
+    		settings_save_();
+    		need_load_settings_set(1);
+    		need_save_settings_set(0);
+    	}
+
+		//обработка очереди для проведения отложенной настройки только после сохранения настроек
+		settings_queue_processing();
+
+
+
+		//обработка событий перезагрузки
+		if(get_reboot_flag()){
+			reboot_(get_reboot_flag());
+			set_reboot_flag(0);
+		}
+
+		//default button
+		if (GPIO_ReadInputDataBit(GPIOE,BTN_DEFAULT_PIN)==Bit_RESET) {
+			vDefault_ButtTask();
+		}
+
+		//изменение PoE на порту
+		if_poe_changed();
+
+		if(get_dev_type()!=DEV_SWU16){
+			//ups & plc processing //10sek
+			if(timer_expired(&ups_plc_timer)){
+				timer_set(&ups_plc_timer, 10000*MSEC);
+				UPS_PLC_detect();
+				if(is_ups_mode()){
+
+					UpsTime(&remtime);
+				}
+			}
+
+			//процесс получения показаний с электросчетчика по rs485
+			if(is_plc_connected()){
+				if(timer_expired(&plc_em_timer)){
+					plc_485_connect();
+					get_plc_em_indications();
+					//plc_processing_flag = 0;
+					timer_set(&plc_em_timer, PLC_POLLING_INTERVAL*60*000*MSEC);//раз в 10 минут
+				}
+			}
+
+			plc_processing();
+
+
+			//события при срабатывании сухих контактов
+			sensor_line_events();
+
+			//обработка событий для отправки на Teleport
+			teleport_processing();
+
+
+		}
+
+		//virtual cable tester processing
+		vct_processing();
+
+		//for test only
+		test_processing();
+
+
+       	//получение статуса линка // раз в 1 сек
+		get_link_state_isr();
+		if(timer_expired(&link_check)){
+			timer_set(&link_check, 1000 * MSEC  );
+			get_link_state_timer();
+		}
+
+
+		if(timer_expired(&mac_timer)){
+			timer_set(&mac_timer, 1000 * MSEC  );
+			mac_filtring_processing();
+		}
+
+		//если изменились состояния, посылаем сообщения
+		//изменение линка на порту
+		if_link_changed();
+
+
+		if(timer_expired(&port_stat_timer)){
+			port_statistics_processing();
+			timer_set(&port_stat_timer, SPEED_STAT_PERIOD*1000*MSEC  );
+		}
+
+		if(timer_expired(&cpu_stat_timer)){
+			timer_set(&cpu_stat_timer, CPU_STAT_PERIOD*MSEC  );
+			cpu_stat_processing();
+		}
+
+		//запись событий в чёрный ящик
+		send_events_task();
+
+
+    	/*контроль зависания свича*/
+		/*если в течении 10 сек  MCU port находится в состоянии blocking,
+		 * то перезагружаем процессор*/
+		if(get_mv_freeze_ctrl_state()==ENABLE){
+			if(timer_expired(&marvell_freeze_timer)){
+				if(marvell_freeze_control()!=0){
+					add_alarm(ERROR_MARVEL_FREEZE,1);
+					vTaskDelay(1000*MSEC);
+					if(get_marvell_id()==DEV_98DX316){
+						for(u8 i=0;i<ALL_PORT_NUM;i++){
+							Salsa2_WritePhyReg(i,Salsa2_get_phyAddr(i),22,PAGE0);
+							Salsa2_WritePhyReg(i,Salsa2_get_phyAddr(i),0,0x8000);
+
+							Salsa2_WritePhyReg(i,Salsa2_get_phyAddr(i),22,PAGE1);
+							Salsa2_WritePhyReg(i,Salsa2_get_phyAddr(i),0,0x8000);
+						}
+					}
+					reboot(REBOOT_ALL);
+
+				}
+				timer_set(&marvell_freeze_timer, 5000*MSEC  );
+			}
+		}
+
+#if LLDP_USE
+		lldp_timer_processing();
+#endif
+
+
+		vTaskDelay(10*MSEC);
+    	i++;
+    }
+}
+
+
+
+int main(void){
+	xTaskCreate( ConfigTask, ( signed char * ) "Config", 2500, NULL, DEFAULT_PRIORITY,( xTaskHandle * ) NULL);
+	xTaskCreate( vTaskLED, ( signed char * ) "LedTask", configMINIMAL_STACK_SIZE, NULL, DEFAULT_PRIORITY,( xTaskHandle * ) NULL);
+#if SSL_USE
+	/* Start SSL Server task */
+	xTaskCreate(ssl_server, ( signed char * )"SSL", configMINIMAL_STACK_SIZE * 5, NULL, DEFAULT_PRIORITY, NULL);
+#endif
+
+#if WATCHDOG_ENABLE
+	// Разрешаем доступ на запись к регистрам вачдога //
+	IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
+
+	// максимальный делитель //
+	IWDG_SetPrescaler(IWDG_Prescaler_256);
+	IWDG_SetReload(157*20);//10cek
+	IWDG_Enable();
+	IWDG_ReloadCounter();
+#endif
+	vTaskStartScheduler();
+	return 0;
+}
+
+
+/*-----------------------------------------------------------*/
+/*
+ * The idle hook is used to scheduler co-routines.
+ */
+volatile static u8 CPU_IDLE = 0;
+
+//---------------------------------
+u8 GetCPU_IDLE(void) {
+   return (100-CPU_IDLE);
+}
+#define _GET_DIFF(a,b) (a - b)
+void vApplicationIdleHook( void ) {     //это и есть поток с минимальным приоритетом
+	static portTickType LastTick;
+	static u32 count;             		//наш трудяга счетчик
+	static u32 max_count ;              //максимальное значение счетчика, вычисляется при калибровке и соответствует 100% CPU idle
+
+	count++;                                                  //приращение счетчика
+
+	if(_GET_DIFF(xTaskGetTickCount(), LastTick ) > configTICK_RATE_HZ)    { //если прошло 1000 тиков (1 сек для моей платфрмы)
+		LastTick = xTaskGetTickCount();
+		if(count > max_count)
+			max_count = count;          //это калибровка
+		CPU_IDLE = 100 * count / max_count;               //вычисляем текущую загрузку
+		count = 0;                                        //обнуляем счетчик
+	}
+}
+
+
+
+#ifdef  USE_FULL_ASSERT
+void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed portCHAR *pcTaskName )
+{
+	/* This function will get called if a task overflows its stack.   If the
+	parameters are corrupt then inspect pxCurrentTCB to find which was the
+	offending task. */
+	//( void ) pxTask;
+	//( void ) pcTaskName;
+	//char str[64];
+	//sprintf(str,"aplication stack overflow:");
+	//strcat(str,(char *)pcTaskName);
+	//write_log_bb(str);
+	for( ;; ){printf("vApplicationIdleHook: %s\r\n",(char *)pcTaskName);}
+}
+
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *   where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t* file, uint32_t line)
+{
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+
+  /* Infinite loop */
+  while (1)
+  {
+	  printf("Wrong parameters value: file %s on line %lu\r\n", file, line);
+  }
+}
+#endif
+
+/*>10 секунд - сброс настроек
+ * до 3 секунд - перезагрузка*/
+void vDefault_ButtTask(void){
+u8 cnt = 0;
+	  /*при нажатии на кнопку, сбрасываем ip, gateway, mac,mask, pasword*/
+	cnt = 0;
+	while(GPIO_ReadInputDataBit(GPIOE,BTN_DEFAULT_PIN)==Bit_RESET){
+		cnt++;
+		vTaskDelay(1000*MSEC);
+
+		if(cnt>10)
+			set_led_default(TOGLE_LED);
+	}
+
+	if(cnt<5 && cnt>1){
+		reboot(REBOOT_ALL);
+	}
+	else if(cnt>10){
+
+		settings_default(0);
+		vTaskDelay(3000*MSEC);
+		reboot(REBOOT_ALL);
+	}
+
+}

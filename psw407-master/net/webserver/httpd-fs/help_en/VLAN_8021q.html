@@ -1,0 +1,37 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body bgcolor = "#eeeeee"> 
+<b><p align="center"> 802.1Q VLAN Settings</p></b>
+<br><br> 
+VLAN (Virtual Local Area Network) — a group of devices that have the ability to 
+interact directly with each other at the link layer, although physically they can 
+be connected to different network switches. 
+<br><br>
+The switch supports VLANs with VID 1-4094<br>
+<br>
+The switch supports up to 100 different VLANs.
+<br><br>
+<b>Managment VLAN ID</b> - VLAN number for the management network. Access to Web-interface is only possible from this VLAN. 
+<br>
+<b>VLAN List</b> - a table containing information about the virtual networks configured on the switch, states and ports belonging to this VLAN. 
+<br>
+<b>VTU Table</b> - VTU (VLAN Table Unit) – table for editing virtual networks, information in this table contains the following fields: 
+ <li><b>VID</b> -  (VLAN ID) - the number of the virtual network. 
+ <li><b>State</b> - State. The created VLAN can be temporarily disabled by selecting the <b>Disable</b> state. 
+ <li><b>VLAN Name</b> - virtual network ID (up to 16 characters). This is used only for convenience of configuration. The field is optional. 
+
+ <li>Port state:
+ <ul>
+ <li><b>N</b> (Not a member) - the port is not a member of this VLAN. 
+ <li><b>U</b> (Untagged) - untagged port (access port) allows to combine selected ports into one VLAN. 
+ <li><b>T</b> (Tagged) - tagged port (trunk port). Several VIDs can be set for a tagged port. 
+
+</ul> 
+To finally apply settings, press <b>Apply</b> button.
+</body>
+</html>
+
+
+

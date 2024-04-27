@@ -1,0 +1,26 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+
+ifeq (APPLICATION_SIDE_ONLY, $(DISTRIBUTED_SIMULATION_ROLE))
+  #slan not needed on application side
+    C_EXCLUDE_FILE_LIST      = simOsWin32Slan.c
+endif
+
+ifeq (BROKER_ONLY, $(DISTRIBUTED_SIMULATION_ROLE))
+  #slan not needed on application side
+    C_EXCLUDE_FILE_LIST      = simOsWin32Slan.c
+endif
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

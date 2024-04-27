@@ -1,0 +1,12 @@
+In order to build image under Tornado 2.2.1 execute next commands from command line:
+
+1. torvars.bat
+2. make vxWorks.st 
+
+In order to build image under WorkBench 2.6 execute next commands from command line:
+
+1. torvars_wb.bat
+2. make vxWorks.st WR_IDE=Wb
+
+In order to build BE image add ENDIAN=BE at end of command line, for example: 
+make vxWorks.st ENDIAN=BE

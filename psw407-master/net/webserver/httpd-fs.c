@@ -1,0 +1,331 @@
+/*
+ * Copyright (c) 2001, Swedish Institute of Computer Science.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the Institute nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ * This file is part of the lwIP TCP/IP stack.
+ *
+ * Author: Adam Dunkels <adam@sics.se>
+ *
+ * $Id: httpd-fs.c,v 1.1 2006/06/07 09:13:08 adam Exp $
+ */
+
+#include "stm32f4xx_iwdg.h"
+#include "httpd.h"
+#include "httpd-fs.h"
+#include "httpd-fsdata.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include "../deffines.h"
+#include "../flash/spiflash.h"
+#include "FreeRTOS.h"
+#include "task.h"
+
+
+//#include "fifo.h"
+//#include "usb.h"
+
+#ifndef NULL
+#define NULL 0
+#endif /* NULL */
+
+#include "httpd-fsdata.h"
+
+#if HTTPD_FS_STATISTICS
+static u16_t count[HTTPD_FS_NUMFILES];
+#endif /* HTTPD_FS_STATISTICS */
+
+#define PGM_P char *
+#define pgm_read_byte(a) *(a)
+
+#if FLASH_FS_USE
+	static struct file_table FAT[MAX_FILE_NUM] __attribute__ ((section (".ccmram")));
+	char help_str[ETH_MAX_PACKET_SIZE+MAX_STR_LEN] __attribute__ ((section (".ccmram")));
+#endif
+
+const char file_name[]={0x2f, 0x50, 0x53, 0x57, 0x32, 0x47, 0x5f, 0x73, 0x65, 0x74, 0x74, 0x69,
+		  0x6e, 0x67, 0x73, 0x5f, 0x62, 0x61, 0x63, 0x6b, 0x75, 0x70, 0x2e, 0x62, 0x61, 0x6b, 0,};
+
+
+/*-----------------------------------------------------------------------------------*/
+static u8_t httpd_fs_strcmp(const char *str1, PGM_P str2)
+{
+  u8_t i;
+  i = 0;
+  loop:
+
+  if(pgm_read_byte(str2+i) == 0 ||
+     str1[i] == '\r' ||
+     str1[i] == '\n') {
+    return 0;
+  }
+
+  if(str1[i] != pgm_read_byte(str2+i)) {
+    return 1;
+  }
+
+  ++i;
+  goto loop;
+  return 0;
+}
+
+
+#if FLASH_FS_USE
+void MakeFileTable(void){
+	char buff[70];
+	char name[51];
+	char tmp[64];
+	uint32_t i;
+	uint32_t offset=0,size=0;
+
+	 for(i=0;i<MAX_FILE_NUM;i++){
+		 name[0]=0;
+		 spi_flash_read(FL_FS_START+i*64,64,buff);
+		 /*имя файла*/
+		 for(uint8_t j=0;j<50;j++){
+			 if(buff[0]=='/'){
+				 if((buff[j]!=0xFF)&&(buff[j]!=' '))
+					 name[j]=buff[j];
+				 else{
+					 name[j]=0;
+					 break;
+				 }
+			 }
+			 else{
+				 name[0]=0;
+				 break;
+			 }
+		 }
+
+		 if(strlen(name)==0)
+			 break;
+		 /*адрес*****/
+		 for(uint8_t j=50;j<60;j++){
+			 tmp[j-50]=buff[j];
+		 }
+		 tmp[strlen(tmp)]=0;
+		 offset=strtoul(tmp, NULL, 10);
+		 /*размер файла*/
+		 for(uint8_t j=0;j<10;j++){
+			 tmp[j]=buff[j+60];
+		 }
+		 tmp[strlen(tmp)]=0;
+		 size=strtoul(tmp, NULL, 10);
+		 /*******************/
+
+		 //добавляем найденное в файловую табл.
+		 strncpy(FAT[i].name,name,FILE_NAME_LEN);
+		 FAT[i].addr = offset;
+		 FAT[i].len = size;
+
+		 DEBUG_MSG(UIP_DEBUG,"file %lu: %s %lu %lu \r\n",i,FAT[i].name,FAT[i].addr,FAT[i].len);
+	 }
+}
+#endif
+
+
+/*-----------------------------------------------------------------------------------*/
+int httpd_fs_open(const char *name, struct httpd_fs_file *file)
+{
+//static struct file_table seach_ft;
+//static u8 fs_init=0;
+
+#if HTTPD_FS_STATISTICS
+  u16_t i = 0;
+#endif /* HTTPD_FS_STATISTICS */
+  struct httpd_fsdata_file_noconst *f;
+
+
+#if 0//SAVE_SETT
+	  if(strncmp(name,"/PSW2G_settings_backup.bak",(strlen(name)-1))==0){
+		  DEBUG_MSG(UIP_DEBUG,"++++open /PSW2G_settings_backup.bak\r\n");
+	  }
+#endif
+
+
+
+  for(f = (struct httpd_fsdata_file_noconst *)HTTPD_FS_ROOT;
+	  f != NULL;
+	  f = (struct httpd_fsdata_file_noconst *)f->next) {
+
+
+
+	if(httpd_fs_strcmp(name, f->name) == 0) {
+		file->data = f->data;
+		file->len = f->len;
+#if HTTPD_FS_STATISTICS
+		++count[i];
+#endif /* HTTPD_FS_STATISTICS */
+		return 1;//нашли
+	}
+#if HTTPD_FS_STATISTICS
+	++i;
+#endif /* HTTPD_FS_STATISTICS */
+   }
+
+/*если не нашли во флеши контроллера*/
+#if   FLASH_FS_USE
+  if(fs_init == 0){
+	  //make file table
+	  MakeFileTable();
+	  fs_init = 1;
+  }
+  /*ищем на spi flash*/
+  //printf("open file %s\r\n", name);
+  if(search_file(name,&seach_ft) == 1){
+	//printf("seach file3 %s %lu %lu \r\n", seach_ft.name, seach_ft.addr , seach_ft.len);
+	/*если данные лежат на spi flash*/
+	file->len=seach_ft.len;
+	//data_PSW2G_settings_backup_bak - просто промежуточный буфер
+	if(((FL_FS_START + seach_ft.addr + seach_ft.len) < FL_FS_END)&&(seach_ft.len < 2450)){
+		memset(help_str,0,sizeof(help_str));
+		seach_ft.len +=seach_ft.len % 2;
+		//printf("spi_flash_read %lu \r\n",FL_FS_START + seach_ft.addr);
+		spi_flash_read((FL_FS_START + seach_ft.addr),seach_ft.len,help_str);
+		file->data=help_str;
+		return 1;
+	}
+  }
+#endif
+  //printf("file not found\r\n");
+  return 0;
+}
+
+
+
+#if   FLASH_FS_USE
+u8 search_file(const char *name1,struct file_table *seach_file_struct){
+uint32_t i;
+	 for(i=0;i<MAX_FILE_NUM;i++){
+
+		 if((FAT[i].name[0]==0xFF)||(FAT[i].name[0]==0))
+			 continue;
+
+		 if(strlen(name1)>FILE_NAME_LEN)
+			 continue;
+
+		 /*осуществляем поиск*/
+		 if(strcmp(FAT[i].name,name1)==0){
+
+			 //printf("seach %s\r\n", FAT[i].name);
+
+			 seach_file_struct->addr = FAT[i].addr;
+			 seach_file_struct->len = FAT[i].len;
+
+			 strcpy(seach_file_struct->name,FAT[i].name);
+			 return 1;
+		 }
+	 }
+	 return 0;
+}
+
+//смотрим, не испортились ли файлы справки
+//0 - справка не повреждена
+//1 - повреждена
+/*
+uint8_t test_help(void){
+u16 tmp;
+	spi_flash_read(FAT_TABLE,2,&tmp);
+	if(tmp==0xFFFF)
+		return 1;
+	else
+		return 0;
+}
+*/
+//восстанавливаем файлы
+void help_restore(void){
+#if HELP_BKP_USE
+u8 tmp[64];
+u32 i;
+	//очищаем
+	spi_flash_erase(FAT_TABLE,65536);
+	spi_flash_erase(FAT_TABLE+65536,65536);
+	//пеерписываем
+	for(i=0;i<HELP_SIZE_MAX;i+=64){
+		spi_flash_read(FAT_TABLE_BAK+i,64,tmp);
+		spi_flash_write(FAT_TABLE+i,64,tmp);
+		if(i==10048)
+			IWDG_ReloadCounter();
+	}
+#endif
+}
+
+//делаем резервную копию данных
+void help_copy(void){
+#if HELP_BKP_USE
+u8 tmp[64];
+u32 i;
+	//очищаем
+	spi_flash_erase(FAT_TABLE_BAK,65536);
+	spi_flash_erase(FAT_TABLE_BAK+65536,65536);
+	//пеерписываем
+	for(i=0;i<HELP_SIZE_MAX;i+=64){
+		spi_flash_read(FAT_TABLE+i,64,tmp);
+		spi_flash_write(FAT_TABLE_BAK+i,64,tmp);
+		if(i==10048)
+			IWDG_ReloadCounter();
+	}
+#endif
+}
+
+/*-----------------------------------------------------------------------------------*/
+void
+httpd_fs_init(void)
+{
+#if HTTPD_FS_STATISTICS
+  u16_t i;
+  for(i = 0; i < HTTPD_FS_NUMFILES; i++) {
+    count[i] = 0;
+  }
+#endif /* HTTPD_FS_STATISTICS */
+}
+/*-----------------------------------------------------------------------------------*/
+#if HTTPD_FS_STATISTICS
+u16_t httpd_fs_count
+(char *name)
+{
+  struct httpd_fsdata_file_noconst *f;
+  u16_t i;
+
+  i = 0;
+  for(f = (struct httpd_fsdata_file_noconst *)HTTPD_FS_ROOT;
+      f != NULL;
+      f = (struct httpd_fsdata_file_noconst *)f->next) {
+
+    if(httpd_fs_strcmp(name, f->name) == 0) {
+      return count[i];
+    }
+    ++i;
+  }
+  return 0;
+}
+#endif /* HTTPD_FS_STATISTICS */
+/*-----------------------------------------------------------------------------------*/
+
+
+#endif

@@ -1,0 +1,13 @@
+;;;;;;Addr=0x  Val=0x Repeat=0d Skip=0x
+;;;;
+;;;; update the device type -- to specific Bobk-Caelum
+;;;;
+;;;; NOTE: in this register we also have the 'RevisionID' (bits 0..3) of the silicon
+;;;;
+;; DX4203 device ID is 0xBC00
+0000004c 000BC000
+;;
+;; note : write to this register 0x4c will also set the PEX register with the
+;;        needed device type
+ffffffff
+

@@ -1,0 +1,54 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body bgcolor = "#eeeeee"> 
+<b><p align="center"> RSTP</p></b>
+<br><br> 
+STP/RSTP protocol statistics<br><br>
+<b>Bridge status</b>: 
+<li><b>STP/RSTP state</b> - protocol activity on the switch. 
+<li><b>Brige Root status</b> - the switch is the root switch. 
+<li><b>Protocol</b> - the protocol used. 
+<li><b>Root bridge MAC</b> - address of the root switch. 
+<li><b>Root bridge priorityt</b> - priority of the root switch. 
+<li><b>Root port</b> - the port directed towards the root switch. 
+<li><b>Path cost to root</b> - the cost of the path to the root switch. 
+<li><b>Designated bridge MAC</b> - address of the designated switch. 
+<li><b>Designated bridge priority</b> -  priority of the designated switch. 
+<li><b>Bridge max age</b> - time of waiting for the bridge in seconds, after which it sends a message about rebuilding of the network. 
+<li><b>Bridge Hello Time</b> - the period of sending BPDU packets in seconds. 
+<li><b>Forward Delay Time</b> - the delay of transition of port states from the Listening and Learning state to the Forwarding state (in seconds). 
+<li><b>Time topology change</b> - the time elapsed since the last topology change in seconds. 
+<li><b>Topology change count</b> - the number of topology changes. 
+<br><br>
+<b>Port status</b>
+<li><b>Port</b> - switch port.
+<li><b>State</b> - STP/RSTP protocol activity on the port.
+<li><b>Baud rate</b> - speed of the port.
+<li><b>Link</b> -  link status on the port.
+<li><b>Duplex</b> - Duplex/Half Duplex.
+<li><b>Port state</b> - port state. The port can be in the following states:
+<table align=center border="1">
+<tr><td><b>STP</b></td><td><b>RSTP</b></td></tr>
+<tr><td>Forwarding</td><td>Forwarding</td></tr>
+<tr><td>Disabled</td><td>Discarding</td></tr>
+<tr><td>Listering</td><td>Discarding</td></tr>
+<tr><td>Learning</td><td>Learning</td></tr>
+<tr><td>Blocking</td><td>Discarding</td></tr>
+</table>
+<li><b>Port role</b> - port role. The following port roles are possible: 
+<ol>
+  <li><b>Disabled</b>
+  <li><b>Root</b>
+  <li><b>Designated</b>
+  <li><b>Alternate</b>
+  <li><b>Backup</b>
+</ol>
+<li><b>Port priority</b> - priority of the port. 
+<li><b>Patch cost</b> - cost of path through the port. 
+<li><b>P2P</b> - point-to-point connection. 
+<li><b>Edge</b> - edge port. 
+<li><b>Forward transitions</b> - the number of transitions to the Forwarding state.
+</body>
+</html>

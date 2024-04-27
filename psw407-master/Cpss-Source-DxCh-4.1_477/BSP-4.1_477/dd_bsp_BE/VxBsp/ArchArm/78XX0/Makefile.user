@@ -1,0 +1,338 @@
+#*******************************************************************************
+#                Copyright 2004, MARVELL SEMICONDUCTOR, LTD.                   *
+# THIS CODE CONTAINS CONFIDENTIAL INFORMATION OF MARVELL.                      *
+# NO RIGHTS ARE GRANTED HEREIN UNDER ANY PATENT, MASK WORK RIGHT OR COPYRIGHT  *
+# OF MARVELL OR ANY THIRD PARTY. MARVELL RESERVES THE RIGHT AT ITS SOLE        *
+# DISCRETION TO REQUEST THAT THIS CODE BE IMMEDIATELY RETURNED TO MARVELL.     *
+# THIS CODE IS PROVIDED "AS IS". MARVELL MAKES NO WARRANTIES, EXPRESSED,       *
+# IMPLIED OR OTHERWISE, REGARDING ITS ACCURACY, COMPLETENESS OR PERFORMANCE.   *
+#                                                                              *
+# MARVELL COMPRISES MARVELL TECHNOLOGY GROUP LTD. (MTGL) AND ITS SUBSIDIARIES, *
+# MARVELL INTERNATIONAL LTD. (MIL), MARVELL TECHNOLOGY, INC. (MTI), MARVELL    *
+# SEMICONDUCTOR, INC. (MSI), MARVELL ASIA PTE LTD. (MAPL), MARVELL JAPAN K.K.  *
+# (MJKK), MARVELL ISRAEL LTD. (MSIL).                                          *
+#*******************************************************************************
+# makefile.user
+#
+# DESCRIPTION:
+# makefile.user contains user private definitions 
+#*******************************************************************************
+#Disco Duo definistions
+TARGET_DIR  = 78XX0
+#*******************************************************************************
+#for DB78200-A-BP 
+#CHIP=78200
+#for DB78100-A-BP   
+CHIP=78100
+CHIP_DEFINE = 78XX0
+#*******************************************************************************
+MV_DEVICE_DIR   = $(SRC_PATH)/mv_devices/dd_family
+#
+# The constants ROM_TEXT_ADRS, ROM_SIZE, and RAM_HIGH_ADRS are defined
+# in config.h and Makefile.
+# All definitions for these constants must be identical.
+#
+ifeq ($(IMAGE), BOOTROM)
+ROM_TEXT_ADRS   = fff80000 # ROM cold entry address
+else
+ROM_TEXT_ADRS   = ffe00000 # ROM cold entry address
+endif
+
+#*******************************************************************************
+# Build VxWorks image with/without SGI Yukon driver support.
+INCLUDE_SGI_INTO_IMAGE = N
+
+# Build SGI Yukon driver with/without ASF, ASF_DEBUG support.
+INCLUDE_ASF = N
+INCLUDE_ASF_DEBUG = N
+
+# Build bootrom.bin image with/without SGI Yukon driver support.
+INCLUDE_SGI_INTO_BOOTROM = N
+
+#*******************************************************************************
+# Build VxWorks image with/without GEI network interface.
+GEI=no
+#*******************************************************************************
+# Build VxWorks image with/without FEI network interface.
+FEI=no
+#*******************************************************************************
+# Build VxWorks image with/without USB .
+USB=yes
+USB_device=yes
+#*******************************************************************************
+# Build VxWorks image with/without PCI .
+PCI=yes
+#*******************************************************************************
+# Build VxWorks image with/without SATA .
+SATA=no
+#*******************************************************************************
+# Build VxWorks image with/without IDMA .
+IDMA=yes
+#*******************************************************************************
+# Build VxWorks image with/without CESA - for PID only.
+CESA=no
+###############################################################################
+VX_BUS=no
+###############################################################################
+# L2 chace option
+
+# L2Enable = yes -  L2_chage enable 
+L2Enable = yes
+
+# L2Option 0 - prevent L2 I cahce duble invalidate
+#          1 - lock L2 I cache only
+#          2 - ignore
+
+L2Option=0
+
+###############################################################################
+# BUILD_TOOL  =     ;(blank) Use Tornado 2.2.1 libraries
+# BUILD_TOOL  = VFP ;Use WindRiver VFP patch (VFP tools)
+# The default tool for Disco Duo project is with VFP
+#BUILD_TOOL  = VFP
+#*******************************************************************************
+# To build Debug image uncomment line below
+#BUILD = _dbg
+
+WDB_AGENT=no
+ifeq ($(BUILD), _dbg)
+MV_DEFINE   = -DINCLUDE_BRIDGING -g -DMV_RT_DEBUG
+DBG_OBJ    = ramDisk.o scsiDisk.o  copyTestFile.o vxFtpTest.o  test_fs.o test_rawfs.o
+ifeq ($(WIND_PLATFORM), vxworks-6.6)
+else
+DBG_OBJ    += vxUdpTests.o 
+endif
+DBG_OBJ    += testmath1.o commonMath.o fpu.o testmath2.o testmath3.o testmath4.o testmath5.o testmath6.o testmath7.o
+#DBG_OBJ   += nflashTest.o idmaErrTest.o 
+
+ifeq ($(USB),yes)
+DBG_OBJ    +=diskp.o
+endif
+
+ifeq ($(WDB_AGENT), N)
+MV_DEFINE   = -DMV_RELEASE 
+endif
+
+else
+MV_DEFINE   = -DINCLUDE_BRIDGING -DMV_RELEASE
+DBG_OBJ	= 
+endif
+###############################################################################
+# This makefile supports Tornado and PID. Set WR_IDE lable with:
+# WR_IDE = Pid   To compile BSP under PID.
+# WR_IDE = Wb    To compile BSP under Workbench (vxWorks 6.x)
+# To compile with standard Tornado leave the label empty
+ifeq ($(WR_IDE), )
+WR_IDE      = Pid
+VX_BUS=no
+endif
+
+###############################################################################
+# for using static DIMM uncomment next line
+DRAM_STATIC = YES
+ifeq ($(CHIP),78200)
+DRAM_STATIC = YES
+endif
+ifeq ($(DRAM_STATIC), YES)
+MV_DEFINE    += -DMV_STATIC_DRAM_ON_BOARD
+	ifeq ($(DIMM), RD645XX)
+	MV_DEFINE    += -DRD_MV645XX
+	endif
+	
+	ifeq ($(DIMM),TS256MLQ72V5U)
+	MV_DEFINE    += -DMV_DIMM_TS256MLQ72V5U
+	endif
+	
+	ifeq ($(DIMM), M3783354CZ3)
+	MV_DEFINE    += -DMV_DIMM_M3783354CZ3_CE6 
+	endif
+
+else
+MV_DEFINE    += -DMV_INC_BOARD_DDIM
+endif
+###############################################################################
+#User configuration selection
+# ARMARCH_NUM = 5   ;Use ARM architecture 5 libraries.
+ARMARCH_NUM = 5
+###############################################################################
+# ENDIAN      = BE  ;Use Big Endian tool chain.
+# ENDIAN      = LE  ;Use Little Endian tool chain.
+
+ifeq ($(ENDIAN), )
+ENDIAN      = LE
+endif
+
+###############################################################################
+# Select CPU mode.
+# Two CPU modes are avilable:
+# MV_CPU = 946 which set the Marvell CPU to ARM946ES mode (MPU enabled)
+# MV_CPU = 926 which set the Marvell CPU to ARM926EJ mode (MMU enabled)
+# Note:
+# Workbench does not support ARM946 currently. Thus selecting Wb as WR_IDE 
+# will force the MV_CPU to be ARM926EJ.
+
+ifeq ($(MV_CPU), )
+MV_CPU = 926
+endif
+
+
+#Path definision
+
+GEI_NAME        = gei82543End$(WR_IDE)
+
+INTEL_NET_OBJS  = $(BSP_OBJ_DIR)/$(GEI_NAME).obj
+
+###############################################################################
+# enable traffic from switch ports
+
+MV_SAGE = YES
+
+ifeq ($(MV_SAGE), YES)
+MV_SWITCH_PORTS = YES
+endif
+###############################################################################
+ifeq ($(WR_IDE), Wb)
+MV_DEFINE       += -DWORKBENCH 
+USB_STACK        = HOST_VXW
+TOOL_VER        = gcc3.3
+ifeq ($(WIND_PLATFORM), vxworks-6.6)
+VXWORD_VER      = 66
+else
+VXWORD_VER      = 63
+VX_BUS=no
+endif
+endif
+
+ifeq ($(WR_IDE), Pid)
+MV_DEFINE       += -DTORNADO_PID
+USB_STACK        = HOST_VXW
+TOOL_VER        = gcc2.96
+VX_BUS=no
+endif
+
+ifeq ($(WR_IDE), )
+MV_DEFINE       += -DTORNADO
+USB_STACK       = DEV_MARVELL
+TOOL_VER        = gcc2.96
+VX_BUS=no
+endif
+
+
+###############################################################################
+ifeq ($(IMAGE), BOOTROM)
+	MV_CESA		= N
+	BUILD = no_debug
+	USB_device=no
+	USB=no
+	SATA=no
+    ifeq ($(WIND_PLATFORM), vxworks-6.6)
+	FEI=no
+	GEI=no
+    endif
+else
+    ifeq ($(CESA), yes)
+	MV_CESA         = Y
+    else
+	MV_CESA		= N
+    endif
+endif
+
+###############################################################################
+
+ifeq ($(SATA), yes)
+MV_DEFINE     += -DMV_INCLUDE_INTEG_SATA -DMV_INCLUDE_SATA   
+endif
+
+###############################################################################
+DRAM     	= ddr2
+DRAM_DIR     	= $(SOC_UNITS)/ddr2
+SOC_MV_78200_DIR	= $(MV_DEVICE_DIR)/mv78200
+RTC  		= EXT_RTC
+#*******************************************************************************
+# Interrupt Statistics
+INTERRUPT_STATISTIC=N
+ifeq ($(INTERRUPT_STATISTIC),Y)
+MV_DEFINE  += -DMV_INCLUDE_INTERRUPT_STATISTIC
+DBG_OBJ    += commonApi.o rtc.o spi.o i2c.o flash.o expandBoot.o #delay.o 
+endif
+#*******************************************************************************
+#include usb
+
+USB_DEFINE    = 
+ifeq ($(USB),yes)
+    USB_object=yes
+    #MV_DEFINE     += -DMV_INCLUDE_USB 
+    ifeq ($(USB_STACK), HOST_VXW)
+	USB_DEFINE     += -DMV_USB_STACK_VXW
+    endif
+#  USB_RESTRICTED = YES is for removed USB restricted source code.
+USB_RESTRICTED = YES
+ifeq ($(USB_RESTRICTED), NO)
+	
+	USER_SRC_DIRS   = $(SRC_PATH)/Soc_units/usb/examples          \
+		      $(SRC_PATH)/Soc_units/usb_restricted/device \
+		      $(SRC_PATH)/Soc_units/usb_restricted/host   \
+		      $(SRC_PATH)/vxBsp/WindRiverFiles      \
+		      $(SRC_PATH)/VxBsp/Debug
+	
+	USER_INC_PATH  =  -I$(SRC_PATH)/Soc_units/usb/api     \
+		      -I$(SRC_PATH)/Soc_units/usb/common      \
+		      -I$(SRC_PATH)/Soc_units/usb/device      \
+		      -I$(SRC_PATH)/Soc_units/usb/examples    \
+		      -I$(SRC_PATH)/Soc_units/usb_restricted/common \
+		      -I$(SRC_PATH)/vxBsp/WindRiverFiles
+    endif
+else
+    ifeq ($(USB_device), yes)
+	USB_object=yes
+	USB_STACK = DEV_MARVELL
+	MV_DEFINE     += -DMV_INCLUDE_USB_DEV_MARVELL
+    endif
+endif
+
+ifeq ($(CHIP), 78100)
+    MV_DEFINE     += -DMV_INC_BOARD_SPI_FLASH    
+endif
+
+
+
+ifeq ($(L2Enable), yes)
+MV_DEFINE     += -DINCLUDE_L2_CACHE 
+endif
+
+ifeq ($(L2Option),0)
+MV_DEFINE     += -DCONFIG_MV_SP_I_FTCH_DB_INV
+endif
+
+ifeq ($(L2Option),1)
+MV_DEFINE     += -DCONFIG_MV_SP_I_FTCH_LCK_L2_ICACHE
+endif
+
+
+
+MV_DEFINE     += -DMV_INCLUDE_PEX
+MV_DEFINE     += -DMV_INCLUDE_TWSI 
+MV_DEFINE     += -DMV_INCLUDE_UART
+#MV_DEFINE     += -DMV_INCLUDE_SFLASH_MTD 
+MV_DEFINE     += -DMV_INCLUDE_GIG_ETH 
+MV_DEFINE     += -DMV_INCLUDE_XOR -DMV_USB_VOLTAGE_FIX 
+#MV_DEFINE    += -DMV_INCLUDE_SDIO 
+#MV_DEFINE    += -DMV_INCLUDE_TDM 
+#MV_DEFINE    += -DMV_INCLUDE_AUDIO
+
+ifeq ($(IMAGE), BOOTROM)
+MV_DEFINE      += -DBOOTROM $(USB_DEFINE) -DDRAM_DETECT
+else
+#vxWorks.st BSP definitions
+#*******************************************************************************
+MV_DEFINE     += -DMV_VXWORKS_ST -DINCLUDE_BRIDGING 
+#MV_DEFINE     += -DINCLUDE_USER_APPL $(USB_DEFINE)
+#BSP_USER_OBJS =   mvUsrAppInit.o $(USB_OBJS) $(MRVL_SATA_OBJS) 
+
+ifeq ($(VXWORD_VER), 66)
+#BSP_USER_OBJS   +=  ipAddr.o 
+else
+#BSP_USER_OBJS +=  vxUtils.o vxTests.o  
+endif
+endif
+

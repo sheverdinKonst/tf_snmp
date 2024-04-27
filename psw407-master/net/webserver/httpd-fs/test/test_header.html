@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="css/sdmenu.css" />
+	<!-- scripts -->
+	<script type="text/javascript" src="js/scripts.js"></script>
+	
+	<script type="text/javascript">
+	function open_url(url) 
+	{
+		parent.ContentFrame.location.href= url;
+	}
+	</script>
+  </head>
+  <body> 
+   
+<noscript>
+<b><h1>JavaScript is not installed!</h1></b>
+</noscript>
+
+   <div class="1" onclick="open_url('/test_status.shtml');">
+   Status
+   </div>
+   <div class="1" onclick="open_url('/test_debug.shtml');">
+   Debug
+   </div>
+   <div class="1" onclick="open_url('/test_product.shtml');">
+   Production
+   </div>
+
+  </body>
+</html>

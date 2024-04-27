@@ -1,0 +1,25 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body bgcolor = "#eeeeee"> 
+<b><p align="center"> IGMP Snooping</p></b>
+<br><br>
+IGMP snooping is the process of monitoring IGMP network traffic that allows network layer devices (switches) 
+to monitor IGMP traffic between consumers and multicast IP traffic providers (routers), 
+formally occurring at a higher (network) level. This functionality always requires separate activation and configuration. 
+<br>
+<li><b>IGMP Snooping state</b> - state of IGMP protocol 
+<li><b>Send IGMP Query</b> - Send General Query 
+<li><b>Query Interval</b> - the interval between sending Query messages (1-255 seconds). 
+<li><b>Query Response Interval</b> - the maximum time to wait for a response from the host to send periodic public queries (1-25 seconds). 
+<li><b>Group Membership Interval</b> -  the interval while the router is waiting for an IGMP Report. If the report was not received, 
+then the router believes that there are no more hosts on the network that belong to the group (1-255 seconds). 
+<li><b>Other Querier Present Interval</b> - if the switch is Non-Querier, then if it has not received a Query during this interval, 
+it starts to consider itself a Querier. 
+ 
+ <li><b>Port State</b> - IGMP Snooping activity on the selected port. The checked box allows IGMP on the port, 
+ unchecked box turns the port to normal operation.
+</body> 
+</html>
+

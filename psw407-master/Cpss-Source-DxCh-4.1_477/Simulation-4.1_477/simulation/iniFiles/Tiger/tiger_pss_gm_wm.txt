@@ -1,0 +1,31 @@
+[fatal_error_file]
+file_name = sim_error.txt
+
+[rs]
+name = DB-EX126-12G, wrGtInitSystem 18,1,0,0,0,0,0
+
+[gm]
+api_file = C:\\GM\\Tiger\\GMApi2.dll
+
+[debug]
+;; to print additional info when error/drop mismatch ... (BOOLEAN)
+print_debug_info = 1
+
+
+[system]
+devices_number = 1
+
+device_type0 = 98EX126gm
+dev0_int_line = 4
+dev0_nsram = 40M
+
+[stack_ports]
+
+dev0_stack_ports_number = 0
+
+[ports_map]
+
+dev0_port0  = slan11
+dev0_port1  = slan12
+dev0_port2  = slan13
+dev0_port3  = slan14

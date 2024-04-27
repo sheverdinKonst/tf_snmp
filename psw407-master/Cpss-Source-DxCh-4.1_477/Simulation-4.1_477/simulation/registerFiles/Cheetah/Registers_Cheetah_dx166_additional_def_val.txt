@@ -1,0 +1,9 @@
+;;;;;;Addr=0x  Val=0x Repeat=0d Skip=0x
+;;;;
+;;;; no additional value / overrides for now ...
+;;;;
+;;;; update the device type -- to DX166
+0000004C 000D8150
+;;;;
+ffffffff
+

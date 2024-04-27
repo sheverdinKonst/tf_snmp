@@ -1,0 +1,33 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body bgcolor = "#eeeeee"> 
+<b><p align="center"> QoS General settings</p></b>
+<br><br>
+<b>CoS Scheduling mechanism</b> - queue scheduling type: 
+<ul>
+<li><b>State</b> - permission to operate the QoS mechanism 
+<li><b>Weighted fair priority</b> - packets with different priority are processed by the switch with the ratio 8: 4: 2: 1. 
+It means, the switch will process 8 high priority packets, 4 medium priority packets, 
+2 low priority packets and 1 packet with the lowest priority in one time unit. 
+
+<li><b>Strict priority</b> - packets with a higher priority will be processed first, 
+until the high-priority packet queue becomes empty. 
+Meanwhile, packets with lower priority will be in the queue. 
+</ul>
+<br>
+<b>Priority mode</b> - priority for choosing CoS or ToS.  
+<ul>
+<li><b>СoS only</b> - only CoS is active and the package priority is determined only by the CoS field. 
+<li><b>ToS only</b> - only ToS is active and packet priority is determined only by the ToS field. 
+<li><b>СoS & ToS</b> -  both CoS and ToS services are active, but if a packet containing both priority fields comes in, 
+the priority is selected by the ToS field. 
+</ul>
+<br><br>
+<b>Default priority</b> - riority by default. When the QoS mechanism is active and a packet that does not contain a priority field comes in, 
+it is given the corresponding default priority by CoS and it is treated as a tagged packet with the appropriate priority. 
+<br><br>
+<b>Note 1. </b>There are 8 CoS priorities. Priorities are numbered from 0 – lowest priority to 7 – highest priority.
+</body>
+</html>

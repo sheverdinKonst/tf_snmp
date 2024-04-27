@@ -1,0 +1,11 @@
+;;;;;;Addr=0x  Val=0x Repeat=0d Skip=0x
+;;;;
+;;;; no additional value / overrides for now ...
+;;;;
+;;;; update the device type -- to ch3+
+0000004c 000DB0F0
+;;;;
+;;;;;;pci registers
+00000000 DB0F11AB 1 0 pci
+ffffffff
+

@@ -1,0 +1,15 @@
+;;;;;;Addr=0x  Val=0x Repeat=0d Skip=0x
+;;;;
+;;;; update the device type -- to specific xCat2
+;;;;
+;;;; NOTE: in this register we also have the 'RevisionID' (bits 0..3) of the silicon
+;;;;
+0000004c 000E63E0
+;; \Cider\EBU\DFX_Project_Instances\bullseye_DFX_IP\bullseye_DFX_IP{DFX_UNITS_REV2_S}\DeviceID Status
+;; bits 23:20 JTAG Revision Status show real device revision
+;; bits 15:0 DeviceID Status like in 0x4c register
+008F8240 0030E63E
+;; note : write to this register 0x4c will also set the PEX register with the
+;;        needed device type
+ffffffff
+

@@ -1,0 +1,11 @@
+SYSTEM.JTAGCLOCK 1.0MHz
+SYStem.CPU 88FR331
+
+; open some windows
+ winpos 0% 0% 100% 50%
+ Data.List
+ winpos 0% 50% 50% 50%
+ SYStem
+
+ MAP.BONCHIP 0--0xffffffff
+

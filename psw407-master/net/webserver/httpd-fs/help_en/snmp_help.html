@@ -1,0 +1,29 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body bgcolor = "#eeeeee"> 
+<b><p align="center">SNMP Settings</p></b>
+<br><br>
+SNMP settings 
+<li><b>State</b>
+<li><b>Server IP address</b> - IP address of the server to which SNMP Traps are sent. 
+<li><b>Version</b> - SNMP protocol version. The switch supports SNMP v1 and SNMP v3.
+<li><b>Read Community</b> - read-only community, the string used for authentication in SNMP v1. 
+<li><b>Write Community</b> - community for recording, the string used for authentication in SNMP v1. 
+<li><b>Engine ID</b> - identifier in SNMP v3. 
+<li><b>User Name</b> - user name in SNMP v3. 
+<li><b>Security Level</b> - security level in SNMP v3: 
+<ul>
+<li><b>NoAuth,NoPriv</b> - operation without authentication by password (only by User Name) and without encryption. 
+<li><b>Auth,NoPriv</b> - operation with Auth Password authentication (HMAC-MD5-96 method), but without encryption. 
+<li><b>Auth,Priv</b> - operation with Auth Password authentication (HMAC-MD5-96 method), and with AES-128 encryption. 
+</ul>
+<li><b>Auth Password</b> - password for authentication in SNMP v3. 
+<li><b>Auth Password</b> - key for the encryption method in SNMP v3. 
+
+<br><br>
+SNMP Traps will be sent only when events occur that are specified in the <b>Event List</b> tab.
+</body>
+</html>
+ 

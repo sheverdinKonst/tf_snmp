@@ -1,0 +1,619 @@
+# Makefile - make rules for Marvell MV78100, MV78200
+#
+# Copyright 1999-2001 Wind River Systems, Inc.
+# Copyright 1999-2001 ARM Limited
+# Copyright 2004-2007 Marvell
+#
+# modification history
+# --------------------
+# 01e,19Sep07,E_N  update for Disco Dou
+# 01d,23may02,m_h  Reduce ROM_SIZE for boards with 32 meg RAM (77901)
+# 01c,20mar02,rec  Increase ROM size, SPR 74146
+# 01b,14nov01,dat  RELEASE update
+# 01a,25sep01,rec  created
+#
+# DESCRIPTION
+# This file contains rules for building VxWorks for the ARM INTEGRATOR AP
+# fited with an ARM946ES core module.
+#
+# INCLUDES
+#     makeTarget
+#*/
+
+include Makefile.user
+
+#BUILD_TOOL = VFP
+
+ifeq ($(BUILD_TOOL), VFP)
+    ifeq ($(WR_IDE), Wb)
+	MV_DEFINE  += -DMV_VFP -march=armv5t -mfpu=vfp -mfloat-abi=softfp -mhard-float -Wa,-mfpu=vfp -Wa,-march=armv5t
+    else
+	TOOL_PREFIX = vfp
+	MV_DEFINE  += -DMV_VFP  -mhard-float
+    endif
+endif
+
+ifeq ($(ENDIAN), BE)
+TOOL_SUFFIX = be
+endif
+
+ifeq ($(MV_CPU), 946)
+MV_CPU_NAME = 946ES
+EXTRA_DEFINE   += -DCPU_946E -DARMMMU=ARMMMU_946E -DARMCACHE=ARMCACHE_946E -DCPU_FAMILY=ARM
+else
+MV_CPU_NAME = 926EJ
+EXTRA_DEFINE   += -DCPU_926E -DARMMMU=ARMMMU_926E -DARMCACHE=ARMCACHE_926E -DCPU_FAMILY=ARM
+endif
+
+CPU     = ARMARCH$(ARMARCH_NUM)
+
+##
+## for diab environment cpss must set the following variables
+## ----------------------------------------------------------
+##
+## set COMILER=DIAB
+## set DIABLIB=c:\TornadoARM\host\diab
+## set PATH=c:\TornadoArm\host\diab\WIN32\bin;%PATH% 
+##
+
+ifeq ($(COMPILER),DIAB)
+COMPILER=DIAB
+else
+COMPILER=GNU
+endif
+
+ifeq ($(COMPILER),GNU)
+TOOL    = $(TOOL_PREFIX)gnu$(TOOL_SUFFIX)
+TOOL_FAMILY=gnu
+else
+TOOL    = $(TOOL_PREFIX)diab$(TOOL_SUFFIX)
+TOOL_FAMILY=diab
+ADDED_CFLAGS+= -D_DIAB_ -Xlint=0x10
+endif
+
+TGT_DIR	= $(WIND_BASE)/target
+include $(TGT_DIR)/h/make/defs.bsp
+
+#ADDED_CFLAGS+= -O2 -g
+ADDED_CFLAGS+= -Os -g
+#ADDED_CFLAGS+= -O0  -g
+
+##
+## diab options to disable optimization
+##
+#ADDED_CFLAGS+= -Xkill-opt=0xffffffff -g -D__diab_optimization_is_off__
+
+#
+## set this variable to NULL to skip linking appDemo
+#
+#USER_BASE=
+
+
+#CC_OPTIM = -O2 -g
+
+#include $(TGT_DIR)/h/make/make.$(CPU)$(TOOL)
+#include $(TGT_DIR)/h/make/defs.$(WIND_HOST_TYPE)
+
+## Only redefine make definitions below this point, or your definitions will
+## be overwritten by the makefile stubs above.
+#BOOTCONFIG=$(SRC_PATH)\bootConfig.c
+USRCONFIG= $(SRC_PATH)\usrConfig.c
+BOOTINIT = $(SRC_PATH)\bootInit.c
+
+
+# General definitions
+VENDOR      = Marvell
+CPU_ARCH    = ARM
+CPU_FAMILY  = ARM
+
+
+# KW definitions
+ifeq ($(PROJECT), KW)
+TARGET_DIR  = mv88fxx81
+# CHIP        = 88F6281
+CHIP        = 98DX4122
+CHIP_DEFINE = 88F6XXX
+# EXTRA_DEFINE += -DMV$(CHIP)A -DDB_$(CHIP)A
+EXTRA_DEFINE += -DDB_$(CHIP)
+endif
+
+#Disco Duo definistions
+ifeq ($(PROJECT), DD)		#DiscoDou
+TARGET_DIR  = 78XX0
+CHIP        = 78100
+CHIP_DEFINE = 78XX0
+endif
+
+RELEASE         += bootrom.bin
+
+# Internal definitions
+
+EXTRA_DEFINE += -Wcomment -DMV_VXWORKS -DMV$(CHIP) -DMV_$(CPU_ARCH) -DMV$(CHIP_DEFINE) \
+                -DCPU_$(MV_CPU_NAME) -DMV_CPU_$(ENDIAN) $(MV_DEFINE) -DMV_SPI_BOOT       \
+                -DARMMMU=ARMMMU_$(MV_CPU)E -DARMCACHE=ARMCACHE_$(MV_CPU)E
+
+#
+# The constants ROM_TEXT_ADRS, ROM_SIZE, and RAM_HIGH_ADRS are defined
+# in config.h and Makefile.
+# All definitions for these constants must be identical.
+#
+
+ifeq ($(PROJECT), KW)    	#Kirkwood
+ifeq ($(IMAGE), BOOTROM)
+ROM_TEXT_ADRS   = E8140000 # ROM cold entry address
+else
+ROM_TEXT_ADRS   = f8240000 # ROM cold entry address
+endif
+endif
+
+ifeq ($(PROJECT), DD)		#DiscoDou
+ifeq ($(IMAGE), BOOTROM)
+ROM_TEXT_ADRS   = fff80000 # ROM cold entry address
+else
+ROM_TEXT_ADRS   = ffe00000 # ROM cold entry address
+endif
+endif
+
+
+ifeq ($(IMAGE), BOOTROM)
+ROM_SIZE        = 00070004 # number of bytes of ROM space
+else
+ROM_SIZE        = 00300000 # number of bytes of ROM space
+endif
+
+ROM_WARM_ADRS   = ffff0004 # ROM warm entry address
+RAM_LOW_ADRS    = 00010000 # RAM text/data address
+RAM_HIGH_ADRS   = 03000000 # RAM text/data address
+
+################################################################################
+# Main directory structure
+COMMON_DIR      = $(SRC_PATH)/common
+GND_DIR         = $(SRC_PATH)/common/gnd
+GEN_ERRATA_DIR  = $(SRC_PATH)/common/errata
+POOL_DIR        = $(SRC_PATH)/common/pool
+OSSERVICES_BASE_DIR = $(SRC_PATH)/osServices
+OSSERVICES_DIR  = $(SRC_PATH)/osServices/vxworks_oss
+PSSSERVICES_DIR = $(SRC_PATH)/pssServices/vxWorks_oss
+PSSSERVICES_BASE_DIR = $(SRC_PATH)/pssServices
+ifeq ($(PROJECT), KW)    	#Kirkwood
+MV_DEVICE_DIR   = $(SRC_PATH)/mv_devices/kw_family
+endif
+ifeq ($(PROJECT), DD)
+MV_DEVICE_DIR   = $(SRC_PATH)/mv_devices/dd_family
+endif
+
+SOC_UNITS     	= $(SRC_PATH)/Soc_units
+VXBSP_DIR       = $(SRC_PATH)/VxBsp
+
+# Marvell device- KW family components
+BOARD_ENV_DIR    = $(MV_DEVICE_DIR)/boardEnv
+BOARD_ERRATA_DIR = $(MV_DEVICE_DIR)/boardEnv/errata
+CPU_DIR__        = $(MV_DEVICE_DIR)/cpu
+DEVICE_DIR       = $(MV_DEVICE_DIR)/device
+CTRL_ENV_DIR	 = $(MV_DEVICE_DIR)/ctrlEnv
+
+# Marvell Soc units components
+CESA_DIR	= $(SOC_UNITS)/cesa
+CNTMR_DIR	= $(SOC_UNITS)/cntmr
+DRAM_DIR     	= $(SOC_UNITS)/ddr2
+ETH_DIR    	= $(SOC_UNITS)/eth
+ETHFP_DIR    	= $(SOC_UNITS)/ethfp
+ETHPHY_DIR   	= $(SOC_UNITS)/eth-phy
+GPP_DIR		= $(SOC_UNITS)/gpp
+ifeq ($(FLASH), NAND)
+HAL_S_N_FLASH_DIR   = $(SOC_UNITS)/Nflash
+else
+HAL_S_N_FLASH_DIR   = $(SOC_UNITS)/sflash
+SPI_DIR		= $(SOC_UNITS)/spi
+endif
+MFLASH_DIR    	= $(SOC_UNITS)/mflash
+NFLASH_DIR   	= $(SOC_UNITS)/Nflash
+NORFLASH_DIR 	= $(SOC_UNITS)/norflash
+PCIIF_DIR	= $(SOC_UNITS)/pci-if
+PEX_DIR		= $(SOC_UNITS)/pex
+RTC_DIR      	= $(SOC_UNITS)/rtc
+SATA_DIR	= $(SOC_UNITS)/sata
+SFLASH_DIR      = $(SOC_UNITS)/sflash
+SPI_DIR		= $(SOC_UNITS)/spi
+TWSI_DIR	= $(SOC_UNITS)/twsi
+UART_DIR	= $(SOC_UNITS)/uart
+XOR_DIR		= $(SOC_UNITS)/xor
+USB_DIR		= $(SOC_UNITS)/usb
+IDMA_DIR       	= $(SOC_UNITS)/idma
+PRESTERA_DIR    = $(SOC_UNITS)/prestera
+DRAGONITE_DIR   = $(SOC_UNITS)/dragonite
+MII_DIR         = $(SOC_UNITS)/mii
+
+################################################################################
+# OS services
+OSSERV_VXWORKS     = $(OSSERVICES_DIR)/VxWorks
+OSSERV_ARCH_DIR    = $(OSSERVICES_DIR)/VxWorks/Arch$(CPU_ARCH)
+
+VXBSP_ROOT_DIR	= $(SRC_PATH)/vxBsp
+VXBSP_ARCH_DIR	= $(VXBSP_ROOT_DIR)/arch$(CPU_ARCH)
+VXBSP_CHIP_DIR  = $(VXBSP_ARCH_DIR)/$(CHIP_DEFINE)
+VXBSP_TESTS_DIR  = $(VXBSP_ROOT_DIR)/Tests
+
+# Marvell Sata Driver
+#MRVL_SATA_DIR   = $(VXBSP_ROOT_DIR)/mrvlSata
+
+# GEI/CACHE/MMU/MPU device driver
+VXBSP_WRFILES_DIR = $(VXBSP_ROOT_DIR)/WindRiverFiles
+
+# debug path
+VXBSP_DBG_DIR     = $(VXBSP_ROOT_DIR)/math
+
+# Yukon PCI device driver
+ifeq ($(IMAGE), BOOTROM)
+ifeq ($(INCLUDE_SGI_INTO_BOOTROM), Y)
+YUKON = N
+else
+YUKON = N
+endif
+else
+ifeq ($(INCLUDE_SGI_INTO_IMAGE), Y)
+YUKON = N
+ifeq ($(INCLUDE_ASF), Y)
+ifeq ($(INCLUDE_ASF_DEBUG), Y)
+#MV_DEFINE  += 	-DINCLUDE_SYSKONNECT -DSK_ASF -DDEBUG -DSK_DEBUG_CHKMOD=0x00000400 -DSK_DEBUG_CHKCAT=0x00000003
+else
+#MV_DEFINE  += 	-DINCLUDE_SYSKONNECT -DSK_ASF
+endif
+else
+#MV_DEFINE  += 	-DINCLUDE_SYSKONNECT
+endif
+else
+YUKON = N
+endif
+endif
+# Yukon PCI device driver
+ifeq ($(YUKON), Y)
+SKGEY2_DIR  = $(VXBSP_ROOT_DIR)/skGeY2
+SKGEY2_PATH = -I$(SKGEY2_DIR)
+INC_VXBSP_SKGEY2_DIR = -I$(VXBSP_ROOT_DIR)/skGeY2
+else
+SKGEY2_DIR  =
+SKGEY2_PATH =
+INC_VXBSP_SKGEY2_DIR =
+endif
+
+# Set the tool chain object directory according to required endiannes.
+BSP_OBJ_DIR = $(VXBSP_ROOT_DIR)/lib/$(TOOL_VER)/obj$(CPU)$(TOOL)
+#BSP_OBJ_DIR = $(SRC_PATH)
+
+###############################################################################
+# CPU 946ES compatible:
+# Tornado 2.2.1 cache library for 946ES does not support the Marvell ARM
+# compatible CPU cache architecture (one way). This is way we need to
+# link agains our cache objects.
+#
+# CPU 926EJ compatible:
+# Tornado 2.2.1 926EJ patch is installed only for ARMARCH5. This is why,
+# in case of big endian (only in ARMARCH4), we need to link against our
+# MMU and cache objects.
+
+ifeq ($(WR_IDE), Wb)
+
+       CPU_OBJS += $(BSP_OBJ_DIR)/cacheAimFeroceonALib.obj  \
+                   $(BSP_OBJ_DIR)/cacheAimFeroceonLib.obj
+else
+        CPU_OBJS += $(BSP_OBJ_DIR)/cache$(MV_CPU)eALib.obj \
+                    $(BSP_OBJ_DIR)/cache$(MV_CPU)eLib.obj  \
+		    $(BSP_OBJ_DIR)/mmu$(MV_CPU)eALib.obj   \
+		    $(BSP_OBJ_DIR)/mmu$(MV_CPU)eLib.obj
+ifeq ($(MV_CPU),946)
+	CPU_OBJS += $(BSP_OBJ_DIR)/vmMpuLib.obj $(BSP_OBJ_DIR)/vmData.obj
+endif
+endif
+
+# Add obj for USB host
+ifeq ($(USB), HOST_VXW)
+ifneq ($(IMAGE), BOOTROM)
+	CPU_OBJS += $(BSP_OBJ_DIR)/usbHostComps.obj
+endif
+endif
+
+# Internal include path
+FAMILY_DEVICE_PATH     = -I$(BOARD_ENV_DIR) -I$(CPU_DIR__) -I$(DEVICE_DIR) \
+						 -I$(DEVICE_DIR)/cpu -I$(CTRL_ENV_DIR) \
+						 -I$(CTRL_ENV_DIR)/sys -I$(BOARD_ERRATA_DIR)
+
+COMMON_PATH     = -I$(COMMON_DIR) -I$(GND_DIR) -I$(POOL_DIR) -I$(GEN_ERRATA_DIR)
+
+SOC_UNITS_PATH =  -I$(SOC_UNITS)  -I$(MV_DEVICE_DIR)						    	\
+		  -I$(CESA_DIR)   -I$(CNTMR_DIR)  -I$(DRAM_DIR)   -I$(ETH_DIR)    -I$(ETHPHY_DIR) 	\
+		  -I$(GPP_DIR)    -I$(MFLASH_DIR) -I$(NFLASH_DIR) -I$(NORFLASH_DIR)   			\
+		  -I$(PCIIF_DIR)  -I$(PEX_DIR)    -I$(RTC_DIR)    -I$(SATA_DIR)   -I$(SFLASH_DIR)   	\
+		  -I$(SPI_DIR)    -I$(TWSI_DIR)   -I$(UART_DIR)   -I$(XOR_DIR)    -I$(USB_DIR)      	\
+		  -I$(MII_DIR) \
+		  -I$(CESA_DIR)/AES                     \
+		  -I$(DRAM_DIR)/spd                     \
+		  -I$(ETH_DIR)/gbe                      \
+		  -I$(TWSI_DIR)/ArchArm                 \
+		  -I$(USB_DIR)/device      		\
+		  -I$(USB_DIR)/api      		\
+		  -I$(USB_DIR)/common                   \
+		  -I$(PRESTERA_DIR)                     \
+		  -I$(TGT_DIR)/h/usb                    \
+		  -I$(TGT_DIR)/h/usb2                   \
+		  -I$(TGT_DIR)/h/drv/usb                \
+		  -I$(DRAGONITE_DIR) \
+		  -I$(ETHFP_DIR) \
+		  -I$(ETHFP_DIR)/gbe
+
+OSSERVICES_PATH = -I$(OSSERVICES_DIR) -I$(OSSERV_VXWORKS) -I$(OSSERV_ARCH_DIR) \
+                  -I$(OSSERVICES_BASE_DIR)
+PSSSERVICES_PATH= -I$(PSSSERVICES_DIR) -I$(PSSSERVICES_BASE_DIR)
+
+VXBSP_PATH      = -I$(VXBSP_ROOT_DIR) -I$(VXBSP_CHIP_DIR) -I$(VXBSP_TESTS_DIR) #-I$(TGT_DIR)/h/nfs
+
+
+# Working Dirs
+FAMILY_DEVICE_DIRS = $(BOARD_ENV_DIR) $(CPU_DIR__) $(DEVICE_DIR) \
+					 $(DEVICE_DIR)/cpu $(CTRL_ENV_DIR) \
+					 $(CTRL_ENV_DIR)/sys $(BOARD_ERRATA_DIR)
+
+COMMON_DIRS     = $(COMMON_DIR) $(GND_DIR) $(POOL_DIR) $(GEN_ERRATA_DIR)
+
+SOC_UNITS_DIRS =  $(CESA_DIR)   $(CNTMR_DIR) $(DRAM_DIR)   $(ETH_DIR)  $(ETHPHY_DIR)   \
+                  $(GPP_DIR)    $(MFLASH_DIR) $(NFLASH_DIR) $(NORFLASH_DIR) \
+		  $(PCIIF_DIR)  $(PEX_DIR)   $(RTC_DIR)    $(SFLASH_DIR)   \
+		  $(SPI_DIR)    $(TWSI_DIR)  $(UART_DIR)   $(XOR_DIR)    $(USB_DIR)      \
+		  $(MII_DIR) \
+		  $(CESA_DIR)/AES		\
+		  $(DRAM_DIR)/spd 		\
+		  $(ETH_DIR)/gbe 		\
+		  $(TWSI_DIR)/ArchArm        	\
+		  $(USB_DIR)/device 		\
+		  $(USB_DIR)/examples		\
+		  $(USB_DIR)/common             \
+		  $(PRESTERA_DIR)               \
+		  $(TGT_DIR)/h/usb              \
+		  $(TGT_DIR)/h/usb2             \
+		  $(TGT_DIR)/h/drv/usb          \
+		  $(DRAGONITE_DIR) \
+		  $(ETHFP_DIR) \
+		  $(ETHFP_DIR)/gbe
+
+ifeq ($(PROJECT), DD)		#DiscoDou
+SOC_UNITS_DIRS +=  $(IDMA_DIR)
+SOC_UNITS_PATH +=  -I$(IDMA_DIR)
+endif
+
+OSSERVICES_DIRS = $(OSSERVICES_DIR) $(OSSERV_VXWORKS) $(OSSERV_ARCH_DIR) \
+                  $(OSSERVICES_BASE_DIR)
+PSSSERVICES_DIRS= $(PSSSERVICES_DIR) $(PSSSERVICES_BASE_DIR)
+
+VXBSP_DIRS      = $(VXBSP_ROOT_DIR) $(VXBSP_CHIP_DIR) $(VXBSP_TESTS_DIR)
+
+COMMON_OBJS =                                                                  \
+                bitOps.o                                                       \
+                mvTwsiDrvCtrl.o                                                \
+                mvTwsiHwCtrl.o                                                 \
+                mvCommon.o                                                     \
+                mvDebug.o                                                      \
+                mvGenBuffPool.o                                                \
+                mvGenPool.o                                                    \
+                mvGenSyncPool.o                                                \
+                mvGnd.o                                                        \
+                mvGndReg.o                                                     \
+                mvHookReg.o                                                    \
+                mvErrata.o                                                     \
+                mvNetDrvCommon.o                                               \
+                mvWriteLog.o
+
+MV_DEVICE_OBJ =                                                                \
+                mvCtrlEnvLib.o                                                 \
+                mvCtrlEnvAddrDec.o                                             \
+                mvBoardEnvLib.o                                                \
+                mvBoardEnvSpec.o                                               \
+                mvBoardErrata.o                                                \
+                mvErrataxCatCPU.o                                              \
+                mvErrataxCatPP.o                                               \
+                mvCpu.o                                                        \
+                mvAhbToMbus.o                                                  \
+                mvCpuIf.o                                                      \
+                mvSysGbe.o                                                     \
+                mvSysPex.o                                                     \
+                mvSysXor.o                                                     \
+                mvSysDram.o
+
+SOC_UNITS_OBJS =                                                               \
+                mvCntmr.o                                                      \
+                mvEthPhy.o                                                     \
+                mvXor.o                                                        \
+                mvSpd.o                                                        \
+                mvDevice.o                                                     \
+                mvDevWriteLog.o                                                \
+                mvDramIf.o                                                     \
+                mvGpp.o                                                        \
+                mvPex.o                                                        \
+                mvTwsi.o                                                       \
+                $(PCI_OBJ)                                                     \
+                $(DRAM_OBJ)                                                    \
+                mvPciIf.o                                                      \
+                mvEth.o                                                        \
+                mvEthDebug.o                                                   \
+                mii.o
+
+ifeq ($(AUDIO),YES)
+SOC_UNITS_OBJS += mvSysAudio.o  mvAudio.o
+endif
+
+SOC_UNITS_OBJS += mvNflash.o mvNflashHwIf.o
+
+ifeq ($(FLASH), NAND)
+
+else
+SOC_UNITS_OBJS += mvSpi.o mvSFlash.o mvSpiCmnd.o
+SOC_UNITS_DIRS += $(SPI_DIR)
+SOC_UNITS_PATH += -I$(SPI_DIR)
+endif
+
+ifeq ($(MV_DRAGONITE), YES)
+SOC_UNITS_OBJS += mvDragonite.o
+endif
+
+################################################################################
+# Switch stuff
+#
+ifeq ($(MV_SWITCH_PORTS), YES)
+SOC_UNITS_DIRS += $(PRESTERA_DIR)
+
+SOC_UNITS_OBJS +=                                                              \
+                mvPrestera.o                                                   \
+                mvPresteraEEPROM.o
+
+MV_DEFINE  += -DMV_SWITCH_PORTS
+MV_DEFINE  += -DMV_INCLUDE_PP
+MV_DEFINE  += -DMV_PP_TO_DRAM_WIN_CFG
+endif
+
+OSSERVICES_OBJS  = mvVxwArm.o mvOsVxw.o
+PSSSERVICES_OBJS = pssBspApis.o pssBspApisVxWorks.o hsu3.o hsu3Asm.o
+
+VXBSP_OBJS =                                                                   \
+                alignment.o                                                    \
+                vxCntmrIntCtrl.o                                               \
+                vxXorIntCtrl.o                                                 \
+                vxSwitchAccess.o                                               \
+                mvCtrlInit.o                                                   \
+                mvCtrlInit2.o                                                  \
+                $(CPU_OBJS)                                                    \
+                sysmap.o                                                       \
+                mgiEnd.o                                                       \
+                mvVxWorksGlue.o                                                \
+                presteraSwitchEnd.o                                            \
+                vxPexIntCtrl.o                                                 \
+                vxGppIntCtrl.o                                                 \
+                vxEthErrIntCtrl.o                                              \
+                sysPciIntCtrl.o                                                \
+                kwtest.o                                                       \
+                mvMemSet.o                                                     \
+                mvNetTest.o                                                    \
+                mv_prestera_switch_test.o
+
+ifeq ($(MV_CESA), Y)
+VXBSP_OBJS	+= vxCciMarvell.o ipsecInit.o mvSysCesa.o
+MV_DEVICE_OBJ   += mvSysCesa.o
+MV_DEFINE       += -DMV_INCLUDE_CESA
+SOC_UNITS_OBJS += mvCesa.o mvCesaDebug.o mvMD5.o mvSHA1.o mvAesApi.o mvAesAlg.o mvCesaTest.o
+endif
+
+ifeq ($(YUKON), Y)
+ifeq ($(INCLUDE_ASF), Y)
+SKGEY2_OBJS     = skaddr.o skcsum.o skdim.o skgehwt.o skgeinit.o \
+                  skgesirq.o sklm80.o skqueue.o skrlmt.o sktimer.o sktwsi.o skvpd.o \
+                  skxmac2.o sky2le.o skfops.o skgeasf.o skgespi.o skgespilole.o \
+                  skGeY2End.o skY2End.o sysSkGeY2End.o
+else
+SKGEY2_OBJS     = skaddr.o skcsum.o skdim.o skgehwt.o skgeinit.o \
+                  skgesirq.o sklm80.o skqueue.o skrlmt.o sktimer.o sktwsi.o skvpd.o \
+                  skxmac2.o sky2le.o skGeY2End.o skY2End.o sysSkGeY2End.o
+endif
+else
+SKGEY2_OBJS     =
+endif
+
+BOOT_EXTRA      = mvDramIfConfig.o #mvDramIfBasicInit.o mvTwsiEeprom.o
+
+ifeq ($(PROJECT), DD)		#DiscoDou
+SOC_UNITS_OBJS  += mvIdma.o
+VXBSP_OBJS      += vxDramIntCtrl.o vxIdmaIntCtrl.o
+MV_DEVICE_OBJ   += mvSysIdma.o
+endif
+
+ifeq ($(IMAGE), BOOTROM)
+else
+VXBSP_OBJS      += vxUsbErrIntCtrl.o $(USB2_OBJ)
+MV_DEVICE_OBJ   += mvSysUsb.o #mvSysUart.o
+SOC_UNITS_OBJS  += mvUart.o mvUartLog.o mvUsb.o
+endif
+
+
+MACH_EXTRA      = $(SKGEY2_OBJS) $(MV_DEVICE_OBJ) $(SOC_UNITS_OBJS)  \
+                  $(OSSERVICES_OBJS) $(PSSSERVICES_OBJS) $(VXBSP_OBJS) \
+                  $(COMMON_OBJS) $(BSP_USER_OBJS) $(DBG_OBJ) #$(INTEL_NET_OBJS)
+
+# for Tornado project facility
+EXTRA_INCLUDE   += $(FAMILY_DEVICE_PATH) $(COMMON_PATH) $(SOC_UNITS_PATH) $(USER_INC_PATH)  \
+                   $(OSSERVICES_PATH) $(VXBSP_PATH) \
+                   $(SKGEY2_PATH) $(PSSSERVICES_PATH)
+
+VPATH           = $(FAMILY_DEVICE_DIRS) $(COMMON_DIRS) $(SOC_UNITS_DIRS)  \
+		  $(OSSERVICES_DIRS) $(VXBSP_DIRS) $(SKGEY2_DIR)   \
+		  $(USER_SRC_DIRS) $(PSSSERVICES_DIRS) $(PSSSERVICES_BASE_DIR) \
+		  $(VXBSP_WRFILES_DIR) $(VXBSP_VXW_DIR) $(VXBSP_DBG_DIR)
+ifdef USER_BASE
+  ifdef USER_MAKE
+    # for Tornado 2.x project facility
+    include $(USER_BASE)/$(USER_MAKE)
+    EXTRA_DEFINE	+= -DINCLUDE_USER_APPL -DPSS_MODE -DMV_PRESTERA_CPSS_MODE
+  endif
+else
+    EXTRA_DEFINE    += -DBSP_MODE
+endif
+
+disa :
+	objdumparm -x -s -S --show-raw-insn -l -D bootrom > bootrom.dis
+
+disatmp :
+	objdumparm -x -s -S --show-raw-insn -l -D tmp.o > tmp.dis
+
+disavxw :
+	objdumparm -x -s -S --show-raw-insn -l -D vxworks.st > vxworks.st.dis
+disabin :
+	objdumparm -x -s -S --show-raw-insn -l -D vxworks.st_rom > vxworks.st_rom.dis
+
+
+
+VMA_START	= 0x$(RAM_LOW_ADRS)
+
+# Binary version of VxWorks ROM images, suitable for programming
+# into Flash using tools provided by ARM.  If other ROM images need to
+# be put into Flash, add similar rules here.
+
+bootrom.bin: bootrom
+	- @ $(RM) $@
+	$(EXTRACT_BIN) -O binary bootrom $@
+
+bootrom_res.bin: bootrom_res
+	- @ $(RM) $@
+	$(EXTRACT_BIN) -O binary bootrom_res $@
+
+bootrom_uncmp.bin: bootrom_uncmp
+	- @ $(RM) $@
+	$(EXTRACT_BIN) -O binary bootrom_uncmp $@
+
+vxWorks.st.bin: vxWorks.st
+		- @ $(RM) $@
+		$(EXTRACT_BIN) -O binary vxWorks.st $@
+vxWorks_rom.bin: vxWorks_rom
+	- @ $(RM) $@
+	$(EXTRACT_BIN) -O binary vxWorks_rom $@
+
+vxWorks.st_rom.bin: vxWorks.st_rom
+	- @ $(RM) $@
+	$(EXTRACT_BIN) -O binary vxWorks.st_rom $@
+
+vxWorks.res_rom.bin: vxWorks.res_rom
+	- @ $(RM) $@
+	$(EXTRACT_BIN) -O binary vxWorks.res_rom $@
+
+vxWorks.res_rom_nosym.bin: vxWorks.res_rom_nosym
+	- @ $(RM) $@
+	$(EXTRACT_BIN) -O binary vxWorks.res_rom_nosym $@
+
+#MACH_EXTRA	=
+#LIB_EXTRA	=
+
+## Only redefine make definitions above this point, or the expansion of
+## makefile target dependencies may be incorrect.
+
+include $(TGT_DIR)/h/make/rules.bsp
+
+.S.o :
+	@ $(RM) $@
+	$(CC) $(CFLAGS_AS) $(OPTION_OBJECT_ONLY) -o $@ $<
+
+

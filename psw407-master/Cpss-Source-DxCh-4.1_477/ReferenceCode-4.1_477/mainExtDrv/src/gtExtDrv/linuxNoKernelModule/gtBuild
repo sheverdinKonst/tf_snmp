@@ -1,0 +1,31 @@
+###
+### doc
+### Generic Linux Driver based on /proc/ and /dev/mem
+### ----------------------------------------------------------
+###
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+ifeq (1,$(SHARED_MEMORY))
+        LIB_NAME = mainExtDrv.lib
+endif
+
+## Uncomment to eneble interrupt emulation by polling
+## interrupt summary register
+#AD_CFLAGS += $(FD)NOKM_DRV_EMULATE_INTERRUPTS
+
+#ifeq (YES,$(APP_DEMO_ONLY))
+#	SUBDIRS = i2cDrv
+#endif
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

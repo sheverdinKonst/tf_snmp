@@ -1,0 +1,79 @@
+###########################################
+##                                       ##
+##    Top Make file for Galileo drivers  ##
+##                                       ##
+###########################################
+
+PROJ_NAME = simulation
+
+include $(USER_BASE)/gtDefsTopMake.mk
+
+ADD_PATH=
+
+PROJECT_PATH = $(BASE_PATH)       \
+		   $(OS_PATH)         \
+		   $(EXT_DRV_PATH)    \
+		   $(PROJ_PATH)       \
+		   $(OS_PATH)  \
+                   $(OS_INCLUDE) \
+	           $(ADD_PATH)
+
+ifeq (EXISTS,$(RTOS_ON_SIM))
+  PROJECT_PATH += $(SIMULATION_PATH)
+endif
+
+include $(USER_BASE)/gtToolsTopMake.mk
+
+ifneq (EXISTS, $(FORCE_GM_USE))
+  ifneq (EXMXPM_FAMILY, $(PRESTERA_FAMILY))
+    ifneq (EXISTS, $(PM_FAMILY))
+      AD_CFLAGS += $(FD)NO_GM_USED
+    endif
+  endif
+endif
+
+ifneq (EXISTS, $(FORCE_SUB20_USE))
+      AD_CFLAGS += $(FD)STUB_SUB20_USED
+endif
+
+#check if this new GM supports ability to bind GM to 'fatal error' function.
+ifeq (EXISTS, $(FORCE_GM_PUMA3_USE))
+  AD_CFLAGS += $(FD)GM_FATAL_ERROR_BIND
+endif
+
+ifeq (EXISTS, $(CM_USED))
+#notify we need communication module
+  AD_CFLAGS += $(FD)COM_MODULE_USED
+endif
+
+AD_CFLAGS += $(FD)$(OS_RUN)
+
+
+ifeq (NL, $(EXTERNAL_TCAM_TYPE))
+#notify we have external TCAM (currently only for EXMXPM)
+    AD_CFLAGS += $(FD)EXTERNAL_TCAM_EXISTS
+endif
+
+ifeq (IDT, $(EXTERNAL_TCAM_TYPE))
+#notify we have external TCAM (currently only for EXMXPM)
+    AD_CFLAGS += $(FD)EXTERNAL_TCAM_EXISTS
+endif
+
+ifeq (EXISTS, $(IMPL_PRINT_CALL_STACK))
+#notify we need implementation of ‘print call stack’ (currently needed only for VC compilation)
+#when this flag is set the application must add "StackWalker.obj" into linker process!
+  AD_CFLAGS += $(FD)PRINT_CALL_STACK_USED
+endif
+
+CFLAGS = $(CFLAGS1) $(CFLAGS2) $(CFLAGS3) $(CFLAGS_OPT) $(OS_DEFINE) $(CPU_FLAGS) $(LFLAGS) $(AD_CFLAGS)
+
+include $(USER_BASE)/gtTargetsTopMake.mk
+
+
+ifeq (visual,$(TOOL))
+  #for visual use 'elf' instead of 'lib','onelib'
+  full: elf
+else
+  full: onelib
+endif
+

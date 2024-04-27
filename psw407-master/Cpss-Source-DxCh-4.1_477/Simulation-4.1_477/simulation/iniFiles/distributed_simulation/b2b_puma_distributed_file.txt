@@ -1,0 +1,157 @@
+;;
+;; distribution section control the distributed architecture
+;;
+
+[distribution]
+;;the roles are : 'application' / 'asic' / 'bus' / 'broker'
+;;-role option is to be given in the command line of simulation
+;; for example -i cheetah_pss_wm.ini -serial 8 -stdout comPort -role asic
+;; NOTE : the role can also be given in this section as : role=application
+
+;;
+;; server side IP address
+;;
+;;server_ip_addr=10.6.150.22
+
+;;
+;; for work on single machine (CPU)
+;;
+server_ip_addr=127.0.0.2
+
+;;
+;; TCP used ports
+;;
+;; tcp_port_synchronic - port of socket where transactions initialized by application side
+;; tcp_port_asynchronous - port of socket where transactions initialized by asic side
+tcp_port_synchronic=12121
+tcp_port_asynchronous=21212
+
+;; NOTE : the tcp_port_nic_rx needed only when using NIC as the CPU ethernet port interface (not using SDMA)
+;;tcp_port_nic_rx=32323
+
+
+;;
+;; about field use_interface_bus :
+;;
+
+;;The devices should know what format of 'tcp port' to look for , because when :
+;;1.        'interface BUS bridge' not exists
+;;  a.        Use TCP ports from INI file - use current format of names:
+;;      i.        tcp_port_synchronic , tcp_port_asynchronous
+;;2.        When 'interface BUS bridge' exists
+;;  a.        Use TCP ports from INI file - new format of names:
+;;      i.        device_0_tcp_port_synchronic , device_0_tcp_port_asynchronous - TCP ports connecting to device 0
+;;      ii.        device_1_tcp_port_synchronic , device_1_tcp_port_asynchronous - TCP ports connecting to device 1
+;;      iii.       ...
+
+;So there will be next parameter in the INI file for this purpose:
+;Under section [distribution] , there will be field : use_interface_bus
+;By default if the field no exists it is like use_interface_bus = 0 .
+;So when use_interface_bus = 0 , devices use : tcp_port_synchronic , tcp_port_asynchronous
+;And when use_interface_bus = 1 , devices use : device_0_tcp_port_synchronic , device_0_tcp_port_asynchronous - TCP ports connecting to device 0
+
+use_interface_bus=1
+
+
+;;
+;; about field use_broker :
+;;
+
+;;
+;; the application that connected to broker uses parameters from the [broker]
+;; so it need to know about that
+;;
+;; Under section [distribution] , there will be field : use_broker
+;;  use_broker = 0 or 1 ' the other side of the sockets connected to broker
+;;          (same machine) or to devices/'pci bridge'.
+;;  NOTE : default is 'no use of broker' (when parameter not exists)
+
+use_broker=0
+
+[interface_bus]
+;; Use TCP ports , per board section connection:
+;;  board_section_0_tcp_port_synchronic , board_section_0_tcp_port_asynchronous - TCP ports connecting to board section 0
+;;  board_section_1_tcp_port_synchronic , board_section_1_tcp_port_asynchronous - TCP ports connecting to board section 1
+;;  ...
+
+board_section_0_tcp_port_synchronic=10100
+board_section_0_tcp_port_asynchronous=10200
+
+board_section_1_tcp_port_synchronic=10101
+board_section_1_tcp_port_asynchronous=10201
+
+;;;;
+;;;;        the IP of the board section(s)
+;;;; NOTE : by default we assum that the used IP is : 127.0.0.2 (loopback IP)
+;;;; optional -- in case not on the same machine
+
+;; open next to change the defaults of 127.0.0.2
+
+;;;; the IP address of board section 0 server
+;;board_section_0_server_ip_addr=10.11.12.13
+;;;; the IP address of board section 1 server
+;;board_section_1_server_ip_addr=10.11.12.14
+
+
+[broker]
+;; the number of applications(clients) connected to the broker
+num_clients=1
+
+
+;;
+;; TCP used ports
+;;
+;; client_0_tcp_port_synchronic - port of socket where transactions initialized by application side
+;; client_0_tcp_port_asynchronous - port of socket where transactions initialized by asic side
+client_0_tcp_port_synchronic=30100
+client_0_tcp_port_asynchronous=30200
+;; example for the use of 2 clients
+client_1_tcp_port_synchronic=30101
+client_1_tcp_port_asynchronous=30201
+
+;NOTE : the broker also need the format of : tcp_port_synchronic , tcp_port_asynchronous
+; to know how to connect to the remote simulation
+
+;;
+;; mode of working with DMA and interrupts
+;;
+;; when the info about the asynchronous TCP port of client is absent we assume
+;; that application work with DMA as shared memory , and should register the info
+;; about the shared memory via special message to the broker
+;; as well for the interrupt is via signalling of the application process
+;;
+;; dma mode
+;; 0 - use sockets
+;; 1 - use shared memory
+;;
+dma_mode=0
+
+;; interrupt mode
+;; 0 - use sockets
+;; 1 - use signal application
+;;
+interrupt_mode=0
+
+;;
+;; intrupt registration
+;; application that will set application_x_not_register_interrupt = 1 will NOT
+;; register itseld to the broker , by default it will register itself
+;;
+application_0_not_register_interrupt=0
+application_1_not_register_interrupt=1
+
+;;
+;; interrupt mask mode
+;;
+;; 0 - the broker will signal application on interrupt , and then will state
+;;     itself into 'Masked state' , meaning that it can't signal the application
+;;     until receiving 'Unmask interrupt' message
+;; 1 - the broker will signal application on interrupt , the broker will NOT state
+;;     itself into 'Masked state' in order for the broker to be in 'Masked state' ,
+;;     application need to send message 'Maks interrupt'
+;;
+;; default is 1
+;;
+interrupt_mask_mode=1
+
+

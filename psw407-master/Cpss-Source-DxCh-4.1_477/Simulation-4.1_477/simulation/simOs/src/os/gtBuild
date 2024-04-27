@@ -1,0 +1,33 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+
+ifeq (linux, $(OS_RUN))
+  SUBDIRS      = Linux
+endif
+
+ifeq (FreeBSD, $(OS_RUN))
+  SUBDIRS      = Linux
+endif
+
+ifeq (VXWORKS, $(OS_RUN))
+     SUBDIRS      = vxWorks
+endif
+
+ifeq (win32, $(OS_RUN))
+     SUBDIRS      = win32
+endif
+
+#C_EXCLUDE_FILE_LIST =
+
+
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

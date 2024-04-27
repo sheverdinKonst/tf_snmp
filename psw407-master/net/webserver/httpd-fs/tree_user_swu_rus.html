@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="css/sdmenu.css" />
+	<!-- scripts -->
+	<script type="text/javascript" src="js/scripts.js"></script>
+	
+	<script type="text/javascript">
+	function open_url(url,help_url) 
+	{
+		parent.ContentFrame.location.href= url;
+		parent.HelpFrame.location.href = help_url;
+	}
+	
+	function SDMenu(id) {
+		if (!document.getElementById || !document.getElementsByTagName)
+			return false;
+		this.menu = document.getElementById(id);
+		this.submenus = this.menu.getElementsByTagName("div");
+		this.speed = 2;
+		this.markCurrent = true;
+		this.oneSmOnly = true;
+	}
+	SDMenu.prototype.init = function() {
+		var mainInstance = this;
+		for (var i = 0; i < this.submenus.length; i++)
+			this.submenus[i].getElementsByTagName("span")[0].onclick = function() {
+				mainInstance.toggleMenu(this.parentNode);
+			};
+		if (this.markCurrent) {
+			var links = this.menu.getElementsByTagName("a");
+			for (var i = 0; i < links.length; i++)
+				if (links[i].href == document.location.href) {
+					links[i].className = "current";
+					break;
+				}
+		}
+	};
+	SDMenu.prototype.toggleMenu = function(submenu) {
+		if (submenu.className == "collapsed")
+			this.expandMenu(submenu);
+		else if (submenu.className != "collapsed2")
+			this.collapseMenu(submenu);
+	};
+	SDMenu.prototype.expandMenu = function(submenu) {
+		var fullHeight = submenu.getElementsByTagName("span")[0].offsetHeight;
+		var links = submenu.getElementsByTagName("a");
+		for (var i = 0; i < links.length; i++)
+			fullHeight += links[i].offsetHeight;
+		var moveBy = Math.round(this.speed * links.length );
+		
+		var mainInstance = this;
+		var intId = setInterval(function() {
+			var curHeight = submenu.offsetHeight;
+			var newHeight = curHeight + moveBy;
+			if (newHeight < fullHeight)
+				submenu.style.height = newHeight + "px";
+			else {
+				clearInterval(intId);
+				submenu.style.height = "";
+				submenu.className = "";
+			}
+		}, 30);
+		this.collapseOthers(submenu);
+	};
+	SDMenu.prototype.collapseMenu = function(submenu) {
+		var minHeight = submenu.getElementsByTagName("span")[0].offsetHeight;
+		var moveBy = Math.round(this.speed * submenu.getElementsByTagName("a").length * 2);
+		var mainInstance = this;
+		var intId = setInterval(function() {
+			var curHeight = submenu.offsetHeight;
+			var newHeight = curHeight - moveBy;
+			if (newHeight > minHeight)
+				submenu.style.height = newHeight + "px";
+			else {
+				clearInterval(intId);
+				submenu.style.height = "";
+				submenu.className = "collapsed";
+			}
+		}, 30);
+	};
+	SDMenu.prototype.collapseOthers = function(submenu) {
+		if (this.oneSmOnly) {
+			for (var i = 0; i < this.submenus.length; i++)
+				if (this.submenus[i] != submenu && this.submenus[i].className != "collapsed" && this.submenus[i].className != "collapsed2")
+					this.collapseMenu(this.submenus[i]);
+		}
+	};
+	var myMenu;
+	window.onload = function() {
+		myMenu = new SDMenu("my_menu");
+		myMenu.init();
+	};
+	</script>
+  </head>
+  
+   <!--<body  background= "img/back.gif">-->
+   <body bgcolor = "#eeeeee"> 
+   
+<noscript>
+<b><h1>JavaScript is not installed!</h1></b>
+</noscript>
+    <div style="float: left" id="my_menu" class="sdmenu" >
+	  <div class="collapsed2" onclick="open_url('/main.shtml','/help_ru/info_help.html');">
+	  <span>Главная</span></div>
+	  <hr>	  
+      <div class="collapsed"><span>Основные</span>
+		<a onclick="open_url('/mngt/managment.shtml','/help_ru/managment_help.html')">Язык интерфейса</a>
+	  </div>
+	  <hr>	  
+      <div class="collapsed"><span>Порты</span>
+        <a onclick="open_url('/info/FEGE_stat.shtml','/help_ru/FEGE_stat_help.html')">Статус портов</a>
+	  </div>
+	  <hr>	  
+      <div class="collapsed"><span>RSTP</span>
+		<a onclick="open_url('/STP/RSTP_stat.shtml','/help_ru/RSTP_stat_help.html')">Статус RSTP</a>
+	  </div>
+	  <hr>	  
+      <div class="collapsed"><span>IGMP</span>
+        <a onclick="open_url('/igmp/groups.shtml','/help_ru/igmp_groups_help.html')">Список групп IGMP</a>
+	  </div>
+	  <hr>	  
+      <div class="collapsed"><span>LLDP</span>
+        <a onclick="open_url('/lldp/lldpstat.shtml','/help_ru/lldpstat_help.html')">Статистика LLDP</a>
+	  </div>
+	  <hr>	  
+      <div class="collapsed"><span>Диагностика</span>
+        <a onclick="open_url('/tools/VCT.shtml','/help_ru/VCT_help.html')">Тестер кабея</a>
+		<a onclick="open_url('/tools/ping.shtml','/help_ru/ping_help.html')">Ping</a>
+	  </div>
+	  <hr>	  
+      <div class="collapsed"><span>Статистика</span>
+        <a onclick="open_url('/info/Port_stat.shtml','/help_ru/Port_stat_help.html')">Статистика портов</a>
+		<a onclick="open_url('/info/ARP.shtml','/help_ru/ARP_help.html')">ARP таблица</a>
+		<a onclick="open_url('/info/MAC.shtml','/help_ru/MAC_help.html')">MAC таблица</a>
+		<a onclick="open_url('/info/dns_stat.shtml','/help_ru/dns_stat_help.html')">DNS таблиза</a>
+	  </div>
+	  <hr>	  
+      <div class="collapsed"><span>Перезагрузка/Сброс</span>
+		<a onclick="open_url('/mngt/reboot.shtml','/help_ru/reboot_help.html')">Перезагрузка</a>
+	  </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,485 @@
+#*******************************************************************************
+#                Copyright 2004, MARVELL SEMICONDUCTOR, LTD.                   *
+# THIS CODE CONTAINS CONFIDENTIAL INFORMATION OF MARVELL.                      *
+# NO RIGHTS ARE GRANTED HEREIN UNDER ANY PATENT, MASK WORK RIGHT OR COPYRIGHT  *
+# OF MARVELL OR ANY THIRD PARTY. MARVELL RESERVES THE RIGHT AT ITS SOLE        *
+# DISCRETION TO REQUEST THAT THIS CODE BE IMMEDIATELY RETURNED TO MARVELL.     *
+# THIS CODE IS PROVIDED "AS IS". MARVELL MAKES NO WARRANTIES, EXPRESSED,       *
+# IMPLIED OR OTHERWISE, REGARDING ITS ACCURACY, COMPLETENESS OR PERFORMANCE.   *
+#                                                                              *
+# MARVELL COMPRISES MARVELL TECHNOLOGY GROUP LTD. (MTGL) AND ITS SUBSIDIARIES, *
+# MARVELL INTERNATIONAL LTD. (MIL), MARVELL TECHNOLOGY, INC. (MTI), MARVELL    *
+# SEMICONDUCTOR, INC. (MSI), MARVELL ASIA PTE LTD. (MAPL), MARVELL JAPAN K.K.  *
+# (MJKK), MARVELL ISRAEL LTD. (MSIL).                                          *
+#*******************************************************************************
+# makefile.user
+#
+# DESCRIPTION:
+# makefile.user contains user private definitions 
+#*******************************************************************************
+
+###############################################################################
+# L2 cache option
+
+# L2Enable = yes - L2 cache enable
+L2Enable=yes
+
+# L2Option 0 - invalidate buffers/descriptors in L2 Cache 
+#          1 - ICache ways in L2 are locked (inactive)
+#          2 - do nothing
+# Note: Option 0 and 1 for Ref # GL-MISL-70 (Speculative Instruction Prefetch).
+
+# for CPSS
+L2Option = 1
+
+###############################################################################
+# MMU option
+
+MmuEnable=yes
+
+###############################################################################
+# Build VxWorks image with/without SGI Yukon driver support.
+INCLUDE_SGI_INTO_IMAGE = N
+
+# Build SGI Yukon driver with/without ASF, ASF_DEBUG support.
+INCLUDE_ASF = N
+INCLUDE_ASF_DEBUG = N
+
+# Build bootrom.bin image with/without SGI Yukon driver support.
+INCLUDE_SGI_INTO_BOOTROM = N
+
+#*******************************************************************************
+# To build Debug image uncomment line below
+#BUILD = _dbg
+include Makefile_usb.user
+
+WDB_AGENT=Y
+ifeq ($(BUILD), _dbg)
+MV_DEFINE   = -DINCLUDE_BRIDGING -g -DMV_RT_DEBUG -DMV_RELEASE 
+DBG_OBJ    = ramDisk.o scsiDisk.o  copyTestFile.o vxFtpTest.o  vxUdpTests.o test_fs.o test_rawfs.o diskp.o
+#DBG_OBJ   += nflashTest.o idmaErrTest.o 
+
+# ifeq ($(WDB_AGENT), N)
+# MV_DEFINE   = -DMV_RELEASE 
+# endif
+
+else
+MV_DEFINE   = -DINCLUDE_BRIDGING #-DMV_RELEASE
+DBG_OBJ	= 
+endif
+
+###############################################################################
+# This makefile supports Tornado and PID. Set WR_IDE lable with:
+# WR_IDE = Pid   To compile BSP under PID.
+# WR_IDE = Wb    To compile BSP under Workbench (vxWorks 6.x)
+# To compile with standard Tornado leave the label empty
+
+ifeq ($(WR_IDE), )
+#WR_IDE      = Pid
+endif
+
+###############################################################################
+# UDP checksum configuration selection
+# UDP_CKSUM   = SW  ; UDP Checksum calculate by the software.
+# UDP_CKSUM   = HW  ; UDP Checksum done by Hardware(offload).
+
+UDP_CKSUM = SW
+
+###############################################################################
+DRAM_STATIC = NO
+
+# for using static DIMM uncomment next line
+ifeq ($(DRAM_STATIC), YES)
+MV_DEFINE    += -DMV_STATIC_DRAM_ON_BOARD
+	ifeq ($(DIMM), RD645XX)
+	MV_DEFINE    += -DRD_MV645XX
+	endif
+	
+	ifeq ($(DIMM),TS256MLQ72V5U)
+	MV_DEFINE    += -DMV_DIMM_TS256MLQ72V5U
+	endif
+	
+	ifeq ($(DIMM), M3783354CZ3)
+	MV_DEFINE    += -DMV_DIMM_M3783354CZ3_CE6 
+	endif
+
+else
+MV_DEFINE    += -DMV_INC_BOARD_DDIM
+endif
+
+###############################################################################
+
+ifeq ($(JUMBO), YES)
+MV_DEFINE      += -DETH_JUMBO_SUPPORT
+endif
+
+ifeq ($(CACHE), SW)
+MV_DEFINE      += -DDRAM_COHERENCY_SW
+endif
+
+###############################################################################
+#User configuration selection
+# ARMARCH_NUM = 5   ;Use ARM architecture 5 libraries.
+ARMARCH_NUM = 5
+###############################################################################
+# ENDIAN      = BE  ;Use Big Endian tool chain.
+# ENDIAN      = LE  ;Use Little Endian tool chain.
+
+ifeq ($(ENDIAN), )
+ENDIAN      = LE
+endif
+
+###############################################################################
+# This make file support the following projects: Disco Duo, Kirkwood
+#PROJECT = KW To compile for Kirkwood project (default project)
+#PROJECT = DD To compile for Disco Duo project
+ifeq ($(PROJECT), )    
+PROJECT = KW
+endif
+###############################################################################
+# BUILD_TOOL  =     ;(blank) Use Tornado 2.2.1 libraries
+# BUILD_TOOL  = VFP ;Use WindRiver VFP patch (VFP tools)
+# BOARD_TYPE  =     ; (blank) Use default DB-88F5x81-DDR1/2-BP
+# BOARD_TYPE  = MNG ; Use DB-88F5181-MNG board.
+# BOARD_TYPE  = NAS ; Use for DB-88f5182 and RD-88f5182
+
+# The default tool for Disco Duo project is with VFP
+ifeq ($(PROJECT), DD )    
+BUILD_TOOL  = VFP
+endif
+
+###############################################################################
+# Select CPU mode.
+# Two CPU modes are avilable:
+# MV_CPU = 946 which set the Marvell CPU to ARM946ES mode (MPU enabled)
+# MV_CPU = 926 which set the Marvell CPU to ARM926EJ mode (MMU enabled)
+# Note:
+# Workbench does not support ARM946 currently. Thus selecting Wb as WR_IDE 
+# will force the MV_CPU to be ARM926EJ.
+
+ifeq ($(MV_CPU), )
+MV_CPU = 926
+endif
+
+
+#Path definition
+SRC_PATH        = .
+DNLD_PATH       = C:\ftproot\DiscoDou
+
+###############################################################################
+# Adding GEI object
+ifeq ($(PROJECT),DD)    
+#GEI_NAME        = gei82543End$(WR_IDE)$(MV_CPU)
+endif
+ifeq ($(PROJECT),KW)    
+#GEI_NAME        = gei82543End$(WR_IDE)
+endif
+
+
+USB_OBJS        = 
+USB_DEFINE      =
+#MV_DEFINE       += -DINCLUDE_L2_CACHE #-DINCLUDE_L2_WT
+
+###############################################################################
+# L2 configuration options
+
+ifeq ($(L2Enable), yes)
+MV_DEFINE     += -DINCLUDE_L2_CACHE 
+endif
+
+ifeq ($(L2Option), 0)
+MV_DEFINE     += -DCONFIG_MV_SP_I_FTCH_DB_INV
+endif
+
+ifeq ($(L2Option), 1)
+MV_DEFINE     += -DCONFIG_MV_SP_I_FTCH_LCK_L2_ICACHE
+endif
+
+#INTEL_NET_OBJS  = $(BSP_OBJ_DIR)/$(GEI_NAME).obj
+
+###############################################################################
+
+# include DRAGONITE subsystem
+
+MV_DRAGONITE = YES
+
+ifeq ($(MV_DRAGONITE), YES)
+MV_DEFINE       += -DMV_INCLUDE_DRAGONITE
+endif
+
+# enable traffic from switch ports
+MV_SAGE = YES
+
+ifeq ($(MV_SAGE), YES)
+MV_SWITCH_PORTS = YES
+endif
+
+ifeq ($(WR_IDE), Wb)
+MV_DEFINE       += -DWORKBENCH 
+USB             = HOST_VXW
+TOOL_VER        = gcc3.3
+endif
+
+ifeq ($(WR_IDE), Pid)
+MV_DEFINE       += -DTORNADO_PID
+USB             = HOST_VXW
+TOOL_VER        = gcc2.96
+endif
+
+ifeq ($(WR_IDE), )
+MV_DEFINE       += -DTORNADO
+TOOL_VER        = gcc2.96
+endif
+
+################################################################################
+#  USB_RESTRICTED = YES is for removed USB restricted source code.
+ifeq ($(USB_PATCH), YES)
+USB             = HOST_VXW
+endif
+
+USB_RESTRICTED = YES
+ifeq ($(USB_RESTRICTED), NO)
+
+USER_SRC_DIRS   = $(SRC_PATH)/plat-feroceon/mv_hal/usb/examples          \
+                  $(SRC_PATH)/plat-feroceon/mv_hal/usb_restricted/device \
+                  $(SRC_PATH)/plat-feroceon/mv_hal/usb_restricted/host   \
+                  $(SRC_PATH)/vxBsp/WindRiverFiles      \
+                  $(SRC_PATH)/VxBsp/Debug
+
+USER_INC_PATH   = -I$(SRC_PATH)/plat-feroceon/mv_hal/usb/api               \
+                  -I$(SRC_PATH)/plat-feroceon/mv_hal/usb/examples          \
+                  -I$(SRC_PATH)/plat-feroceon/mv_hal/usb_restricted/common \
+                  -I$(SRC_PATH)/vxBsp/WindRiverFiles
+                                                  
+USB_DEV_OBJS    = mvUsbDevMain.o mvUsbDevRecv.o mvUsbDevSend.o     \
+                  mvUsbDevUtl.o  mvUsbHsDevCncl.o mvUsbHsDevMain.o \
+                  mvUsbHsDevUtl.o mvUsbDevCh9.o
+                  
+USB_DEV_DEMO_OBJS = mouse.o disk.o 
+
+USB_HOST_OBJS   = mvUsbHostCh9.o mvUsbHostClasses.o mvUsbHostCommon.o   \
+                  mvUsbHostDevList.o mvUsbHostMain.o mvUsbHsHostBw.o    \
+                  mvUsbHsHostIntr.o mvUsbHsHostIso.o mvUsbHsHostMain.o
+else
+USER_SRC_DIRS   = 
+USER_INC_PATH   = 
+USB_DEV_OBJS    = 
+USB_DEV_DEMO_OBJS = 
+USB_HOST_OBJS   =
+endif
+
+ifeq ($(USB), HOST_VXW)
+USB_DEFINE      += -DMV_USB_STACK_VXW
+endif
+
+ifeq ($(USB1),HOST)
+MV_DEFINE       += -DUSB1_HOST
+endif
+
+MV_DEFINE       += -DUSB0_HOST -DUSB2_HOST -DMV_INCLUDE_PEX
+
+#-------start-------------------------------------------------------------------
+ifeq ($(IMAGE), BOOTROM)
+MV_DEFINE      += -DBOOTROM $(USB_DEFINE) -DDRAM_DETECT
+BSP_USER_OBJS   = 
+else
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# vxWorks.st BSP definitions 
+
+ifeq ($(USB_RESTRICTED), NO)
+USB_OBJS       += $(BSP_OBJ_DIR)/usbDevLib.obj \
+                  $(BSP_OBJ_DIR)/usbDevDemo.obj \
+                  vxUsbDevs.o
+else
+USB_OBJS       += $(BSP_OBJ_DIR)/usbDevLib.obj \
+                  $(BSP_OBJ_DIR)/usbDevDemo.obj
+                  
+    ifeq ($(USB), HOST_VXW)
+    USB_OBJS       += vxUsbDevs.o
+    endif
+    
+endif
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+USB_DEFINE    += -DMV_USB_VOLTAGE_FIX # -DMV_USB_TRACE_PRINT
+MV_DEFINE     += -DMV_INCLUDE_USB
+#MV_DEFINE     += -DMV_VXWORKS_ST -DMV_INCLUDE_INTEG_SATA -DMV_SATA_SUPPORT
+MV_DEFINE     += -DINCLUDE_USER_APPL $(USB_DEFINE)
+
+BSP_USER_OBJS =  mvUsrAppInit.o $(USB_OBJS) $(MRVL_SATA_OBJS) vxUsbErrIntCtrl.o vxTests.o
+
+ifeq ($(WR_IDE), Wb)
+        BSP_USER_OBJS += ipAddr.o
+else
+        BSP_USER_OBJS += vxUtils.o
+endif
+
+endif
+#-------end---------------------------------------------------------------------
+
+################################################################################
+#  USB_RESTRICTED = YES is for removed USB restricted source code.
+ifeq ($(USB_PATCH), YES)
+USB             = HOST_VXW
+endif
+
+USB_RESTRICTED = YES
+ifeq ($(USB_RESTRICTED), NO)
+
+USER_SRC_DIRS   = $(SRC_PATH)/plat-feroceon/mv_hal/usb/examples          \
+                  $(SRC_PATH)/plat-feroceon/mv_hal/usb_restricted/device \
+                  $(SRC_PATH)/plat-feroceon/mv_hal/usb_restricted/host   \
+                  $(SRC_PATH)/vxBsp/WindRiverFiles      \
+                  $(SRC_PATH)/VxBsp/Debug
+
+USER_INC_PATH   = -I$(SRC_PATH)/plat-feroceon/mv_hal/usb/api               \
+                  -I$(SRC_PATH)/plat-feroceon/mv_hal/usb/examples          \
+                  -I$(SRC_PATH)/plat-feroceon/mv_hal/usb_restricted/common \
+                  -I$(SRC_PATH)/vxBsp/WindRiverFiles
+                                                  
+
+USB_DEV_OBJS    = mvUsbDevMain.o mvUsbDevRecv.o mvUsbDevSend.o     \
+                  mvUsbDevUtl.o  mvUsbHsDevCncl.o mvUsbHsDevMain.o \
+                  mvUsbHsDevUtl.o mvUsbDevCh9.o
+                  
+USB_DEV_DEMO_OBJS = mouse.o disk.o 
+
+USB_HOST_OBJS   = mvUsbHostCh9.o mvUsbHostClasses.o mvUsbHostCommon.o   \
+                  mvUsbHostDevList.o mvUsbHostMain.o mvUsbHsHostBw.o    \
+                  mvUsbHsHostIntr.o mvUsbHsHostIso.o mvUsbHsHostMain.o
+else
+USER_SRC_DIRS   = 
+USER_INC_PATH   = 
+USB_DEV_OBJS	= 
+USB_DEV_DEMO_OBJS = 
+USB_HOST_OBJS	=
+endif
+
+ifeq ($(IMAGE), BOOTROM)
+MV_CESA		= N
+else
+#MV_CESA         = Y
+#MV_DEFINE       +=  -DMV_INCLUDE_CESA
+endif
+
+ifeq ($(USB), HOST_VXW)
+USB_DEFINE     += -DMV_USB_STACK_VXW
+endif
+
+
+ifeq ($(USB1),HOST)
+MV_DEFINE       += -DUSB1_HOST
+endif
+
+
+
+MV_DEFINE       += -DMV_INCLUDE_PEX #-DUSB0_HOST -DUSB2_HOST 
+MV_DEFINE       += -DMV_INCLUDE_TWSI #-DMV_INCLUDE_TDM
+MV_DEFINE       += -DMV_INCLUDE_XOR -DMV_INCLUDE_UART
+MV_DEFINE       += -DMV_INCLUDE_SFLASH_MTD -DMV_INCLUDE_SDIO
+MV_DEFINE       += -DMV_INCLUDE_GIG_ETH -DCONFIG_MV_INCLUDE_GIG_ETH -DMV_INC_BOARD_SPI_FLASH -DMV_INCLUDE_CLK_PWR_CNTRL
+ifeq ($(MV_SAGE), YES)
+MV_DEFINE += -DMV_INCLUDE_SAGE
+endif
+
+# MV_DEFINE += -DMV_XCAT_INTERPOSER
+
+ifeq ($(AUDIO),YES)
+MV_DEFINE       += -DMV_INCLUDE_AUDIO
+endif
+
+ifeq ($(FLASH), NAND)
+MV_DEFINE +=  -DMV_INCLUDE_NAND -DMV_NAND_BOOT -DMV_NAND
+else 
+#MV_DEFINE += -DMV_INCLUDE_NAND
+MV_DEFINE  +=  -DMV_INCLUDE_SPI
+endif
+
+ifeq ($(IMAGE), BOOTROM)
+MV_DEFINE      += -DBOOTROM $(USB_DEFINE) -DDRAM_DETECT
+BSP_USER_OBJS   = 
+else
+
+#vxWorks.st BSP definitions
+USB_OBJS       +=
+
+USB_DEFINE    += -DMV_USB_VOLTAGE_FIX #-DMV_USB_TRACE_PRINT
+MV_DEFINE     += #-DMV_INCLUDE_USB  -DMV_VXWORKS_ST -DMV_INCLUDE_INTEG_SATA -DMV_SATA_SUPPORT
+MV_DEFINE     += -DINCLUDE_USER_APPL #$(USB_DEFINE)
+BSP_USER_OBJS =  mvUsrAppInit.o $(USB_OBJS) $(MRVL_SATA_OBJS) #vxUsbErrIntCtrl.o vxTests.o
+
+ifeq ($(WR_IDE), Wb)
+        BSP_USER_OBJS += ipAddr.o
+else
+        BSP_USER_OBJS += vxUtils.o
+endif
+endif
+
+# sysKonect
+YUKON=N
+ifeq ($(YUKON), Y)
+MV_DEFINE      +=  -DINCLUDE_SYSKONECT
+endif
+
+################################################################################
+# For Marvell internal use.
+
+$(GEI_NAME).obj:        $(GEI_NAME).o
+	- @ $(RM) $(BSP_OBJ_DIR)/$@
+	$(LD_PARTIAL) $(GEI_NAME).o -o $(BSP_OBJ_DIR)/$@     
+
+usbDevLib.obj:  $(USB_DEV_OBJS)
+	- @ $(RM) $(BSP_OBJ_DIR)/$@
+	$(LD_PARTIAL) $(MV_DEFINE) $(USB_DEV_OBJS) -o $(BSP_OBJ_DIR)/$@
+        
+usbDevDemo.obj:  $(USB_DEV_DEMO_OBJS)
+	- @ $(RM) $(BSP_OBJ_DIR)/$@
+	$(LD_PARTIAL) $(MV_DEFINE) $(USB_DEV_DEMO_OBJS) -o $(BSP_OBJ_DIR)/$@
+        
+usbHostLib.obj: $(USB_HOST_OBJS)
+	- @ $(RM) $(BSP_OBJ_DIR)/$@
+	$(LD_PARTIAL) $(MV_DEFINE) $(USB_HOST_OBJS) -o $(BSP_OBJ_DIR)/$@
+
+
+cache$(MV_CPU)eALib.obj:  cache$(MV_CPU)eALib.o
+	- @ $(RM) $(BSP_OBJ_DIR)/$@     
+	$(LD_PARTIAL) $(MV_DEFINE) cache$(MV_CPU)eALib.o -o $(BSP_OBJ_DIR)/$@     
+        
+cache$(MV_CPU)eLib.obj:  cache$(MV_CPU)eLib.o
+	- @ $(RM) $(BSP_OBJ_DIR)/$@
+	$(LD_PARTIAL) $(MV_DEFINE) cache$(MV_CPU)eLib.o -o $(BSP_OBJ_DIR)/$@     
+        
+mmu$(MV_CPU)eALib.obj:  mmu$(MV_CPU)eALib.o
+	- @ $(RM) $(BSP_OBJ_DIR)/$@     
+	$(LD_PARTIAL) $(MV_DEFINE) mmu$(MV_CPU)eALib.o -o $(BSP_OBJ_DIR)/$@     
+        
+mmu$(MV_CPU)eLib.obj:  mmu$(MV_CPU)eLib.o
+	- @ $(RM) $(BSP_OBJ_DIR)/$@
+	$(LD_PARTIAL) $(MV_DEFINE) mmu$(MV_CPU)eLib.o -o $(BSP_OBJ_DIR)/$@     
+        
+
+cacheAimFeroceonLib.obj:  cacheAimFeroceonLib.o
+	- @ $(RM) $(BSP_OBJ_DIR)/$@
+	$(LD_PARTIAL) $(MV_DEFINE) cacheAimFeroceonLib.o -o $(BSP_OBJ_DIR)/$@     
+        
+cacheAimFeroceonALib.obj:  cacheAimFeroceonALib.o
+	- @ $(RM) $(BSP_OBJ_DIR)/$@
+	$(LD_PARTIAL) $(MV_DEFINE) cacheAimFeroceonALib.o -o $(BSP_OBJ_DIR)/$@     
+
+
+
+        
+#################################################################
+# Must run twice. Once for MV_CPU = 946 and once for MV_CPU = 926
+
+arch4beObjs: usbDevLib.obj usbDevDemo.obj $(GEI_NAME).obj       \
+             mmu$(MV_CPU)eALib.obj mmu$(MV_CPU)eLib.obj        \
+             cache$(MV_CPU)eALib.obj cache$(MV_CPU)eLib.obj
+
+#################################################################
+# Must set MV_CPU = 946
+
+arch5leObjs: usbDevLib.obj usbDevDemo.obj $(GEI_NAME).obj       \
+             cache$(MV_CPU)eALib.obj cache$(MV_CPU)eLib.obj
+

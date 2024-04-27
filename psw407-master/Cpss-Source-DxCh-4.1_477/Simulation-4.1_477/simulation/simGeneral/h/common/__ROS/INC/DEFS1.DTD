@@ -1,0 +1,61 @@
+/*!**************************************************RND Template version 4.1
+ *!                 D A T A   T Y P E   D E F I N I T I O N
+ *!==========================================================================
+ *$ TITLE: Router Server - General definitions, Part 1
+ *!--------------------------------------------------------------------------
+ *$ FILENAME: X:\simulation\chip_simulation\simulation\h\common\ROS\INC\DEFS1.DTD
+ *!--------------------------------------------------------------------------
+ *$ SYSTEM, SUBSYSTEM: Router Server, General definitions
+ *!--------------------------------------------------------------------------
+ *$ AUTHORS: Michael,AmitK
+ *!--------------------------------------------------------------------------
+ *$ LATEST UPDATE: 19-Jun-2007, 12:43 PM CREATION DATE: 29-Dec-94
+ *!**************************************************************************
+ *!
+ *!**************************************************************************
+ *!
+ *$ GENERAL DESCRIPTION:
+ *!
+ *$ REMARKS:
+ *!
+ *!**************************************************************************
+ *!*/
+
+/* ACSII constants */
+
+#define NUL     000     /* null                 */
+#define SOH     001     /* start of header      */
+#define EOT     004     /* end of transmission  */
+#define ACK     006     /* acknowledge          */
+#define BS      010     /* backspace            */
+#define TAB     011     /* tab                  */
+#define CR      015     /* carriage return      */
+#define LF      012     /* line feed            */
+#define NAK     025     /* no acknowledge       */
+#define CAN     030     /* cancel               */
+#define SP      040     /* space                */
+#define DEL     177     /* delete               */
+#define CTRL_P  020     /* Control P            */
+#define XON     021     /* flow control on      */
+#define XOFF    023     /* flow control off     */
+#define SYNC    026     /*! Sync character      */
+#define SPACE   0x20    /*! Space character     */
+
+/*! Standard macros definitions: */
+
+#ifndef MAX
+    #define MAX(a,b) ((a) > (b) ? (a) : (b))
+#endif /*MAX*/
+#ifndef MIN
+ #define MIN(a,b) ((a) < (b) ? (a) : (b))
+#endif /*MIN*/
+#ifndef ABS
+    #define ABS(a) ((a) > 0 ? (a) : -(a))
+#endif /*ABS*/
+#ifndef MODULU
+    #define MODULU %
+#endif /*MODULU*/
+
+/* Useful constants */
+#define KBYTES      1024
+

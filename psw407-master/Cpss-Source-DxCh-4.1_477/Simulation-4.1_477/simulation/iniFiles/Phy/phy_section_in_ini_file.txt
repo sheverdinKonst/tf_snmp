@@ -1,0 +1,99 @@
+;
+; this file refer to the PHY device with id = X
+;
+;; switch side                                      network side
+;;                           QUAD_PHY
+;;                   =====================
+;; devX_port0  ------|   phy  core 0     |******  devX_port1
+;;                   |-------------------|
+;; devX_port10 ------|   phy  core 1     |******  devX_port11
+;;                   |-------------------|
+;; devX_port20 ------|   phy  core 2     |******  devX_port21
+;;                   |-------------------|
+;; devX_port30 ------|   phy  core 3     |******  devX_port31
+;;                   =====================
+
+
+;; ABOUT the : SMI bus ID
+;;  --> NOTE: this info can be given only once on the 'shell' device -->phy
+;;              and no need to duplicate to all 4 cores
+;; the SMI bus ID --> the PHY connected to a DX/PM device on SMI 0 or SMI 1
+;; NOTE: according to 'board schema' there can be up to 12 devices on SMI 0 or 1
+;;       that can be managed via the DX device
+;; formula : devX_bus_id = (Y * 10) + smi
+;; for example : if DX device id = 5 and PHY device id = 8 and it connected to
+;; the DX on SMI 1 --> should set next line
+;; dev8_bus_id = 51
+;; for example : if DX device id = 9 and PHY device id = 3 and it connected to
+;; the DX on SMI 0 --> should set next line
+;; dev3_bus_id = 90
+
+device_typeX = phy
+registersX = X:\cpss\SW\prestera\simulation\registerFiles\Phy\phy.registers_default_val.txt
+;;
+;; additional phy registers setting  (used to override defaults)
+;;
+registersX_01 = X:\cpss\SW\prestera\simulation\registerFiles\Phy\phy_1540.registers_additional_def_val.txt
+
+
+;; the SMI bus ID --> the QUAD_PHY connected to a DX/PM device on SMI 0 or SMI 1
+devX_bus_id = 0
+
+
+;; the PHY hold 4 cores (channels)
+;; all cores are identical
+devX_cores_num = 4
+
+;
+; the 'cores' sections, note that all 'cores' use the same  registers files ,
+; and the same device type
+; but each 'core' has it's unique : interrupt line , SMI base address
+;
+
+[devX_core0]
+device_typeX = phy_core_1540m_1548m
+devX_int_line = 50
+; SMI address
+devX_hw_id = 17
+
+
+[devX_core1]
+device_typeX = phy_core_1540m_1548m
+devX_int_line = 51
+; SMI address
+devX_hw_id = 18
+
+[devX_core2]
+device_typeX = phy_core_1540m_1548m
+devX_int_line = 52
+; SMI address
+devX_hw_id = 19
+
+
+[devX_core3]
+device_typeX = phy_core_1540m_1548m
+devX_int_line = 53
+; SMI address
+devX_hw_id = 20
+
+
+[ports_map]
+;; connect the PHY ports to the network (slans)
+;; NOTE: dont define slans for ports that are not in use --> unnecessary slan tasks
+;;
+;; use ODD ports to connect to slans (with 10 between values)
+;;
+devX_port1   = slan00
+devX_port11  = slan01
+devX_port21  = slan02
+devX_port31  = slan03
+
+[internal connections]
+;; connect the PHY ports to the device that connected on the PCS side (dx/pm/macsec)
+;;
+;; use Even ports to connect to 'internal connection' (with 10 between values)
+;;
+devY_portP0 = devX_port0
+devY_portP1 = devX_port10
+devY_portP2 = devX_port20
+devY_portP3 = devX_port30

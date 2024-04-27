@@ -1,0 +1,143 @@
+;;;;;;Addr=0x  Val=0x Repeat=0d Skip=0x
+;;
+;;  NOTE: Address build from next info :
+;;  (page << 16) + regAddr
+;;
+;; page 0
+;;
+;; page 0 , reg 0
+00000000 00001140
+;; page 0 , reg 1
+00000001 00007949
+;; page 0 , reg 2   -->also in page 1
+00000002 00000141  2    10000
+;; page 0 , reg 3   -->also in page 1
+00000003 00000EB0  2    10000
+;; page 0 , reg 4
+00000004 00000001
+;; page 0 , reg 6
+00000006 00000004
+;; page 0 , reg 7
+00000007 00002001
+;; page 0 , reg 9
+00000008 00000200
+;; page 0 , reg 15
+0000000f 00003000
+;; page 0 , reg 16
+00000010 00003000
+;; page 0 , reg 17
+00000011 00008040
+;; page 0 , reg 20
+00000014 00000020
+;; page 0 , reg 26
+0000001a 00000040
+;;
+;; page 1
+;;
+;; page 1 , reg 0
+00010000 00000140
+;; page 1 , reg 1
+00010001 00000141
+;; page 1 , reg 2   -->see in page 0
+;; page 1 , reg 3   -->see in page 0
+;; page 1 , reg 4
+00010004 00000001
+;; page 1 , reg 6
+00010006 00000004
+;; page 1 , reg 7
+00010007 00002001
+;; page 1 , reg 16
+00010010 0000408F
+;; page 1 , reg 17
+00010011 00000010
+;; page 1 , reg 26
+0001001a 00000042
+;;
+;; page 2
+;;
+;; page 2 , reg 16
+00020010 00007008
+;; page 2 , reg 21
+00020015 00001046
+;;
+;; page 3
+;;
+;; page 3 , reg 16
+00030010 00001777
+;; page 3 , reg 17
+00030011 00008800
+;; page 3 , reg 18
+00030012 00004B05
+;; page 3 , reg 19
+00030013 00000073
+;;
+;; page 4
+;;
+;; page 4 , reg 0
+00040000 00000140
+;; page 4 , reg 4
+00040004 00000001
+;; page 4 , reg 16
+00040010 00006205
+;; page 4 , reg 26
+0004001a 00003002
+;; page 4 , reg 27
+0004001b 00003e00
+;;
+;; page 5
+;;
+;; page 5 , reg 23
+00050017 00000603
+;; page 5 , reg 25   -->also in page 7
+00050019 00000104  2    20000
+;; page 5 , reg 26   -->also in page 7
+0005001a 00000f12  2    20000
+;; page 5 , reg 27   -->also in page 7
+0005001b 00000a0c  2    20000
+;; page 5 , reg 28   -->also in page 7
+0005001c 00000006  2    20000
+;;
+;; page 6
+;;
+;; page 6 , reg 20
+00060014 00000200
+;; page 6 , reg 26
+0006001a 00001900
+;;
+;; page 7
+;;
+;; page 7 , reg 21
+00070015 00004000
+;; page 7 , reg 25   -->see in page 5
+;; page 7 , reg 26   -->see in page 5
+;; page 7 , reg 27   -->see in page 5
+;; page 7 , reg 28   -->see in page 5
+;;
+;; page 8
+;;
+;; page 8 , reg 0
+00080000 00001000
+;; page 8 , reg 1
+00080001 0000020c
+;;
+;; page 12
+;;
+;; page 12 , reg 1
+000c0001 00001f40
+;; page 12 , reg 5
+000c0005 0000f000
+;;
+;; page 14
+;;
+;; page 14 , reg 3
+000e0003 00000001
+;;
+;; page 18
+;;
+;; page 18 , reg 20
+00120014 00000200
+;; page 18 , reg 27
+0012001b 00002000
+;;
+;;
+ffffffff

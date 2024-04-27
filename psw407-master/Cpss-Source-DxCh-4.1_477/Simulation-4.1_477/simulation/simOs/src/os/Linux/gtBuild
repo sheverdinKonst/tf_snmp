@@ -1,0 +1,21 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST = 
+
+ifneq (EXISTS,$(RTOS_ON_SIM))
+	C_EXCLUDE_FILE_LIST = simOsLinuxIniFileEmu.c
+else
+	C_EXCLUDE_FILE_LIST = simOsLinuxIniFile.c
+endif
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

@@ -1,0 +1,28 @@
+;;;;;;Addr=0x  Val=0x Repeat=0d Skip=0x
+;;;;
+;;;; update the device type -- to xCat
+;;;;    revision 3 for "xCat-C0" , but see also the TTI metal fix register bit 31
+;;;; DDB1 - FE device
+;;0000004c 000DDB13
+;;;; DDB0 - GE device
+0000004c 000DDB03
+;;
+;; TTI unit
+;;
+;; TTI Metal Fix Register
+;; bit 31 is the indication for "xCat-C0"
+0c0002b0    8000FFFF
+;;TT Ingress TPID Select%n
+0c000524    FFFFFFFF    32  0x4
+;;
+;; HA unit
+;;
+;; TS TP-ID Configuration Register<%n>
+0f000700    81008100    4   0x4
+;; Passenger TPID0_TPID1<%n>
+0f000750    81008100    4   0x4
+;; FROM_CPU constants to fanout devices
+0f000780    00000002
+;;;;
+ffffffff
+

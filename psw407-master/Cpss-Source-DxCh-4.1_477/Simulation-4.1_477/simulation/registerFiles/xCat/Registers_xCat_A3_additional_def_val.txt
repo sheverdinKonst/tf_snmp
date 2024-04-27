@@ -1,0 +1,23 @@
+;;;;;;Addr=0x  Val=0x Repeat=0d Skip=0x
+;;;;
+;;;; update the device type -- to xCat
+;;;; DDB1 - FE device
+;;0000004c 000DDB13
+;;;; DDB0 - GE device
+0000004c 000DDB03
+;; Metal Fix Bit[2] - Rev ID for xCat Plus
+00000054 00000004
+;; XG Ports Metal Fix Bits[15-1] - Metal Fix
+08806240 0000ff00 4                400
+;; BCN Control  Bit[1] - BCN Aware Packet Type, Bit[2] - En UC BCN Aware
+0a400000 00000006
+;; BCN Global Pause Thresholds Bits[12-0] - Global XOFF Threshold, Bits[25-13] - Global XON Threshold
+0a400014 00c00f00
+;;;;
+;;;;
+;;;;;;pci registers
+;;;;
+;;;; 0xDDB1 --> 98DX2122 (24+4)
+;;;;
+ffffffff
+

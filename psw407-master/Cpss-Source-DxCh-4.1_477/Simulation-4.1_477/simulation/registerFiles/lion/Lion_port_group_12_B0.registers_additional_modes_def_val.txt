@@ -1,0 +1,71 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; XG XPCS Lane Status Sync OK
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Port 0 is configured to XAUI interface
+;; 6 lanes of port 0
+0880025C 00000010       6       0x44
+;;
+;; Ports 2-3 and 5-11 are configured to RXAUI interface
+;;
+;; 6 lanes of port 2
+08800A5C 00000010       6       0x44
+;; 6 lanes of port 3
+08800E5C 00000010       6       0x44
+;; 6 lanes of port 5
+0880165C 00000010       6       0x44
+;; 6 lanes of port 6
+08801A5C 00000010       6       0x44
+;; 6 lanes of port 7
+08801E5C 00000010       6       0x44
+;; 6 lanes of port 8
+0880225C 00000010       6       0x44
+;; 6 lanes of port 9
+0880265C 00000010       6       0x44
+;; 6 lanes of port 10
+08802A5C 00000010       6       0x44
+;; 6 lanes of port 11
+08802E5C 00000010       6       0x44
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Ports XG XPCS Global Status Sync OK
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Ports 0 is configured to XAUI interfaces
+08800210 00000001
+;;
+;; Ports 2-3 and 5-11 are configured to RXAUI interfaces
+08800A10 00000001       2       0x400
+08801610 00000001       7       0x400
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Port Status Register0 Sync OK
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Port 4 is configured to SGMII interface
+0A801010 00004000
+;;
+ffffffff
+;;
+;;
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; XLG interface mode and 40G data speed may be defined
+;; on port 10 only and use ports 8,9,10 and 11 !!!
+;; The following configuration is optional and could be
+;; used in Simulation.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; XG XPCS Lane Status Sync OK
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 6 lanes of port 10
+;;08802A5C 00000010       6       0x44
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; GearBox Status - GearBox0/1/2/3 Locked
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;088033d0 00000F00
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; PCS40G Common Status - PCS is alligned and all lanes are locked
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;08803230 00000001
+
+

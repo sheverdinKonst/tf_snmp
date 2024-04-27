@@ -1,0 +1,19 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#C_EXCLUDE_FILE_LIST =
+
+ifneq (EXISTS, $(ASIC_SIMULATION))
+  #not allow to compile the simulation dir
+  SUBDIRS      = NONE
+endif
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

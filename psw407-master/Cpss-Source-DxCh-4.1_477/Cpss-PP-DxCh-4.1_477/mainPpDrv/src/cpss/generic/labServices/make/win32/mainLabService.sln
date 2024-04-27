@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mainLabService", "mainLabService.vcxproj", "{BF5E8D1D-57C5-8CDF-88BC-07A4818083BF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mainOs", "..\..\..\labServices-Dev\mainOs\make\win32\mainOs.vcxproj", "{234BFFA2-5E7A-20EA-7E18-818071D0F8DA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestLabServices", "..\..\..\labServices-Dev\TestLabServices\TestLabServices.vcxproj", "{99E0659F-7C59-FBFF-6E72-4D207487B84D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BF5E8D1D-57C5-8CDF-88BC-07A4818083BF} = {BF5E8D1D-57C5-8CDF-88BC-07A4818083BF}
+		{234BFFA2-5E7A-20EA-7E18-818071D0F8DA} = {234BFFA2-5E7A-20EA-7E18-818071D0F8DA}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SourceCodeControl) = preSolution
+		SccNumberOfProjects = 2
+		SccProjectUniqueName0 = mainLabService.vcxproj
+		SccProjectName0 = \u0022$/SW/LabSystem/mainLabServices/make/win32\u0022,\u0020BHRJAAAA
+		SccLocalPath0 = .
+		SccProvider0 = MSSCCI:Microsoft\u0020Visual\u0020SourceSafe
+		SccProjectUniqueName1 = ..\\..\\..\\labServices-Dev\\mainOs\\make\\win32\\mainOs.vcxproj
+		SccProjectName1 = \u0022$/SW/LabSystem/mainOs\u0022,\u0020BXQJAAAA
+		SccLocalPath1 = ..\\..\\..\\labServices-Dev\\mainOs
+		SccProvider1 = MSSCCI:Microsoft\u0020Visual\u0020SourceSafe
+		SccProjectFilePathRelativizedFromConnection1 = make\\win32\\
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+		Template|Win32 = Template|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BF5E8D1D-57C5-8CDF-88BC-07A4818083BF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BF5E8D1D-57C5-8CDF-88BC-07A4818083BF}.Debug|Win32.Build.0 = Debug|Win32
+		{BF5E8D1D-57C5-8CDF-88BC-07A4818083BF}.Release|Win32.ActiveCfg = Release|Win32
+		{BF5E8D1D-57C5-8CDF-88BC-07A4818083BF}.Release|Win32.Build.0 = Release|Win32
+		{BF5E8D1D-57C5-8CDF-88BC-07A4818083BF}.Template|Win32.ActiveCfg = Template|Win32
+		{BF5E8D1D-57C5-8CDF-88BC-07A4818083BF}.Template|Win32.Build.0 = Template|Win32
+		{234BFFA2-5E7A-20EA-7E18-818071D0F8DA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{234BFFA2-5E7A-20EA-7E18-818071D0F8DA}.Debug|Win32.Build.0 = Debug|Win32
+		{234BFFA2-5E7A-20EA-7E18-818071D0F8DA}.Release|Win32.ActiveCfg = Release|Win32
+		{234BFFA2-5E7A-20EA-7E18-818071D0F8DA}.Release|Win32.Build.0 = Release|Win32
+		{234BFFA2-5E7A-20EA-7E18-818071D0F8DA}.Template|Win32.ActiveCfg = Template|Win32
+		{234BFFA2-5E7A-20EA-7E18-818071D0F8DA}.Template|Win32.Build.0 = Template|Win32
+		{99E0659F-7C59-FBFF-6E72-4D207487B84D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{99E0659F-7C59-FBFF-6E72-4D207487B84D}.Debug|Win32.Build.0 = Debug|Win32
+		{99E0659F-7C59-FBFF-6E72-4D207487B84D}.Release|Win32.ActiveCfg = Release|Win32
+		{99E0659F-7C59-FBFF-6E72-4D207487B84D}.Release|Win32.Build.0 = Release|Win32
+		{99E0659F-7C59-FBFF-6E72-4D207487B84D}.Template|Win32.ActiveCfg = Release|Win32
+		{99E0659F-7C59-FBFF-6E72-4D207487B84D}.Template|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
